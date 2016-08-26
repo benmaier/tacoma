@@ -18,10 +18,16 @@ class get_pybind_include(object):
 ext_modules = [
     Extension(
         'EpiFlockwork',
-        ['EpiFlockwork/EpiFlockwork.cpp'],
+        [ 
+            'EpiFlockwork/Utilities.cpp', 
+            'EpiFlockwork/Events.cpp', 
+            'EpiFlockwork/SIS.cpp', 
+            'EpiFlockwork/EpiFlockwork.cpp', 
+        ],
         include_dirs=[
             get_pybind_include(),
-            get_pybind_include(user=True)
+            get_pybind_include(user=True),
+            "./EpiFlockwork/"
         ],
         language='c++',
     ),
@@ -70,6 +76,7 @@ class BuildExt(build_ext):
             opts.append(cpp_flag(self.compiler))
             if has_flag(self.compiler, '-fvisibility=hidden'):
                 opts.append('-fvisibility=hidden')
+            opts.append('-lm')
         for ext in self.extensions:
             ext.extra_compile_args = opts
         build_ext.build_extensions(self)

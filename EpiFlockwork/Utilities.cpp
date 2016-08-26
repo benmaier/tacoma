@@ -65,8 +65,7 @@ size_t arg_choose_from_vector(
 
     if (N==0)
     {
-        cout << "list is empty" << endl;
-        return -1;
+        throw length_error( "Rate list is empty." );
     }
 
     double sum_event = 0.0;

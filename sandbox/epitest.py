@@ -8,9 +8,11 @@ from numpy import *
 
 
 N = 1000
-Q = 0.95
+Q = 0.9
 k0 = min([N-1,1./(1.-Q)])
 
+
+#=========== create and equilibrate =============
 G = nx.fast_gnp_random_graph(N,p=k0/N)
 edge_list = EqFlockwork.equilibrate(G.edges(),N,Q)
 #edge_list = EqFlockwork.equilibrate([],N,Q)
@@ -41,6 +43,9 @@ k,hist = F.deg_dist()
 ax.plot(k,hist)
 ax.set_xscale("log")
 ax.set_yscale("log")
+
+
+
 
 pl.show()
 
