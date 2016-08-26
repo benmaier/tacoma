@@ -380,11 +380,18 @@ tuple <
     default_random_engine generator(seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
-    t_max = 1000;
+    //init result vectors 
+    vector < pair <double,size_t> > I_of_t;
+    vector < pair <double,size_t> > SI_of_t;
+    vector < pair <double,double> > R0_of_t;
+
+    size_t t_max = 1000;
     //equilibrate
     for(size_t t=0; t<t_max; t++)
     {
         rewire(G,Q,generator,uni_distribution,k,SI_E,node_status);
+        infect(G,generator,uni_distribution,SI_E,node_status,infected);
+        SIS_recover(G,generator,uni_distribution,SI_E,node_status,infected);
     }
 
     //convert back to edge list
@@ -406,7 +413,7 @@ tuple <
         delete G[node];
     }
 
-    return new_E;
+    return make_tuple(I_of_t, SI_of_t, R0_of_t, new_E);
 }
 
 
