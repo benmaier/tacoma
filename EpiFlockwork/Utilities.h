@@ -22,7 +22,10 @@
  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
  * IN THE SOFTWARE.
  */
+#ifndef __EPIFLUTILS__
+#define __EPIFLUTILS__
 
+#include <iostream>
 #include <algorithm>
 #include <stdexcept>
 #include <vector>
@@ -34,29 +37,24 @@
 #include <random>
 #include <ctime>
 #include <tuple>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include "SIS.h"
 
 using namespace std;
-namespace py = pybind11;
 
-PYBIND11_PLUGIN(EpiFlockwork) {
-    py::module m("EpiFlockwork", "Module to equilibrate a flockwork in a fast manner");
+void choose (const size_t N, size_t &first, size_t &second, const double r1, const double r2);
 
-    m.def("SIS", &SIS, "Simulate an SIS process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
-            py::arg("E"),
-            py::arg("N"),
-            py::arg("Q"),
-            py::arg("t_run_total"),
-            py::arg("infection_rate"),
-            py::arg("recovery_rate"),
-            py::arg("rewiring_rate") = 1.,
-            py::arg("number_of_vaccinated") = 0,
-            py::arg("number_of_infected") = 1,
-            py::arg("seed") = 0
-            );
+pair <size_t,size_t> get_sorted_pair(size_t i, size_t j);
 
-    return m.ptr();
+size_t arg_choose_from_vector(
+        vector < double > const & weights, 
+        default_random_engine & generator, 
+        uniform_real_distribution<double> & distribution
+      );
 
-}
+void get_gillespie_tau_and_event( 
+                vector < double > const & rates,
+                double & tau,
+                size_t & event,
+                default_random_engine & generator, 
+                uniform_real_distribution<double> & distribution
+             );
+#endif

@@ -23,6 +23,12 @@
  * IN THE SOFTWARE.
  */
 
+#ifndef __FLSIS__
+#define __FLSIS__
+
+#include "Events.h"
+#include "Utilities.h"
+#include <iostream>
 #include <algorithm>
 #include <stdexcept>
 #include <vector>
@@ -34,29 +40,26 @@
 #include <random>
 #include <ctime>
 #include <tuple>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include "SIS.h"
 
 using namespace std;
-namespace py = pybind11;
 
-PYBIND11_PLUGIN(EpiFlockwork) {
-    py::module m("EpiFlockwork", "Module to equilibrate a flockwork in a fast manner");
+tuple < 
+        vector < pair < double, size_t > >, 
+        vector < pair < double, size_t > >, 
+        vector < pair < double, double > >,
+        vector < vector < size_t > * >
+      >
+     SIS(
+                 vector < tuple < size_t, size_t > > E, //edgelist
+                 const size_t N,       //number of nodes
+                 const double Q,       //probability to connect with neighbors of neighbor
+                 const size_t t_run_total,
+                 const double infection_rate,
+                 const double recovery_rate,
+                 const double rewiring_rate,
+                 const size_t number_of_vaccinated,
+                 const size_t number_of_infected,
+                 const size_t seed
+        );
 
-    m.def("SIS", &SIS, "Simulate an SIS process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
-            py::arg("E"),
-            py::arg("N"),
-            py::arg("Q"),
-            py::arg("t_run_total"),
-            py::arg("infection_rate"),
-            py::arg("recovery_rate"),
-            py::arg("rewiring_rate") = 1.,
-            py::arg("number_of_vaccinated") = 0,
-            py::arg("number_of_infected") = 1,
-            py::arg("seed") = 0
-            );
-
-    return m.ptr();
-
-}
+#endif
