@@ -1,0 +1,12 @@
+*.so*
+*.o*
+.DS_Store
+
+*_data
+*_data_*
+a.out
+
+/*.egg-info/
+/build/
+/tmp/
+/dist/
