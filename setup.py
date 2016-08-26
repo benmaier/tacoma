@@ -81,7 +81,7 @@ setup(
     author_email='bfmaier@physik.hu-berlin.de',
     url='https://github.com/benmaier/EpiFlockwork',
     license='BSD',
-    description='Equilibrates a network to the flockwork structure in a fast manner.',
+    description='Runs epidemic simulations on flockworks in a fast manner.',
     long_description='',
     ext_modules=ext_modules,
     install_requires=['pybind11'],

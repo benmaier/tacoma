@@ -35,11 +35,8 @@
 #include <random>
 #include <ctime>
 #include <tuple>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 
 using namespace std;
-namespace py = pybind11;
 
 const size_t S = 0;
 const size_t I = 1;
@@ -383,6 +380,7 @@ tuple <
     vector < pair <double,size_t> > SI_of_t;
     vector < pair <double,double> > R0_of_t;
 
+
     size_t t_max = t_run_total;
     //equilibrate
     for(size_t t=0; t<t_max; t++)
@@ -427,32 +425,12 @@ void choose (const size_t N, size_t &first, size_t &second, const double r1, con
      second++;
 }
 
-PYBIND11_PLUGIN(EpiFlockwork) {
-    py::module m("EpiFlockwork", "Module to equilibrate a flockwork in a fast manner");
-
-    m.def("SIS", &SIS, "Simulate an SIS process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
-            py::arg("E"),
-            py::arg("N"),
-            py::arg("Q"),
-            py::arg("t_run_total"),
-            py::arg("infection_rate"),
-            py::arg("recovery_rate"),
-            py::arg("rewiring_rate") = 1.,
-            py::arg("number_of_vaccinated") = 0,
-            py::arg("number_of_infected") = 1,
-            py::arg("seed") = 0
-            );
-
-    return m.ptr();
-
-}
-
 int main()
 {
     size_t N = 500;
     vector < tuple < size_t, size_t  > > E;
     double Q = 0.1;
-    size_t t_run_total = 10;
+    size_t t_run_total = 100000;
     double infection_rate = 1.;
     double recovery_rate = 0.01;
     double rewiring_rate = 1.;
