@@ -47,7 +47,7 @@ tuple <
         vector < pair < double, size_t > >, 
         vector < pair < double, size_t > >, 
         vector < pair < double, double > >,
-        vector < vector < size_t > * >
+        set < pair < size_t, size_t >  >
       >
      SIS(
                  vector < tuple < size_t, size_t > > E, //edgelist

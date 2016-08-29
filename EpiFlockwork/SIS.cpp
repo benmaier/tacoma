@@ -53,7 +53,7 @@ tuple <
         vector < pair < double, size_t > >, 
         vector < pair < double, size_t > >, 
         vector < pair < double, double > >,
-        vector < vector < size_t > * >
+        set < pair < size_t, size_t >  >
       >
      SIS(
                  vector < tuple < size_t, size_t > > E, //edgelist
@@ -193,18 +193,15 @@ tuple <
 
 
     //convert back to edge list
-    vector < vector < size_t > * > new_E;
+    set < pair < size_t, size_t > > new_E;    
 
     //loop through graph
     for(size_t node=0; node<N; node++)
     {
+
         //loop through nodes' neighbors and add edge
         for(auto const& neigh: *G[node])
-        {
-            new_E.push_back(new vector < size_t >(2));
-            new_E.back()->at(0) = node;
-            new_E.back()->at(1) = neigh;
-        }
+            new_E.insert( get_sorted_pair(node,neigh)  );
 
         //delete created set
         delete G[node];
