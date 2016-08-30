@@ -5,6 +5,7 @@
 *_data
 *_data_*
 a.out
+*.npy
 
 /*.egg-info/
 /build/
