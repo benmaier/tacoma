@@ -22,9 +22,12 @@
  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
  * IN THE SOFTWARE.
  */
-#ifndef __EPIFLUTILS__
-#define __EPIFLUTILS__
 
+#ifndef __FLSIR__
+#define __FLSIR__
+
+#include "Events.h"
+#include "Utilities.h"
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
@@ -36,35 +39,29 @@
 #include <numeric>
 #include <random>
 #include <ctime>
-#include <cstdlib>
 #include <tuple>
 
 using namespace std;
 
-void choose (const size_t N, size_t &first, size_t &second, const double r1, const double r2);
-
-pair <size_t,size_t> get_sorted_pair(size_t i, size_t j);
-
-size_t arg_choose_from_vector(
-        vector < double > const & weights, 
-        default_random_engine & generator, 
-        uniform_real_distribution<double> & distribution
-      );
-
-void get_gillespie_tau_and_event( 
-                vector < double > const & rates,
-                double & tau,
-                size_t & event,
-                default_random_engine & generator, 
-                uniform_real_distribution<double> & distribution
-             );
-
-vector<size_t>::iterator choose_random_unique(
-        vector<size_t>::iterator begin, 
-        vector<size_t>::iterator end, 
-        size_t num_random,
-        default_random_engine & generator,
-        uniform_real_distribution<double> & distribution
-        ); 
+tuple < 
+        vector < pair < double, size_t > >, 
+        vector < pair < double, size_t > >, 
+        vector < pair < double, size_t > >, 
+        vector < pair < double, double > >,
+        set < pair < size_t, size_t >  >
+      >
+     SIR(
+                 vector < tuple < size_t, size_t > > E, //edgelist
+                 const size_t N,       //number of nodes
+                 const double Q,       //probability to connect with neighbors of neighbor
+                 const double infection_rate,
+                 const double recovery_rate,
+                 const double rewiring_rate,
+                 const size_t t_run_total,
+                 const size_t number_of_vaccinated,
+                 const size_t number_of_infected,
+                 const bool   use_random_rewiring,
+                 const size_t seed
+        );
 
 #endif

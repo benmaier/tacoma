@@ -59,6 +59,7 @@ tuple <
                  const double rewiring_rate,
                  const size_t number_of_vaccinated,
                  const size_t number_of_infected,
+                 const bool   use_random_rewiring,
                  const size_t seed
         );
 

@@ -51,6 +51,50 @@ void choose (const size_t N, size_t &first, size_t &second, const double r1, con
      second++;
 }
 
+//This function is based on http://ideone.com/3A3cv
+//or http://stackoverflow.com/questions/9345087/choose-m-elements-randomly-from-a-vector-containing-n-elements
+
+/*
+template<class bidiiter> 
+bidiiter choose_random_unique(
+                 bidiiter begin, 
+                 bidiiter end, 
+                 size_t num_random, 
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution
+               )
+{
+    size_t left = distance(begin, end);
+    while (num_random--) {
+        bidiiter r = begin;
+        advance(r, distribution(generator)*left);
+        swap(*begin, *r);
+        ++begin;
+        --left;
+    }
+    return begin;
+}
+*/
+
+vector<size_t>::iterator choose_random_unique(
+        vector<size_t>::iterator begin, 
+        vector<size_t>::iterator end, 
+        size_t num_random,
+        default_random_engine & generator,
+        uniform_real_distribution<double> & distribution
+    ) 
+{
+    size_t left = distance(begin, end);
+    while (num_random--) {
+        vector<size_t>::iterator r = begin;
+        advance(r, distribution(generator) * left);
+        swap(*begin, *r);
+        ++begin;
+        --left;
+    }
+    return begin;
+}
+
 size_t arg_choose_from_vector(
         vector < double > const & weights, 
         default_random_engine & generator, 

@@ -25,7 +25,7 @@
 
 #include "Events.h"
 #include "Utilities.h"
-#include "SIS.h"
+#include "SIR.h"
 
 #include <iostream>
 #include <algorithm>
@@ -52,17 +52,18 @@ const size_t R = 2;
 tuple < 
         vector < pair < double, size_t > >, 
         vector < pair < double, size_t > >, 
+        vector < pair < double, size_t > >, 
         vector < pair < double, double > >,
         set < pair < size_t, size_t >  >
       >
-     SIS(
+     SIR(
                  vector < tuple < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
                  const double Q,       //probability to connect with neighbors of neighbor
-                 const size_t t_run_total,
                  const double infection_rate,
                  const double recovery_rate,
                  const double rewiring_rate,
+                 const size_t t_run_total,
                  const size_t number_of_vaccinated,
                  const size_t number_of_infected,
                  const bool   use_random_rewiring,
@@ -149,10 +150,12 @@ tuple <
 
     //init result vectors 
     vector < pair <double,size_t> > I_of_t;
+    vector < pair <double,size_t> > R_of_t;
     vector < pair <double,size_t> > SI_of_t;
     vector < pair <double,double> > R0_of_t;
 
     I_of_t.push_back(make_pair(0.,infected.size()));
+    R_of_t.push_back(make_pair(0.,number_of_vaccinated));
     SI_of_t.push_back(make_pair(0.,SI_E.size()));
     R0_of_t.push_back(make_pair(0.,k*infection_rate/recovery_rate));
 
@@ -160,7 +163,7 @@ tuple <
     //simulate
     double t = 0;
     size_t last_event = -1;
-    while ( (t < t_run_total) && (infected.size()>0) )
+    while ( (infected.size()>0) || ( (t_run_total>0) && (t<t_run_total) ))
     {
         //calculate rates
         vector <double> rates;
@@ -185,6 +188,7 @@ tuple <
                 rewire(G,Q,generator,uni_distribution,k,SI_E,node_status);
                 R0_of_t.push_back(make_pair(t,k*infection_rate/recovery_rate));
             }
+
         } else if (event == 1)
         {
             infect(G,generator,uni_distribution,SI_E,node_status,infected);
@@ -192,8 +196,9 @@ tuple <
             SI_of_t.push_back(make_pair(t,SI_E.size()));
         } else if (event == 2)
         {
-            SIS_recover(G,generator,uni_distribution,SI_E,node_status,infected);
+            SIR_recover(G,generator,uni_distribution,SI_E,node_status,infected);
             I_of_t.push_back(make_pair(t,infected.size()));
+            R_of_t.push_back(make_pair(t,R_of_t.back().second+1));
             SI_of_t.push_back(make_pair(t,SI_E.size()));
         }
     }
@@ -202,11 +207,13 @@ tuple <
     {
         I_of_t.push_back( make_pair( t, infected.size() ) );
         SI_of_t.push_back( make_pair( t, SI_E.size() ) );
-    } else {
+        R_of_t.push_back(make_pair(t,R_of_t.back().second));
+        if (use_random_rewiring)
+            R0_of_t.push_back(make_pair(t,k*infection_rate/recovery_rate));
+    } else { 
         R0_of_t.push_back(make_pair(t,k*infection_rate/recovery_rate));
     }
-
-
+   
     //convert back to edge list
     set < pair < size_t, size_t > > new_E;    
 
@@ -222,6 +229,6 @@ tuple <
         delete G[node];
     }
 
-    return make_tuple(I_of_t, SI_of_t, R0_of_t, new_E);
+    return make_tuple(I_of_t, R_of_t, SI_of_t, R0_of_t, new_E);
 }
 
