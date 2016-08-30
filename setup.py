@@ -22,6 +22,7 @@ ext_modules = [
             'EpiFlockwork/Utilities.cpp', 
             'EpiFlockwork/Events.cpp', 
             'EpiFlockwork/SIS.cpp', 
+            'EpiFlockwork/SIR.cpp', 
             'EpiFlockwork/EpiFlockwork.cpp', 
         ],
         include_dirs=[
@@ -83,7 +84,7 @@ class BuildExt(build_ext):
 
 setup(
     name='EpiFlockwork',
-    version='0.0.1',
+    version='0.0.2',
     author='Benjamin F. Maier',
     author_email='bfmaier@physik.hu-berlin.de',
     url='https://github.com/benmaier/EpiFlockwork',

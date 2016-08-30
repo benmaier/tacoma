@@ -45,13 +45,11 @@ using namespace std;
 const size_t S = 0;
 const size_t I = 1;
 const size_t R = 2;
-
-
         
 //returns vector containing vaccinated 
 tuple < 
         vector < pair < double, size_t > >, 
-        vector < pair < double, size_t > >, 
+        //vector < pair < double, size_t > >, 
         vector < pair < double, size_t > >, 
         vector < pair < double, double > >,
         set < pair < size_t, size_t >  >
@@ -138,7 +136,6 @@ tuple <
                 SI_E.insert( current_pair );
             }
         }
-
     }
 
     //calculate mean degree
@@ -229,6 +226,7 @@ tuple <
         delete G[node];
     }
 
-    return make_tuple(I_of_t, R_of_t, SI_of_t, R0_of_t, new_E);
+    //return make_tuple(I_of_t, R_of_t, SI_of_t, R0_of_t, new_E);
+    return make_tuple(I_of_t, SI_of_t, R0_of_t, new_E);
 }
 

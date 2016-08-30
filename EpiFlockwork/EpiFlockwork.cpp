@@ -36,15 +36,15 @@
 #include <tuple>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "SIS.h"
 #include "SIR.h"
+#include "SIS.h"
 
 using namespace std;
 namespace py = pybind11;
 
 PYBIND11_PLUGIN(EpiFlockwork) {
     py::module m("EpiFlockwork", "Module to equilibrate a flockwork in a fast manner");
-
+    
     m.def("SIS", &SIS, "Simulate an SIS process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
             py::arg("E"),
             py::arg("N"),
