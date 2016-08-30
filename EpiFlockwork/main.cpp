@@ -1,5 +1,6 @@
 #include "SIS.h"
 #include "SIR.h"
+#include "ResultClasses.h"
 
 using namespace std;
 
@@ -37,14 +38,7 @@ int main()
         }
 
 
-
-    tuple < 
-            vector < pair < double, size_t > >, 
-            vector < pair < double, size_t > >, 
-            vector < pair < double, size_t > >, 
-            vector < pair < double, double > >,
-            set < pair < size_t, size_t > >
-          > result;
+    SIR_result result;
 
     result = SIR(E,N,Q,
                  infection_rate,
@@ -58,15 +52,12 @@ int main()
              );
 
 
-    vector < pair < double, size_t > > I_of_t = get<0>(result);
-    vector < pair < double, size_t > > R_of_t = get<1>(result);
-
-    for(auto p: I_of_t)
+    for(auto p: result.I_of_t)
     {
         cout << p.first << " " << p.second << endl;
     }
 
-    for(auto p: R_of_t)
+    for(auto p: result.R_of_t)
     {
         cout << p.first << " " << p.second << endl;
     }

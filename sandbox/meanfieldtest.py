@@ -40,7 +40,10 @@ for iR0, R0 in enumerate(R0s):
         print R0, kw['recovery_rate'], N-1
         kw['infection_rate'] = R0 * kw['recovery_rate'] / (N-1.)
         kw["seed"] = seed
-        I, SI, R0_, new_edge_list = EpiFlockwork.SIS(**kw)
+
+        result = EpiFlockwork.SIS(**kw)
+        I = result.I_of_t
+
         print R0, I[-1]
         I = array(I)
         seed += 1

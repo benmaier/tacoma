@@ -25,6 +25,7 @@
 
 #include "Events.h"
 #include "Utilities.h"
+#include "ResultClasses.h"
 #include "SIS.h"
 
 #include <iostream>
@@ -49,12 +50,7 @@ const size_t R = 2;
 
         
 //returns vector containing vaccinated 
-tuple < 
-        vector < pair < double, size_t > >, 
-        vector < pair < double, size_t > >, 
-        vector < pair < double, double > >,
-        set < pair < size_t, size_t >  >
-      >
+SIS_result
      SIS(
                  vector < tuple < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
@@ -222,6 +218,13 @@ tuple <
         delete G[node];
     }
 
-    return make_tuple(I_of_t, SI_of_t, R0_of_t, new_E);
+    SIS_result result;
+
+    result.I_of_t = I_of_t;
+    result.SI_of_t = SI_of_t;
+    result.R0_of_t = R0_of_t;
+    result.edge_list = new_E;
+
+    return result;
 }
 

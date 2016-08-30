@@ -28,6 +28,7 @@
 
 #include "Events.h"
 #include "Utilities.h"
+#include "ResultClasses.h"
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
@@ -43,13 +44,7 @@
 
 using namespace std;
 
-tuple < 
-        vector < pair < double, size_t > >, 
-        vector < pair < double, size_t > >, 
-        vector < pair < double, size_t > >, 
-        vector < pair < double, double > >,
-        set < pair < size_t, size_t >  >
-      >
+SIR_result
      SIR(
                  vector < tuple < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes

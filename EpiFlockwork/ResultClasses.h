@@ -43,33 +43,19 @@
 
 struct SIR_result 
 {
-    SIR_result(
-                const vector < pair < double, size_t > > & I_of_t,  
-                const vector < pair < double, size_t > > & R_of_t, 
-                const vector < pair < double, size_t > > & SI_of_t, 
-                const vector < pair < double, double > > & R0_of_t,
-                const set < pair < size_t, size_t >  > & edge_list
-            )
-    {
-       I_of_t(I_of_t); 
-       R_of_t(R_of_t); 
-       SI_of_t(SI_of_t); 
-       R0_of_t(R0_of_t); 
-       edge_list(edge_list);
-    }
-
-    const vector < pair < double, size_t > > &I_of_t const { return I_of_t; }
-    const vector < pair < double, size_t > > &R_of_t const { return R_of_t; }
-    const vector < pair < double, size_t > > &SI_of_t const { return SI_of_t; }
-    const vector < pair < double, double > > &R0_of_t const { return R0_of_t; }
-    const set < pair < size_t, size_t >  > &edge_list() const { return edge_list; }
-
     vector < pair < double, size_t > > I_of_t; 
     vector < pair < double, size_t > > R_of_t; 
     vector < pair < double, size_t > > SI_of_t; 
     vector < pair < double, double > > R0_of_t;
-    set < pair < size_t, size_t >  > edge_list;
-    
-}
+    set < pair < size_t, size_t > > edge_list;
+};
+
+struct SIS_result 
+{
+    vector < pair < double, size_t > > I_of_t; 
+    vector < pair < double, size_t > > SI_of_t; 
+    vector < pair < double, double > > R0_of_t;
+    set < pair < size_t, size_t > > edge_list;
+};
 
 #endif

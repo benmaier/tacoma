@@ -38,6 +38,7 @@
 #include <pybind11/stl.h>
 #include "SIR.h"
 #include "SIS.h"
+#include "ResultClasses.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -72,6 +73,22 @@ PYBIND11_PLUGIN(EpiFlockwork) {
             py::arg("use_random_rewiring") = false,
             py::arg("seed") = 0
             );
+
+    py::class_<SIR_result>(m,"SIR_result")
+        .def(py::init<>())
+        .def_readwrite("I_of_t", &SIR_result::I_of_t)
+        .def_readwrite("R_of_t", &SIR_result::R_of_t)
+        .def_readwrite("SI_of_t", &SIR_result::SI_of_t)
+        .def_readwrite("R0_of_t", &SIR_result::R0_of_t)
+        .def_readwrite("edge_list", &SIR_result::edge_list);
+
+    py::class_<SIS_result>(m,"SIS_result")
+        .def(py::init<>())
+        .def_readwrite("I_of_t", &SIS_result::I_of_t)
+        .def_readwrite("SI_of_t", &SIS_result::SI_of_t)
+        .def_readwrite("R0_of_t", &SIS_result::R0_of_t)
+        .def_readwrite("edge_list", &SIS_result::edge_list);
+
 
     return m.ptr();
 
