@@ -27,7 +27,8 @@
 
 const size_t S = 0;
 const size_t I = 1;
-const size_t R = 1;
+const size_t R = 2;
+const size_t V = 3;
 
 using namespace std;
 
@@ -60,6 +61,8 @@ void infect(
     {
         new_infected = i;
     } else {
+		//cout << "node status: " << node_status[i] << " " << node_status[j] <<endl;
+		//cout << "link: " << i << " " << j <<endl;
         throw domain_error( "There was a non SI link in the set of SI links. This should not happen." );
     }
 
@@ -80,7 +83,6 @@ void infect(
         else if (node_status[neigh_of_new_I] == S)
             SI_E.insert(current_edge);
     }
-
 }
                 
 void SIS_recover(
@@ -113,7 +115,7 @@ void SIS_recover(
         //if the neighbor is infected, then the edge belongs in SI_E
         if (node_status[neigh_of_new_S] == I)
             SI_E.insert(current_edge);
-        //if the neighbor is susceptible, then it belongs in SI_E now
+        //if the neighbor is susceptible, then it does not belong in SI_E anymore
         else if (node_status[neigh_of_new_S] == S)
             SI_E.erase(current_edge);
     }
@@ -152,7 +154,84 @@ void SIR_recover(
             SI_E.erase(current_edge);
         }
     }
+}
 
+void SIRS_recover(
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 set < pair < size_t, size_t > > & SI_E, //edge list of SI links
+                 vector < size_t > & node_status,
+                 set < size_t > & infected,
+                 set < size_t > & recovered
+           )
+{
+    //get element of infected that recovers
+    double r = distribution(generator);
+    size_t element = infected.size() * r;
+
+    set< size_t >::const_iterator new_recovered_it(infected.begin());
+    advance(new_recovered_it,element);
+
+    size_t new_recovered = *new_recovered_it;
+    //change status of that node
+    node_status[new_recovered] = R;
+    infected.erase(new_recovered);
+    recovered.insert(new_recovered);
+
+    //loop through the neighbors of i
+    for(auto neigh_of_new_R : *G[new_recovered] )
+    {
+        //if the neighbor is susceptible, then it doesnt belong in SI_E anymore
+        //if (new_recovered==752) 
+            //cout << "I->R, status 752 = " << node_status[new_recovered] << "; node_status[659] = "<< node_status[659] << endl;
+        if (node_status[neigh_of_new_R] == S)
+        {
+            //get edge
+            pair <size_t,size_t> current_edge = get_sorted_pair(new_recovered,neigh_of_new_R);
+            SI_E.erase(current_edge);
+        }
+    }
+}
+
+void become_susceptible(
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 set < pair < size_t, size_t > > & SI_E, //edge list of SI links
+                 vector < size_t > & node_status,
+                 set < size_t > & recovered
+           )
+{
+    //get element of infected that recovers
+    double r = distribution(generator);
+    size_t element = recovered.size() * r;
+
+    set< size_t >::const_iterator new_susceptible_it(recovered.begin());
+    advance(new_susceptible_it,element);
+
+    size_t new_susceptible = *new_susceptible_it;
+    //change status of that node
+    node_status[new_susceptible] = S;
+    recovered.erase(new_susceptible);
+
+	//cout << "status neigh of new S" << endl;
+    //loop through the neighbors of i
+    for(auto neigh_of_new_S : *G[new_susceptible] )
+    {
+        //if the neighbor is infected, then the edge belongs in SI_E
+		//cout << node_status[neigh_of_new_S] << endl;
+        //if (new_susceptible==752) 
+        //    cout << "status 752 = " << node_status[new_susceptible] << "; node_status[659] = "<< node_status[659] << endl;
+        if (node_status[neigh_of_new_S] == I)
+        {
+            //get edge
+            pair <size_t,size_t> current_edge = get_sorted_pair(new_susceptible,neigh_of_new_S);
+            SI_E.insert(current_edge);
+			//cout << "new_recovered: " << new_susceptible << " ; infected" << neigh_of_new_S <<endl;
+			//cout << node_status[new_susceptible] << " " << node_status[neigh_of_new_S] << endl;
+        }
+    }
 }
 
 void rewire(

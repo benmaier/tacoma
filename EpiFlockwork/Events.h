@@ -50,7 +50,7 @@ void rewire(
                  double & mean_degree,
                  set < pair < size_t, size_t > > & SI_E, //edge list of SI links
                  const vector < size_t > & node_status
-              );
+           );
 
 void random_rewire(
                  vector < set < size_t > * > & G, //Adjacency matrix
@@ -59,7 +59,7 @@ void random_rewire(
                  set < pair < size_t, size_t > > & SI_E, //edge list of SI links
                  const vector < size_t > & node_status,
                  vector < size_t > & node_ints
-            );
+           );
 
 void infect(
                  vector < set < size_t > * > & G, //Adjacency matrix
@@ -86,6 +86,25 @@ void SIR_recover(
                  set < pair < size_t, size_t > > & SI_E, //edge list of SI links
                  vector < size_t > & node_status,
                  set < size_t > & infected
+           );
+
+void SIRS_recover(
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 set < pair < size_t, size_t > > & SI_E, //edge list of SI links
+                 vector < size_t > & node_status,
+                 set < size_t > & infected,
+                 set < size_t > & recovered
+           );
+
+void become_susceptible (
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 set < pair < size_t, size_t > > & SI_E, //edge list of SI links
+                 vector < size_t > & node_status,
+                 set < size_t > & recovered
            );
 
 #endif
