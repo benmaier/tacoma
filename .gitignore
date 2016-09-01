@@ -6,6 +6,7 @@
 *_data_*
 a.out
 *.npy
+*.mexmaci64
 
 /*.egg-info/
 /build/

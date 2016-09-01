@@ -50,7 +50,7 @@ const size_t R = 2;
 //returns vector containing vaccinated 
 SIR_result
      SIR(
-                 vector < tuple < size_t, size_t > > E, //edgelist
+                 vector < pair < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
                  const double Q,       //probability to connect with neighbors of neighbor
                  const double infection_rate,
@@ -108,8 +108,8 @@ SIR_result
     for(auto edge: E)
     {
         //get nodes belonging to that edge
-        size_t i = get<0>(edge);
-        size_t j = get<1>(edge);
+        size_t i = edge.first;
+        size_t j = edge.second;
 
         //check if j is already a neighbor of i
         const bool already_counted = G[i]->find(j) != G[i]->end();

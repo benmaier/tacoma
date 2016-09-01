@@ -46,7 +46,7 @@ using namespace std;
 
 SIS_result
      SIS(
-                 vector < tuple < size_t, size_t > > E, //edgelist
+                 vector < pair < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
                  const double Q,       //probability to connect with neighbors of neighbor
                  const size_t t_run_total,

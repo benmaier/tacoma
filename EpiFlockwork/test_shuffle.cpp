@@ -9,7 +9,7 @@ int main()
     vector < set < size_t > * > G;
     vector < size_t > node_ints;
     vector < size_t > node_status;
-    set < pair<size_t,size_t> > SI_E;
+    set < tuple<size_t,size_t> > SI_E;
 
     size_t N = 10;
 
