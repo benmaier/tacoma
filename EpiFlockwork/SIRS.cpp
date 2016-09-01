@@ -54,11 +54,11 @@ SIR_result
                  vector < pair < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
                  const double Q,       //probability to connect with neighbors of neighbor
+                 const size_t t_run_total,
                  const double infection_rate,
                  const double recovery_rate,
                  const double susceptible_rate,
                  const double rewiring_rate,
-                 const size_t t_run_total,
                  const size_t number_of_vaccinated,
                  const size_t number_of_infected,
                  const bool   use_random_rewiring,

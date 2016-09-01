@@ -47,11 +47,11 @@ int main()
     SIR_result result;
 
     result = SIRS(E,N,Q,
+                 t_run_total,
                  infection_rate,
                  recovery_rate,
                  susceptible_rate,
                  rewiring_rate,
-                 t_run_total,
                  number_of_vaccinated,
                  number_of_infected,
                  use_random_rewiring,
