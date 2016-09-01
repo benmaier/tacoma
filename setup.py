@@ -23,6 +23,7 @@ ext_modules = [
             'EpiFlockwork/Events.cpp', 
             'EpiFlockwork/SIS.cpp', 
             'EpiFlockwork/SIR.cpp', 
+            'EpiFlockwork/SIRS.cpp', 
             'EpiFlockwork/EpiFlockwork.cpp', 
         ],
         include_dirs=[
@@ -77,7 +78,6 @@ class BuildExt(build_ext):
             opts.append(cpp_flag(self.compiler))
             if has_flag(self.compiler, '-fvisibility=hidden'):
                 opts.append('-fvisibility=hidden')
-            opts.append('-lm')
         for ext in self.extensions:
             ext.extra_compile_args = opts
         build_ext.build_extensions(self)

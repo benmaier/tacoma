@@ -8,7 +8,7 @@ using namespace std;
 int main()
 {
     size_t N = 1000;
-    vector < tuple < size_t, size_t  > > E;
+    vector < pair < size_t, size_t  > > E;
     double Q = 0.9;
     size_t t_run_total = 1000;
     double recovery_rate = 1.0;
@@ -37,9 +37,9 @@ int main()
             if (start_with_ER)
             {
                 if (uni_distribution(generator)<p)
-                    E.push_back( make_tuple(i,j) );
+                    E.push_back( make_pair(i,j) );
             } else {
-                E.push_back( make_tuple(i,j) );
+                E.push_back( make_pair(i,j) );
             }
         }
 
