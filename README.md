@@ -1,6 +1,6 @@
 # EpiFlockworks
 
-For a fast epidemic simulation on flockworks.
+For fast simulations of epidemic spreading on flockworks, random rewiring networks and static networks.
 
 ## Install
 
@@ -8,9 +8,10 @@ For all systems, first clone this repository.
 
 ### Matlab (Mac OSX)
 
-You need to have the current XCode version installed (free in AppStore). Open Matlab and change into the directory of the repository. Type
+You need to have the current XCode version installed (free in AppStore). Open Matlab and change into the directory of the repository. At first, there's two files you need to change.
 
 ```matlab
+>>> cd /path/to/repository
 >>> edit ([matlabroot '/bin/maci64/mexopts/clang++_maci64.xml'])
 >>> edit ([matlabroot '/bin/maci64/mexopts/clang_maci64.xml'])
 ```
