@@ -23,8 +23,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef __FLSIRS__
-#define __FLSIRS__
+#ifndef __FLSIS__
+#define __FLSIS__
 
 #include "Events.h"
 #include "Utilities.h"
@@ -44,19 +44,19 @@
 
 using namespace std;
 
-SIR_result
-     SIRS(
+SIS_result
+     SIS(
                  vector < pair < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
                  const double Q,       //probability to connect with neighbors of neighbor
                  const size_t t_run_total,
                  const double infection_rate,
                  const double recovery_rate,
-                 const double susceptible_rate,
                  const double rewiring_rate,
                  const size_t number_of_vaccinated,
                  const size_t number_of_infected,
                  const bool   use_random_rewiring,
+                 const bool   equilibrate_flockwork,
                  const size_t seed
         );
 

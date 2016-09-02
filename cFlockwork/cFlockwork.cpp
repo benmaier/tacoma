@@ -40,12 +40,13 @@
 #include "SIRS.h"
 #include "SIS.h"
 #include "ResultClasses.h"
+#include "EqFlockwork.h"
 
 using namespace std;
 namespace py = pybind11;
 
-PYBIND11_PLUGIN(EpiFlockwork) {
-    py::module m("EpiFlockwork", "Module to equilibrate a flockwork in a fast manner");
+PYBIND11_PLUGIN(cFlockwork) {
+    py::module m("cFlockwork", "Module to perform fast flockwork simulations");
     
     m.def("SIS", &SIS, "Simulate an SIS process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
             py::arg("E"),
@@ -58,6 +59,7 @@ PYBIND11_PLUGIN(EpiFlockwork) {
             py::arg("number_of_vaccinated") = 0,
             py::arg("number_of_infected") = 1,
             py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
             py::arg("seed") = 0
             );
 
@@ -72,6 +74,7 @@ PYBIND11_PLUGIN(EpiFlockwork) {
             py::arg("number_of_vaccinated") = 0,
             py::arg("number_of_infected") = 1,
             py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
             py::arg("seed") = 0
             );
 
@@ -87,7 +90,24 @@ PYBIND11_PLUGIN(EpiFlockwork) {
             py::arg("number_of_vaccinated") = 0,
             py::arg("number_of_infected") = 1,
             py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
             py::arg("seed") = 0
+            );
+
+    m.def("equilibrate", &equilibrate_edgelist_seed, "Equilibrates a flockwork given an initial state as an edge list. Returns new edge list.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("Q"),
+            py::arg("seed"),
+            py::arg("t_max") = 0
+            );
+
+    m.def("simulate", &simulate_flockwork, "Equilibrates a flockwork given an initial state as an edge list. Returns new edge list.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("Q"),
+            py::arg("seed"),
+            py::arg("num_timesteps")
             );
 
     py::class_<SIR_result>(m,"SIR_result")

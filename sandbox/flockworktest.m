@@ -2,7 +2,7 @@ clear;
 close all;
 
 % set random_seed
-random_seed = 12;
+random_seed = 12634;
 
 % define Flockwork parameters
 edges = [];
@@ -18,11 +18,27 @@ recovery_rate = 1;
 susceptible_rate = 1;
 rewiring_rate = 1;
 number_of_vaccinated = 10;
-number_of_initially_infected = N/2;
+number_of_initially_infected = 10;
 
 infection_rate = R0 * recovery_rate / k;
 
-% =========================== SIS ======================
+%% ========================= Equilibration ======================
+
+num_timesteps = 0; % if this is zero, the function determines this number
+                   % by itself, using N and Q
+edges = FlockworkEq(edges,N,Q,random_seed,num_timesteps);
+random_seed = random_seed + 1;
+
+%% ========================= Simulation ======================
+
+num_timesteps = N; 
+edges = FlockworkEq(edges,N,Q,random_seed,num_timesteps);
+random_seed = random_seed + 1;
+
+%% =========================== SIS ======================
+% start this simulation as a fully disconnected graph and equilibrate
+% within simulation
+equilibrate_flockwork = 1; % true doesn't work
 
 [I,SI,R0,edgelist] = FlockworkSIS(edges,...
                                   N,...
@@ -34,6 +50,7 @@ infection_rate = R0 * recovery_rate / k;
                                   number_of_vaccinated,...
                                   number_of_initially_infected,...
                                   use_random_rewiring,...
+                                  equilibrate_flockwork,...
                                   random_seed...
                                  );
 
@@ -48,10 +65,14 @@ title('SIS')
 legend('S','I')
 xlabel('time t')
 ylabel('population ratios')
+ylim([0,1])
 
 figure;
 
 %% ========================== SIRS ============================
+% start this simulation with the equilibrated graph from above
+equilibrate_flockwork = 0; % false doesn't work
+
 random_seed = random_seed + 1;
 
 [I,R,SI,R0,edgelist] = FlockworkSIRS(edges,...
@@ -65,6 +86,7 @@ random_seed = random_seed + 1;
                                   number_of_vaccinated,...
                                   number_of_initially_infected,...
                                   use_random_rewiring,...
+                                  equilibrate_flockwork,...
                                   random_seed...
                                  );
                              
@@ -80,6 +102,7 @@ title('SIRS')
 legend('R','I')
 xlabel('time t')
 ylabel('population ratios')
+ylim([0,1])
 
 figure;
 
@@ -99,6 +122,7 @@ t_run_total = 0;
                                   number_of_vaccinated,...
                                   number_of_initially_infected,...
                                   use_random_rewiring,...
+                                  equilibrate_flockwork,...
                                   random_seed...
                                  );
                              
@@ -115,3 +139,4 @@ title('SIR')
 legend('R','I')
 xlabel('time t')
 ylabel('population ratios')
+ylim([0,1])

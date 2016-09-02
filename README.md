@@ -23,13 +23,21 @@ Now, run
 
 ```matlab
 >>> setup
->>> epitest
+>>> cd sandbox
+>>> flockworktest
 ```
 
 ### Python
 
-    $ sudo pip ./EpiFlockwork install
+    $ sudo pip install ./EpiFlockwork
 
 ## Example
 
-    $ python sandbox/eq_test.py
+### Python
+
+    $ python sandbox/meanfieldtest.py
+
+### Matlab
+
+    >>> cd sandbox
+    >>> flockworktest

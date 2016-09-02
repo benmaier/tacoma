@@ -13,8 +13,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     size_t N, t_run_total, number_of_vaccinated, number_of_infected, seed;
     double Q, inf_rate, rec_rate, rew_rate;
-    bool use_random_rew;
+    bool use_random_rew, eq_flw;
     
+    if (nrhs!=12)
+    {
+        mexPrintf("Got %d input arguments. ", nrhs);
+        throw length_error("Invalid number of input arguments. Has to be 12.");
+    }
+
+    if (nlhs!=4)
+    {
+        mexPrintf("Got %d output arguments. ", nrhs);
+        throw length_error("Invalid number of output arguments. Has to be 4.");
+    }
+
+
     vector < pair <size_t,size_t > > edgelist = get_edgelist(prhs[0]);
 
     read_single_value(prhs[1],N);
@@ -26,7 +39,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     read_single_value(prhs[7],number_of_vaccinated);
     read_single_value(prhs[8],number_of_infected);
     read_single_value(prhs[9],use_random_rew);
-    read_single_value(prhs[10],seed);
+    read_single_value(prhs[10],eq_flw);
+    read_single_value(prhs[11],seed);
+
+    /*
+    if (eq_flw)
+        mexPrintf("    eq_flw  =  true\n");
+    else
+        mexPrintf("    eq_flw  =  false\n");
+    */
 
     SIS_result result = SIS( edgelist,
                              N,
@@ -38,6 +59,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                              number_of_vaccinated,
                              number_of_infected,
                              use_random_rew,
+                             eq_flw,
                              seed
                            );
 

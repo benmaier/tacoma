@@ -21,6 +21,7 @@ int main()
     double k = 1. / (1.-Q);
     double p = k / (N-1);
     bool use_random_rewiring = false;
+    bool equilibrate_flockwork = true;
 
     double infection_rate = R0 * recovery_rate / k;
 
@@ -55,6 +56,7 @@ int main()
                  number_of_vaccinated,
                  number_of_infected,
                  use_random_rewiring,
+                 equilibrate_flockwork,
                  seed
              );
 

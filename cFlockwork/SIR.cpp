@@ -25,8 +25,9 @@
 
 #include "Events.h"
 #include "Utilities.h"
-#include "SIRS.h"
+#include "SIR.h"
 #include "ResultClasses.h"
+#include "EqFlockwork.h"
 
 #include <iostream>
 #include <algorithm>
@@ -46,22 +47,21 @@ using namespace std;
 const size_t S = 0;
 const size_t I = 1;
 const size_t R = 2;
-const size_t V = 2;
         
 //returns vector containing vaccinated 
 SIR_result
-     SIRS(
+     SIR(
                  vector < pair < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
                  const double Q,       //probability to connect with neighbors of neighbor
-                 const size_t t_run_total,
                  const double infection_rate,
                  const double recovery_rate,
-                 const double susceptible_rate,
                  const double rewiring_rate,
+                 const size_t t_run_total,
                  const size_t number_of_vaccinated,
                  const size_t number_of_infected,
                  const bool   use_random_rewiring,
+                 const bool   equilibrate_flockwork,
                  const size_t seed
         )
 {
@@ -71,13 +71,22 @@ SIR_result
     if (number_of_vaccinated + number_of_infected > N) 
         throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
 
+    //initialize random generators
+    default_random_engine generator(seed);
+    uniform_real_distribution<double> uni_distribution(0.,1.);
+
+    if (equilibrate_flockwork)
+    {
+        size_t eq_time = 0;
+        E = equilibrate_edgelist_generator(E,N,Q,generator,uni_distribution,eq_time);
+    }
+
     //initialize status vector of nodes and vector of infected
     vector < size_t > node_status;
     set < size_t > infected;
-    set < size_t > recovered;
 
     for(size_t node=0; node<number_of_vaccinated; node++)
-        node_status.push_back( V );
+        node_status.push_back( R );
 
     for(size_t node=number_of_vaccinated; node<number_of_vaccinated+number_of_infected; node++)
     {
@@ -139,10 +148,6 @@ SIR_result
     //calculate mean degree
     double k = (2.0 / N) * number_of_edges;
 
-    //initialize random generators
-    default_random_engine generator(seed);
-    uniform_real_distribution<double> uni_distribution(0.,1.);
-
     //init result vectors 
     vector < pair <double,size_t> > I_of_t;
     vector < pair <double,size_t> > R_of_t;
@@ -150,21 +155,25 @@ SIR_result
     vector < pair <double,double> > R0_of_t;
 
     I_of_t.push_back(make_pair(0.,infected.size()));
-    R_of_t.push_back(make_pair(0.,0));
+    R_of_t.push_back(make_pair(0.,number_of_vaccinated));
     SI_of_t.push_back(make_pair(0.,SI_E.size()));
     R0_of_t.push_back(make_pair(0.,k*infection_rate/recovery_rate));
 
+    
     //simulate
     double t = 0;
     size_t last_event = -1;
-    while ( (infected.size()>0) && (t<t_run_total) )
+    while ( (infected.size()>0) && 
+            ( ( (t_run_total>0) && (t<t_run_total) ) ||
+              ( (t_run_total==0) ) 
+            )
+          )
     {
         //calculate rates
         vector <double> rates;
         rates.push_back(N*rewiring_rate);
         rates.push_back(SI_E.size()*infection_rate);
         rates.push_back(infected.size()*recovery_rate);
-        rates.push_back(recovered.size()*susceptible_rate);
 
         double tau;
         size_t event;
@@ -191,14 +200,9 @@ SIR_result
             SI_of_t.push_back(make_pair(t,SI_E.size()));
         } else if (event == 2)
         {
-            SIRS_recover(G,generator,uni_distribution,SI_E,node_status,infected,recovered);
+            SIR_recover(G,generator,uni_distribution,SI_E,node_status,infected);
             I_of_t.push_back(make_pair(t,infected.size()));
-            R_of_t.push_back(make_pair(t,recovered.size()));
-            SI_of_t.push_back(make_pair(t,SI_E.size()));
-        } else if (event == 3)
-        {
-            become_susceptible(G,generator,uni_distribution,SI_E,node_status,recovered);
-            R_of_t.push_back(make_pair(t,recovered.size()));
+            R_of_t.push_back(make_pair(t,R_of_t.back().second+1));
             SI_of_t.push_back(make_pair(t,SI_E.size()));
         }
     }
@@ -207,7 +211,7 @@ SIR_result
     {
         I_of_t.push_back( make_pair( t, infected.size() ) );
         SI_of_t.push_back( make_pair( t, SI_E.size() ) );
-        R_of_t.push_back(make_pair( t, recovered.size() ));
+        R_of_t.push_back(make_pair(t,R_of_t.back().second));
         if (use_random_rewiring)
             R0_of_t.push_back(make_pair(t,k*infection_rate/recovery_rate));
     } else { 

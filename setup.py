@@ -17,19 +17,20 @@ class get_pybind_include(object):
 
 ext_modules = [
     Extension(
-        'EpiFlockwork',
+        'cFlockwork',
         [ 
-            'EpiFlockwork/Utilities.cpp', 
-            'EpiFlockwork/Events.cpp', 
-            'EpiFlockwork/SIS.cpp', 
-            'EpiFlockwork/SIR.cpp', 
-            'EpiFlockwork/SIRS.cpp', 
-            'EpiFlockwork/EpiFlockwork.cpp', 
+            'cFlockwork/Utilities.cpp', 
+            'cFlockwork/Events.cpp', 
+            'cFlockwork/SIS.cpp', 
+            'cFlockwork/SIR.cpp', 
+            'cFlockwork/SIRS.cpp', 
+            'cFlockwork/EqFlockwork.cpp', 
+            'cFlockwork/cFlockwork.cpp', 
         ],
         include_dirs=[
             get_pybind_include(),
             get_pybind_include(user=True),
-            "./EpiFlockwork/"
+            "./cFlockwork/"
         ],
         language='c++',
     ),
@@ -83,13 +84,13 @@ class BuildExt(build_ext):
         build_ext.build_extensions(self)
 
 setup(
-    name='EpiFlockwork',
-    version='0.0.3',
+    name='cFlockwork',
+    version='0.0.4',
     author='Benjamin F. Maier',
     author_email='bfmaier@physik.hu-berlin.de',
-    url='https://github.com/benmaier/EpiFlockwork',
+    url='https://github.com/benmaier/cFlockwork',
     license='BSD',
-    description='Runs epidemic simulations on flockworks in a fast manner.',
+    description='Runs flockwork simulations in a fast manner.',
     long_description='',
     ext_modules=ext_modules,
     install_requires=['pybind11'],
