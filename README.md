@@ -15,7 +15,7 @@ You need to have the current XCode version installed (free in AppStore). Open Ma
 >>> edit ([matlabroot '/bin/maci64/mexopts/clang_maci64.xml'])
 ```
 
-In both files, copy lines matching occurences of `MacOSX10.x.sdk' and change `MacOSX10.x.sdk' to `MacOSX10.11.sdk'(or whichever current version od XCode you're using).
+In both files, copy lines matching occurences of `MacOSX10.x.sdk` and change `MacOSX10.x.sdk` to `MacOSX10.11.sdk`(or whichever current version of XCode you're using).
 
 Now, run
 
