@@ -1,5 +1,5 @@
 import EqFlockwork
-import EpiFlockwork
+import cFlockwork
 from flockworks import flockwork
 import networkx as nx
 import pylab as pl
@@ -41,7 +41,7 @@ for iR0, R0 in enumerate(R0s):
         kw['infection_rate'] = R0 * kw['recovery_rate'] / (N-1.)
         kw["seed"] = seed
 
-        result = EpiFlockwork.SIS(**kw)
+        result = cFlockwork.SIS(**kw)
         I = result.I_of_t
 
         print R0, I[-1]

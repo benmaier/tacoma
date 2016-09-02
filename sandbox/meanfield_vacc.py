@@ -1,5 +1,5 @@
 import EqFlockwork
-import EpiFlockwork
+import cFlockwork
 from flockworks import flockwork
 import networkx as nx
 import pylab as pl
@@ -49,7 +49,7 @@ else:
                 print R0, kw['recovery_rate'], N-1
                 kw['infection_rate'] = R0 * kw['recovery_rate'] / (N-1.)
                 kw["seed"] = seed
-                I, SI, R0_, new_edge_list = EpiFlockwork.SIS(**kw)
+                I, SI, R0_, new_edge_list = cFlockwork.SIS(**kw)
                 print R0, I[-1]
                 I = array(I)
                 seed += 1

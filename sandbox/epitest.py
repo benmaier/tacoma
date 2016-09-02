@@ -1,5 +1,5 @@
 import EqFlockwork
-import EpiFlockwork
+import cFlockwork
 from flockworks import flockwork
 import networkx as nx
 import pylab as pl
