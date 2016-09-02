@@ -155,7 +155,11 @@ SIR_result
     //simulate
     double t = 0;
     size_t last_event = -1;
-    while ( (infected.size()>0) || ( (t_run_total>0) && (t<t_run_total) ))
+    while ( (infected.size()>0) && 
+            ( ( (t_run_total>0) && (t<t_run_total) ) ||
+              ( (t_run_total==0) ) 
+            )
+          )
     {
         //calculate rates
         vector <double> rates;
