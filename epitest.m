@@ -22,6 +22,8 @@ number_of_initially_infected = N/2;
 
 infection_rate = R0 * recovery_rate / k;
 
+% =========================== SIS ======================
+
 [I,SI,R0,edgelist] = FlockworkSIS(edges,...
                                   N,...
                                   Q,...
@@ -48,6 +50,8 @@ xlabel('time t')
 ylabel('population ratios')
 
 figure;
+
+%% ========================== SIRS ============================
 
 [I,R,SI,R0,edgelist] = FlockworkSIRS(edges,...
                                   N,...
@@ -77,6 +81,11 @@ xlabel('time t')
 ylabel('population ratios')
 
 figure;
+
+%% ===================== SIR ==================
+
+% let SIR run until all infected are gone
+t_run_total = 0;
 
 [I,R,SI,R0,edgelist] = FlockworkSIR(edges,...
                                   N,...
