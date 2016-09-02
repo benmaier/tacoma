@@ -2,18 +2,18 @@ clear;
 close all;
 
 % set random_seed
-random_seed = 123;
+random_seed = 12;
 
 % define Flockwork parameters
 edges = [];
-N = 100;
+N = 500;
 Q = 0.5;
 k = 1/(1-Q);
-use_random_rewiring = false;
+use_random_rewiring = 0; %Careful! "false" doesn't work.
 
 % define epidemic parameters
-t_run_total = 1234.56;
-R0 = 1.5;
+t_run_total = 123.56;
+R0 = 4;
 recovery_rate = 1;
 susceptible_rate = 1;
 rewiring_rate = 1;
@@ -52,6 +52,7 @@ ylabel('population ratios')
 figure;
 
 %% ========================== SIRS ============================
+random_seed = random_seed + 1;
 
 [I,R,SI,R0,edgelist] = FlockworkSIRS(edges,...
                                   N,...
@@ -83,6 +84,7 @@ ylabel('population ratios')
 figure;
 
 %% ===================== SIR ==================
+random_seed = random_seed + 1;
 
 % let SIR run until all infected are gone
 t_run_total = 0;
