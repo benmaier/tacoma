@@ -15,26 +15,26 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double Q, inf_rate, rec_rate, rew_rate;
     bool use_random_rew;
     
-    vector < pair <size_t,size_t > > edgelist = get_edgelist(prhs[0]);
+    vector < pair <size_t,size_t> > edgelist = get_edgelist(prhs[0]);
 
     read_single_value(prhs[1],N);
     read_single_value(prhs[2],Q);
-    read_single_value(prhs[3],t_run_total);
-    read_single_value(prhs[4],inf_rate);
-    read_single_value(prhs[5],rec_rate);
-    read_single_value(prhs[6],rew_rate);
+    read_single_value(prhs[3],inf_rate);
+    read_single_value(prhs[4],rec_rate);
+    read_single_value(prhs[5],rew_rate);
+    read_single_value(prhs[6],t_run_total);
     read_single_value(prhs[7],number_of_vaccinated);
     read_single_value(prhs[8],number_of_infected);
     read_single_value(prhs[9],use_random_rew);
     read_single_value(prhs[10],seed);
 
-    SIS_result result = SIS( edgelist,
+    SIR_result result = SIR(edgelist,
                              N,
                              Q,
-                             t_run_total,
                              inf_rate,
                              rec_rate,
                              rew_rate,
+                             t_run_total,
                              number_of_vaccinated,
                              number_of_infected,
                              use_random_rew,
@@ -55,7 +55,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     plhs[0] = result;
     */
     plhs[0] = cast_EPI_array_to_matlab(result.I_of_t.begin(), result.I_of_t.end());
-    plhs[1] = cast_EPI_array_to_matlab(result.SI_of_t.begin(), result.SI_of_t.end());
-    plhs[2] = cast_EPI_array_to_matlab(result.R0_of_t.begin(), result.R0_of_t.end());
-    plhs[3] = cast_EPI_array_to_matlab(result.edge_list.begin(), result.edge_list.end());
+    plhs[1] = cast_EPI_array_to_matlab(result.R_of_t.begin(), result.R_of_t.end());
+    plhs[2] = cast_EPI_array_to_matlab(result.SI_of_t.begin(), result.SI_of_t.end());
+    plhs[3] = cast_EPI_array_to_matlab(result.R0_of_t.begin(), result.R0_of_t.end());
+    plhs[4] = cast_EPI_array_to_matlab(result.edge_list.begin(), result.edge_list.end());
 }
