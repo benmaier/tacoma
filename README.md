@@ -1,4 +1,4 @@
-# EpiFlockworks
+# cFlockwork
 
 For fast simulations of epidemic spreading on flockworks, random rewiring networks and static networks.
 
