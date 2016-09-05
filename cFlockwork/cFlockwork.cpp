@@ -39,6 +39,7 @@
 #include "SIR.h"
 #include "SIRS.h"
 #include "SIS.h"
+#include "SI.h"
 #include "ResultClasses.h"
 #include "EqFlockwork.h"
 
@@ -48,6 +49,19 @@ namespace py = pybind11;
 PYBIND11_PLUGIN(cFlockwork) {
     py::module m("cFlockwork", "Module to perform fast flockwork simulations");
     
+    m.def("SI", &SI, "Simulate an SI process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("Q"),
+            py::arg("infection_rate"),
+            py::arg("rewiring_rate") = 1.,
+            py::arg("number_of_vaccinated") = 0,
+            py::arg("number_of_infected") = 1,
+            py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
+            py::arg("seed") = 0
+            );
+
     m.def("SIS", &SIS, "Simulate an SIS process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
             py::arg("E"),
             py::arg("N"),

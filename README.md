@@ -29,7 +29,7 @@ Now, run
 
 ### Python
 
-    $ sudo pip install ./EpiFlockwork
+    $ sudo pip install ./cFlockwork
 
 ## Example
 

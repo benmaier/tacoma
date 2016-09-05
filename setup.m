@@ -5,6 +5,7 @@ mex -setup C++;
 mex -v CXXFLAGS='-O3 -std=c++11 -stdlib=libc++ -I./cFlockwork -I./matlab' matlab/FlockworkSIS.cpp matlab/CastResult.cpp cFlockwork/SIS.cpp cFlockwork/Utilities.cpp cFlockwork/Events.cpp cFlockwork/EqFlockwork.cpp;
 mex -v CXXFLAGS='-O3 -std=c++11 -stdlib=libc++ -I./cFlockwork -I./matlab' matlab/FlockworkSIRS.cpp matlab/CastResult.cpp cFlockwork/SIRS.cpp cFlockwork/Utilities.cpp cFlockwork/Events.cpp cFlockwork/EqFlockwork.cpp;
 mex -v CXXFLAGS='-O3 -std=c++11 -stdlib=libc++ -I./cFlockwork -I./matlab' matlab/FlockworkSIR.cpp matlab/CastResult.cpp cFlockwork/SIR.cpp cFlockwork/Utilities.cpp cFlockwork/Events.cpp cFlockwork/EqFlockwork.cpp;
+mex -v CXXFLAGS='-O3 -std=c++11 -stdlib=libc++ -I./cFlockwork -I./matlab' matlab/FlockworkSI.cpp matlab/CastResult.cpp cFlockwork/SI.cpp cFlockwork/Utilities.cpp cFlockwork/Events.cpp cFlockwork/EqFlockwork.cpp;
 mex -v CXXFLAGS='-O3 -std=c++11 -stdlib=libc++ -I./cFlockwork -I./matlab' matlab/FlockworkSim.cpp matlab/CastResult.cpp cFlockwork/SIR.cpp cFlockwork/Utilities.cpp cFlockwork/Events.cpp cFlockwork/EqFlockwork.cpp;
 mex -v CXXFLAGS='-O3 -std=c++11 -stdlib=libc++ -I./cFlockwork -I./matlab' matlab/FlockworkEq.cpp matlab/CastResult.cpp cFlockwork/SIR.cpp cFlockwork/Utilities.cpp cFlockwork/Events.cpp cFlockwork/EqFlockwork.cpp;
 

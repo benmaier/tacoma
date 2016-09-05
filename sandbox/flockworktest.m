@@ -32,8 +32,42 @@ random_seed = random_seed + 1;
 %% ========================= Simulation ======================
 
 num_timesteps = N; 
-edges = FlockworkEq(edges,N,Q,random_seed,num_timesteps);
+edges = FlockworkSim(edges,N,Q,random_seed,num_timesteps);
 random_seed = random_seed + 1;
+
+%% =========================== SI ======================
+% start this simulation as a fully disconnected graph and equilibrate
+% within simulation
+equilibrate_flockwork = 1; % true doesn't work
+
+
+[I,SI,R0,edgelist] = FlockworkSI(edges,...
+                                  N,...
+                                  Q,...
+                                  infection_rate,...
+                                  rewiring_rate,...
+                                  number_of_vaccinated,...
+                                  number_of_initially_infected,...
+                                  use_random_rewiring,...
+                                  equilibrate_flockwork,...
+                                  random_seed...
+                                 );
+
+
+random_seed = random_seed + 1;
+
+figure;
+
+t = I(:,1);
+i = I(:,2) / N;
+plot(t,1-i); hold on;
+plot(t,i); 
+
+title('SI')
+legend('S','I')
+xlabel('time t')
+ylabel('population ratios')
+ylim([0,1])
 
 %% =========================== SIS ======================
 % start this simulation as a fully disconnected graph and equilibrate
@@ -54,6 +88,8 @@ equilibrate_flockwork = 1; % true doesn't work
                                   random_seed...
                                  );
 
+random_seed = random_seed + 1;
+
 figure;
 
 t = I(:,1);
@@ -72,8 +108,6 @@ figure;
 %% ========================== SIRS ============================
 % start this simulation with the equilibrated graph from above
 equilibrate_flockwork = 0; % false doesn't work
-
-random_seed = random_seed + 1;
 
 [I,R,SI,R0,edgelist] = FlockworkSIRS(edges,...
                                   N,...

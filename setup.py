@@ -22,6 +22,7 @@ ext_modules = [
             'cFlockwork/Utilities.cpp', 
             'cFlockwork/Events.cpp', 
             'cFlockwork/SIS.cpp', 
+            'cFlockwork/SI.cpp', 
             'cFlockwork/SIR.cpp', 
             'cFlockwork/SIRS.cpp', 
             'cFlockwork/EqFlockwork.cpp', 
