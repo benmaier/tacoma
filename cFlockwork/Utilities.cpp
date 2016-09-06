@@ -32,11 +32,7 @@ pair <size_t,size_t> get_sorted_pair(size_t i, size_t j)
 {
     //swap i and j if j is the smaller number
     if (j<i) 
-    {
-        size_t mem = i;
-        i = j;
-        j = mem;
-    }
+        swap(i,j);
 
     return make_pair(i,j);
 }
