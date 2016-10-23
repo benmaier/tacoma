@@ -67,4 +67,15 @@ vector<size_t>::iterator choose_random_unique(
         uniform_real_distribution<double> & distribution
         ); 
 
+void get_gillespie_tau_and_event_with_varying_gamma( 
+                vector < double > & standard_rates,
+                vector < pair < double, double > > const & gamma,
+                double t0,
+                double t_max,
+                size_t & ti,
+                double & tau,
+                size_t & event,
+                default_random_engine & generator, 
+                uniform_real_distribution<double> & distribution
+             );
 #endif

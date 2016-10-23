@@ -147,3 +147,87 @@ void get_gillespie_tau_and_event(
 
     tau = log(1.0/distribution(generator)) / a0;
 }
+
+void get_gillespie_tau_and_event_with_varying_gamma( 
+                vector < double > & standard_rates,
+                vector < pair < double, double > > const & gamma,
+                double t0,
+                double t_max,
+                size_t & ti,
+                double & tau,
+                size_t & event,
+                default_random_engine & generator, 
+                uniform_real_distribution<double> & distribution
+             )
+{
+    // ======================= FIND TAU ========================
+    size_t N_gamma = gamma.size();
+    double beta0 = accumulate(standard_rates.begin(), standard_rates.end(), 0.0);
+    double m_log_1mU = - log( 1. - distribution(generator));
+
+    double t_basic = (i_t / N_gamma) * t_max;
+
+    double t_iP1 = get<0>(gamma[(i_t+1) % N_gamma]) + t_basic; 
+    double t_i   = get<0>(gamma[i_t % N_gamma]) + t_basic;
+    double g_i   = get<1>(gamma[i_t % N_gamma]);
+
+    double S_i = 0.;
+    double S_iP1 = (t_iP1 - t0) * g_i;
+
+    double next_limit = (t_iP1 - t0) * beta0 + S_iP1;
+
+    while (m_log_1mU > next_limit) {
+
+        i_t++;
+        t_basic = (i_t / N_gamma) * t_max;
+
+        g_i   = get<1>(gamma[i_t % N_gamma]);
+        t_i   = get<0>(gamma[i_t % N_gamma]) + t_basic;
+        t_iP1 = get<0>(gamma[(i_t+1) % N_gamma]) + t_basic;
+
+        S_i = S_iP1;
+        S_iP1 += (t_iP1 - t_i) * g_i;
+        next_limit = (t_iP1 - t0) * beta0 + S_iP1;
+    }
+
+
+    //tau = ( m_log_1mU - S_i + g_i*t_i + t0*beta0 ) / (beta0 + g_i) - t0;
+    //
+    tau = (m_log_1mU - S_i + g_i * (t_i-t0) ) / (beta0 + g_i);
+    double Lambda = g_i * (tau+(t_0-t_i)) + S_i;
+
+
+    //================ FIND EVENT ========================
+    size_t N = standard_rates.size();
+    double a0 = Lambda;
+
+    //get the mean number of events happened per channel
+    for(size_t rate=0; rate<N; rate++)
+    {
+        standard_rates[rate] *= tau;
+        a0 += standard_rates[rate];
+    }
+
+    //push rewiring event to the end
+    standard_rates.push_back(Lambda);
+    N++;
+
+    //find event as usual
+    double rProduct = distribution(generator) * a0;
+
+    event = 0;
+
+    if (N==0)
+    {
+        throw length_error( "Rate list is empty." );
+    }
+
+    double sum_event = 0.0;
+    while ( (event<N) and not ( (sum_event < rProduct) and (rProduct <= sum_event+standard_rates[event]) ) )
+    {
+        sum_event += standard_rates[event];
+        event++;
+    }
+
+}
+
