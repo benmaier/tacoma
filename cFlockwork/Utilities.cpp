@@ -153,7 +153,7 @@ void get_gillespie_tau_and_event_with_varying_gamma(
                 vector < pair < double, double > > const & gamma,
                 double t0,
                 double t_max,
-                size_t & ti,
+                size_t & i_t,
                 double & tau,
                 size_t & event,
                 default_random_engine & generator, 
@@ -167,8 +167,8 @@ void get_gillespie_tau_and_event_with_varying_gamma(
 
     double t_basic = (i_t / N_gamma) * t_max;
 
-    double t_iP1 = get<0>(gamma[(i_t+1) % N_gamma]) + t_basic; 
-    double t_i   = get<0>(gamma[i_t % N_gamma]) + t_basic;
+    double t_iP1 = get<0>(gamma[(i_t+1) % N_gamma]) + ((i_t+1) / N_gamma) * t_max; 
+    double t_i   = t0;
     double g_i   = get<1>(gamma[i_t % N_gamma]);
 
     double S_i = 0.;
@@ -176,14 +176,14 @@ void get_gillespie_tau_and_event_with_varying_gamma(
 
     double next_limit = (t_iP1 - t0) * beta0 + S_iP1;
 
-    while (m_log_1mU > next_limit) {
-
+    while (m_log_1mU > next_limit) 
+    {
         i_t++;
         t_basic = (i_t / N_gamma) * t_max;
 
         g_i   = get<1>(gamma[i_t % N_gamma]);
         t_i   = get<0>(gamma[i_t % N_gamma]) + t_basic;
-        t_iP1 = get<0>(gamma[(i_t+1) % N_gamma]) + t_basic;
+        t_iP1 = get<0>(gamma[(i_t+1) % N_gamma]) + ((i_t+1) / N_gamma) * t_max;
 
         S_i = S_iP1;
         S_iP1 += (t_iP1 - t_i) * g_i;
@@ -194,7 +194,7 @@ void get_gillespie_tau_and_event_with_varying_gamma(
     //tau = ( m_log_1mU - S_i + g_i*t_i + t0*beta0 ) / (beta0 + g_i) - t0;
     //
     tau = (m_log_1mU - S_i + g_i * (t_i-t0) ) / (beta0 + g_i);
-    double Lambda = g_i * (tau+(t_0-t_i)) + S_i;
+    double Lambda = g_i * (tau+(t0-t_i)) + S_i;
 
 
     //================ FIND EVENT ========================

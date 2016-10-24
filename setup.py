@@ -27,6 +27,7 @@ ext_modules = [
             'cFlockwork/SIRS.cpp', 
             'cFlockwork/EqFlockwork.cpp', 
             'cFlockwork/cFlockwork.cpp', 
+            'cFlockwork/test_varying_rate.cpp', 
         ],
         include_dirs=[
             get_pybind_include(),

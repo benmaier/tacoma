@@ -42,6 +42,7 @@
 #include "SI.h"
 #include "ResultClasses.h"
 #include "EqFlockwork.h"
+#include "test_varying_rate.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -123,6 +124,16 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("seed"),
             py::arg("num_timesteps")
             );
+
+    m.def("gillespie_tau_and_event_varying_gamma",&gillespie_tau_and_event_varying_gamma,"Get a Gillespie tau and event number for varying rewiring rates",
+            py::arg("standard_rates"),
+            py::arg("gamma"),
+            py::arg("t0"),
+            py::arg("ti"),
+            py::arg("t_max"),
+            py::arg("seed")
+         );
+
 
     py::class_<SIR_result>(m,"SIR_result")
         .def(py::init<>())
