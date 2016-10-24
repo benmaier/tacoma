@@ -28,6 +28,7 @@ ext_modules = [
             'cFlockwork/SIR.cpp', 
             'cFlockwork/SIR_varying.cpp', 
             'cFlockwork/SIRS.cpp', 
+            'cFlockwork/SIRS_varying.cpp', 
             'cFlockwork/EqFlockwork.cpp', 
             'cFlockwork/cFlockwork.cpp', 
             'cFlockwork/test_varying_rate.cpp', 

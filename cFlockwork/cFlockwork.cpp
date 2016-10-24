@@ -44,6 +44,7 @@
 #include "SI_varying.h"
 #include "SIS_varying.h"
 #include "SIR_varying.h"
+#include "SIRS_varying.h"
 #include "ResultClasses.h"
 #include "test_varying_rate.h"
 
@@ -151,6 +152,23 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("recovery_rate"),
             py::arg("susceptible_rate"),
             py::arg("rewiring_rate") = 1.,
+            py::arg("number_of_vaccinated") = 0,
+            py::arg("number_of_infected") = 1,
+            py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
+            py::arg("seed") = 0
+            );
+
+    m.def("SIRS_varying_rates", &SIRS_varying_rates, "Simulate an SIRS process on a flockwork given an initial state as an edge list with varying rewiring rates and Q. Returns time and number of infected as well as time and current R0.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("Q"),
+            py::arg("t_run_total"),
+            py::arg("infection_rate"),
+            py::arg("recovery_rate"),
+            py::arg("susceptible_rate"),
+            py::arg("rewiring_rate"),
+            py::arg("tmax"),
             py::arg("number_of_vaccinated") = 0,
             py::arg("number_of_infected") = 1,
             py::arg("use_random_rewiring") = false,
