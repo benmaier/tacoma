@@ -23,6 +23,8 @@ ext_modules = [
             'cFlockwork/Events.cpp', 
             'cFlockwork/SIS.cpp', 
             'cFlockwork/SI.cpp', 
+            'cFlockwork/SI_varying.cpp', 
+            'cFlockwork/SIS_varying.cpp', 
             'cFlockwork/SIR.cpp', 
             'cFlockwork/SIRS.cpp', 
             'cFlockwork/EqFlockwork.cpp', 

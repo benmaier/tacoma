@@ -36,12 +36,14 @@
 #include <tuple>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include "EqFlockwork.h"
 #include "SIR.h"
 #include "SIRS.h"
 #include "SIS.h"
 #include "SI.h"
+#include "SI_varying.h"
+#include "SIS_varying.h"
 #include "ResultClasses.h"
-#include "EqFlockwork.h"
 #include "test_varying_rate.h"
 
 using namespace std;
@@ -50,12 +52,26 @@ namespace py = pybind11;
 PYBIND11_PLUGIN(cFlockwork) {
     py::module m("cFlockwork", "Module to perform fast flockwork simulations");
     
-    m.def("SI", &SI, "Simulate an SI process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
+    m.def("SI", &SI, "Simulate an SI process on a flockwork given an initial state as an edge list and varying rewiring rates. Returns time and number of infected as well as time and current R0.",
             py::arg("E"),
             py::arg("N"),
             py::arg("Q"),
             py::arg("infection_rate"),
             py::arg("rewiring_rate") = 1.,
+            py::arg("number_of_vaccinated") = 0,
+            py::arg("number_of_infected") = 1,
+            py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
+            py::arg("seed") = 0
+            );
+
+    m.def("SI_varying_rates", &SI_varying_rates, "Simulate an SI process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("Q"),
+            py::arg("infection_rate"),
+            py::arg("rewiring_rate"),
+            py::arg("tmax"),
             py::arg("number_of_vaccinated") = 0,
             py::arg("number_of_infected") = 1,
             py::arg("use_random_rewiring") = false,
@@ -71,6 +87,22 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("infection_rate"),
             py::arg("recovery_rate"),
             py::arg("rewiring_rate") = 1.,
+            py::arg("number_of_vaccinated") = 0,
+            py::arg("number_of_infected") = 1,
+            py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
+            py::arg("seed") = 0
+            );
+
+    m.def("SIS_varying_rates", &SIS_varying_rates, "Simulate an SIS process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("Q"),
+            py::arg("t_run_total"),
+            py::arg("infection_rate"),
+            py::arg("recovery_rate"),
+            py::arg("rewiring_rate"),
+            py::arg("tmax"),
             py::arg("number_of_vaccinated") = 0,
             py::arg("number_of_infected") = 1,
             py::arg("use_random_rewiring") = false,

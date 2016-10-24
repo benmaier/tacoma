@@ -196,6 +196,9 @@ void get_gillespie_tau_and_event_with_varying_gamma(
     tau = (m_log_1mU - S_i + g_i * (t_i-t0) ) / (beta0 + g_i);
     double Lambda = g_i * (tau+(t0-t_i)) + S_i;
 
+    if ((t0+tau) == t_iP1)
+        i_t++;
+
 
     //================ FIND EVENT ========================
     size_t N = standard_rates.size();
