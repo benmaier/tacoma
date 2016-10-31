@@ -49,7 +49,7 @@ SIR_result
                  vector < pair < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
                  vector < double > Q,       //probability to connect with neighbors of neighbor
-                 const size_t t_run_total,
+                 const double t_run_total,
                  const double infection_rate,
                  const double recovery_rate,
                  const double susceptible_rate,
