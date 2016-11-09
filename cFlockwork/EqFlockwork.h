@@ -47,7 +47,8 @@ vector < pair < size_t, size_t > >
                  const size_t N,       //number of nodes
                  const double Q,       //probability to connect with neighbors of neighbor
                  const size_t seed = 0,
-                 size_t t_max = 0
+                 size_t t_max = 0,
+                 const bool use_Q_as_P = false
                 );
 
 vector < pair < size_t, size_t > > 
@@ -57,7 +58,8 @@ vector < pair < size_t, size_t > >
                  const double Q,       //probability to connect with neighbors of neighbor
                  default_random_engine & generator, 
                  uniform_real_distribution<double> & distribution,
-                 size_t t_max
+                 size_t t_max,
+                 const bool use_Q_as_P = false
                  );
 
 void equilibrate_neighborset(
@@ -65,7 +67,8 @@ void equilibrate_neighborset(
                  const double Q,       //probability to connect with neighbors of neighbor
                  default_random_engine & generator, 
                  uniform_real_distribution<double> & distribution,
-                 size_t t_max = 0
+                 size_t t_max = 0,
+                 const bool use_Q_as_P = false
                 );
 
 void flockwork_timestep(
@@ -75,11 +78,27 @@ void flockwork_timestep(
                  uniform_real_distribution<double> & distribution
                 );
 
+void flockwork_P_timestep(
+                 vector < set < size_t  > * > &G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution
+            );
+
 vector < pair < size_t, size_t > > 
      simulate_flockwork(
                  vector < pair < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
                  const double Q,       //probability to connect with neighbors of neighbor
+                 const size_t seed,
+                 size_t num_timesteps
+                 );
+
+vector < pair < size_t, size_t > > 
+     simulate_flockwork_P(
+                 vector < pair < size_t, size_t > > E, //edgelist
+                 const size_t N,       //number of nodes
+                 const double P,       //probability to connect with neighbors of neighbor
                  const size_t seed,
                  size_t num_timesteps
                  );

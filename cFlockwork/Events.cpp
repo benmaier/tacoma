@@ -314,6 +314,85 @@ void rewire(
 
 }
 
+void rewire_P(
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 double & mean_degree,
+                 set < pair < size_t, size_t > > & SI_E, //edge list of SI links
+                 const vector < size_t > & node_status
+            )
+{
+    //choose two nodes
+    size_t N = G.size();
+    double r1 = distribution(generator);
+    double r2 = distribution(generator);
+    size_t i,j;
+    choose(N,i,j,r1,r2);
+
+    size_t number_of_old_edges = 0;
+    size_t number_of_new_edges = 0;
+
+    //loop through the neighbors of i
+    for(auto neigh_i : *G[i] )
+    {
+        //and erase the link to i
+        G[neigh_i]->erase(i);
+        number_of_old_edges++;
+
+        //check if we erased an SI link
+        if ( 
+             ( (node_status[i] == I) && (node_status[neigh_i] == S) ) ||
+             ( (node_status[i] == S) && (node_status[neigh_i] == I) )
+           ) 
+        {
+            SI_E.erase( get_sorted_pair(i,neigh_i) );
+        }
+    } 
+
+    //erase the links from the perspective of i
+    G[i]->clear();
+
+    if ( distribution(generator) < P )
+    {
+        //loop through the neighbors of j
+        for(auto neigh_j : *G[j] ) 
+        {
+            G[ neigh_j ]->insert( i );
+            G[ i ]->insert( neigh_j );
+            number_of_new_edges++;
+
+            //check if we created an SI link
+            if ( 
+                 ( (node_status[i] == I) && (node_status[neigh_j] == S) ) ||
+                 ( (node_status[i] == S) && (node_status[neigh_j] == I) )
+               ) 
+            {
+                SI_E.insert( get_sorted_pair(i,neigh_j) );
+            }
+        }
+
+        //add j as neighbor and count additional edge
+        G[ j ]->insert( i );
+        G[ i ]->insert( j );
+        number_of_new_edges++;
+
+        //check if we created an SI link
+        if ( 
+             ( (node_status[i] == I) && (node_status[j] == S) ) ||
+             ( (node_status[i] == S) && (node_status[j] == I) )
+           ) 
+        {
+            SI_E.insert( get_sorted_pair(i,j) );
+        }
+    }
+
+    //calculate new number of edges
+    mean_degree += 2.0 * ( double(number_of_new_edges) - double(number_of_old_edges) ) / double(N);
+
+}
+
 void random_rewire(
                  vector < set < size_t > * > & G, //Adjacency matrix
                  default_random_engine & generator, 

@@ -112,6 +112,22 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("seed") = 0
             );
 
+    m.def("SIS_varying_rates_P", &SIS_varying_rates_P, "Simulate an SIS process on a flockwork P-model given an initial state as an edge list with varying rewiring rate and P. Returns time and number of infected as well as time and current R0.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("P"),
+            py::arg("t_run_total"),
+            py::arg("infection_rate"),
+            py::arg("recovery_rate"),
+            py::arg("rewiring_rate"),
+            py::arg("tmax"),
+            py::arg("number_of_vaccinated") = 0,
+            py::arg("number_of_infected") = 1,
+            py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
+            py::arg("seed") = 0
+            );
+
     m.def("SIR", &SIR, "Simulate an SIR process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
             py::arg("E"),
             py::arg("N"),
@@ -181,13 +197,31 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("N"),
             py::arg("Q"),
             py::arg("seed"),
-            py::arg("t_max") = 0
+            py::arg("t_max") = 0,
+            py::arg("use_Q_as_P") = false
+            );
+
+    m.def("equilibrate_P", &equilibrate_edgelist_seed, "Equilibrates a flockwork given an initial state as an edge list. Returns new edge list.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("P"),
+            py::arg("seed"),
+            py::arg("t_max") = 0,
+            py::arg("use_Q_as_P") = true
             );
 
     m.def("simulate", &simulate_flockwork, "Equilibrates a flockwork given an initial state as an edge list. Returns new edge list.",
             py::arg("E"),
             py::arg("N"),
             py::arg("Q"),
+            py::arg("seed"),
+            py::arg("num_timesteps")
+            );
+
+    m.def("simulate_P", &simulate_flockwork_P, "Equilibrates a flockwork given an initial state as an edge list. Returns new edge list.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("P"),
             py::arg("seed"),
             py::arg("num_timesteps")
             );
