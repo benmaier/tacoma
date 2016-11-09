@@ -408,8 +408,11 @@ SIS_result
                 random_rewire(G,generator,uni_distribution,SI_E,node_status,node_ints);
             } else {
                 //flockwork
+                double old_k(k);
                 rewire_P(G,P[i_t%N_gamma],generator,uni_distribution,k,SI_E,node_status);
-                R0_of_t.push_back(make_pair(t,k*infection_rate/recovery_rate));
+
+                if (old_k!=k)
+                    R0_of_t.push_back(make_pair(t,k*infection_rate/recovery_rate));
             }
         } else if (event == 0)
         {
