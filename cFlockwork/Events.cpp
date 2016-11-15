@@ -314,7 +314,8 @@ void rewire(
 
 }
 
-void rewire_P(
+pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
+    rewire_P(
                  vector < set < size_t > * > & G, //Adjacency matrix
                  double P,       //probability to connect with neighbors of neighbor
                  default_random_engine & generator, 
@@ -334,12 +335,18 @@ void rewire_P(
     size_t number_of_old_edges = 0;
     size_t number_of_new_edges = 0;
 
+    vector < pair < size_t, size_t > > edges_out;
+    vector < pair < size_t, size_t > > edges_in;
+
     //loop through the neighbors of i
     for(auto neigh_i : *G[i] )
     {
         //and erase the link to i
         G[neigh_i]->erase(i);
         number_of_old_edges++;
+        
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_i);
+        edges_out.push_back( current_edge );
 
         //check if we erased an SI link
         if ( 
@@ -347,7 +354,7 @@ void rewire_P(
              ( (node_status[i] == S) && (node_status[neigh_i] == I) )
            ) 
         {
-            SI_E.erase( get_sorted_pair(i,neigh_i) );
+            SI_E.erase( current_edge );
         }
     } 
 
@@ -363,13 +370,16 @@ void rewire_P(
             G[ i ]->insert( neigh_j );
             number_of_new_edges++;
 
+            pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_j);
+            edges_in.push_back( current_edge );
+
             //check if we created an SI link
             if ( 
                  ( (node_status[i] == I) && (node_status[neigh_j] == S) ) ||
                  ( (node_status[i] == S) && (node_status[neigh_j] == I) )
                ) 
             {
-                SI_E.insert( get_sorted_pair(i,neigh_j) );
+                SI_E.insert( current_edge );
             }
         }
 
@@ -378,18 +388,121 @@ void rewire_P(
         G[ i ]->insert( j );
         number_of_new_edges++;
 
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,j);
+        edges_in.push_back( current_edge );
+
         //check if we created an SI link
         if ( 
              ( (node_status[i] == I) && (node_status[j] == S) ) ||
              ( (node_status[i] == S) && (node_status[j] == I) )
            ) 
         {
-            SI_E.insert( get_sorted_pair(i,j) );
+            SI_E.insert( current_edge );
         }
     }
 
     //calculate new number of edges
     mean_degree += 2.0 * ( double(number_of_new_edges) - double(number_of_old_edges) ) / double(N);
+
+    return make_pair(edges_out,edges_in);
+
+}
+
+pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
+    rewire_P_neighbor_affinity(
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 vector < pair < vector < size_t >, vector < double > > > neighbor_affinity,
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 double & mean_degree,
+                 set < pair < size_t, size_t > > & SI_E, //edge list of SI links
+                 const vector < size_t > & node_status
+            )
+{
+    //choose two nodes
+    size_t N = G.size();
+    double r1 = distribution(generator);
+    size_t i = r1 * N;
+    size_t j;
+
+    size_t number_of_old_edges = 0;
+    size_t number_of_new_edges = 0;
+
+    vector < pair < size_t, size_t > > edges_out;
+    vector < pair < size_t, size_t > > edges_in;
+
+    //loop through the neighbors of i
+    for(auto neigh_i : *G[i] )
+    {
+        //and erase the link to i
+        G[neigh_i]->erase(i);
+        number_of_old_edges++;
+        
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_i);
+        edges_out.push_back( current_edge );
+
+        //check if we erased an SI link
+        if ( 
+             ( (node_status[i] == I) && (node_status[neigh_i] == S) ) ||
+             ( (node_status[i] == S) && (node_status[neigh_i] == I) )
+           ) 
+        {
+            SI_E.erase( current_edge );
+        }
+    } 
+
+    //erase the links from the perspective of i
+    G[i]->clear();
+
+    if ( distribution(generator) < P )
+    {
+        // get node from social network structure
+        size_t neighbor_index = arg_choose_from_vector(neighbor_affinity[i].second, generator, distribution);        
+        j = neighbor_affinity[i].first[neighbor_index];
+
+        //loop through the neighbors of j
+        for(auto neigh_j : *G[j] ) 
+        {
+            G[ neigh_j ]->insert( i );
+            G[ i ]->insert( neigh_j );
+            number_of_new_edges++;
+
+            pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_j);
+            edges_in.push_back( current_edge );
+
+            //check if we created an SI link
+            if ( 
+                 ( (node_status[i] == I) && (node_status[neigh_j] == S) ) ||
+                 ( (node_status[i] == S) && (node_status[neigh_j] == I) )
+               ) 
+            {
+                SI_E.insert( current_edge );
+            }
+        }
+
+        //add j as neighbor and count additional edge
+        G[ j ]->insert( i );
+        G[ i ]->insert( j );
+        number_of_new_edges++;
+
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,j);
+        edges_in.push_back( current_edge );
+
+        //check if we created an SI link
+        if ( 
+             ( (node_status[i] == I) && (node_status[j] == S) ) ||
+             ( (node_status[i] == S) && (node_status[j] == I) )
+           ) 
+        {
+            SI_E.insert( current_edge );
+        }
+    }
+
+    //calculate new number of edges
+    mean_degree += 2.0 * ( double(number_of_new_edges) - double(number_of_old_edges) ) / double(N);
+
+    return make_pair(edges_out,edges_in);
 
 }
 

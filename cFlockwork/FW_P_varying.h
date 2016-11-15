@@ -23,11 +23,12 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef __RESULTCLASSES_H__
-#define __RESULTCLASSES_H__
+#ifndef __FW_P_VARYING_H__
+#define __FW_P_VARYING_H__
 
 #include "Events.h"
 #include "Utilities.h"
+#include "ResultClasses.h"
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
@@ -41,28 +42,34 @@
 #include <ctime>
 #include <tuple>
 
-struct SIR_result 
-{
-    vector < pair < double, size_t > > I_of_t; 
-    vector < pair < double, size_t > > R_of_t; 
-    vector < pair < double, size_t > > SI_of_t; 
-    vector < pair < double, double > > R0_of_t;
-    set < pair < size_t, size_t > > edge_list;
-};
+using namespace std;
 
-struct SIS_result 
-{
-    vector < pair < double, size_t > > I_of_t; 
-    vector < pair < double, size_t > > SI_of_t; 
-    vector < pair < double, double > > R0_of_t;
-    set < pair < size_t, size_t > > edge_list;
-};
+edge_changes
+     flockwork_P_varying_rates(
+                 vector < pair < size_t, size_t > > E, //edgelist
+                 const size_t N,       //number of nodes
+                 vector < double > P,       //probability to reconnect after cutting
+                 const double t_run_total,
+                 vector < pair < double, double > > rewiring_rate,
+                 const double tmax,
+                 const bool   use_random_rewiring,
+                 const bool   equilibrate_flockwork,
+                 const size_t seed
+        );
 
-struct edge_changes
-{
-    vector < double > t;
-    vector < vector < pair < size_t, size_t > > > edges_out; 
-    vector < vector < pair < size_t, size_t > > > edges_in;
-};
+edge_changes
+     flockwork_P_varying_rates_neighbor_affinity(
+                 vector < pair < size_t, size_t > > E, //edgelist
+                 const size_t N,       //number of nodes
+                 vector < double > P,       //probability to reconnect after cutting
+                 const double t_run_total,
+                 vector < pair < double, double > > rewiring_rate,
+                 vector < pair < vector < size_t >, vector < double > > > neighbor_affinity,
+                 const double tmax,
+                 const bool   use_random_rewiring,
+                 const bool   equilibrate_flockwork,
+                 const size_t seed
+        );
+
 
 #endif

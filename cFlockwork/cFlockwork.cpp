@@ -45,6 +45,7 @@
 #include "SIS_varying.h"
 #include "SIR_varying.h"
 #include "SIRS_varying.h"
+#include "FW_P_varying.h"
 #include "ResultClasses.h"
 #include "test_varying_rate.h"
 
@@ -128,6 +129,40 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("seed") = 0
             );
 
+    m.def("SIS_varying_rates_P_neighbor_affinity", &SIS_varying_rates_P_neighbor_affinity, "Simulate an SIS process on a flockwork P-model given an initial state as an edge list with varying rewiring rate and P. Accounts for the integrated social structure of the network. Returns time and number of infected as well as time and current R0.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("P"),
+            py::arg("t_run_total"),
+            py::arg("infection_rate"),
+            py::arg("recovery_rate"),
+            py::arg("rewiring_rate"),
+            py::arg("neighbor_affinity"),
+            py::arg("tmax"),
+            py::arg("number_of_vaccinated") = 0,
+            py::arg("number_of_infected") = 1,
+            py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
+            py::arg("seed") = 0
+            );
+
+    m.def("SIS_varying_rates_P_neighbor_affinity_infected_nodes", &SIS_varying_rates_P_neighbor_affinity_infected_nodes, "Simulate an SIS process on a flockwork P-model given an initial state as an edge list with varying rewiring rate and P. Accounts for the integrated social structure of the network. Returns time and number of infected as well as time and current R0.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("P"),
+            py::arg("t_run_total"),
+            py::arg("infection_rate"),
+            py::arg("recovery_rate"),
+            py::arg("rewiring_rate"),
+            py::arg("neighbor_affinity"),
+            py::arg("tmax"),
+            py::arg("vaccinated_nodes"),
+            py::arg("infected_nodes"),
+            py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
+            py::arg("seed") = 0
+            );
+
     m.def("SIR", &SIR, "Simulate an SIR process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
             py::arg("E"),
             py::arg("N"),
@@ -158,6 +193,31 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("equilibrate_flockwork") = false,
             py::arg("seed") = 0
             );
+
+    m.def("flockwork_P_varying_rates", &flockwork_P_varying_rates, "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rate and varying P. Returns time points and concurrent edge changes.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("P"),
+            py::arg("t_run_total"),
+            py::arg("rewiring_rate"),
+            py::arg("tmax"),
+            py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
+            py::arg("seed") = 0
+         );
+
+    m.def("flockwork_P_varying_rates_neighbor_affinity", &flockwork_P_varying_rates_neighbor_affinity, "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rate and varying P. Rewiring neighbors are chosen according to a neighbor affinity value. Returns time points and concurrent edge changes.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("P"),
+            py::arg("t_run_total"),
+            py::arg("rewiring_rate"),
+            py::arg("neighbor_affinity"),
+            py::arg("tmax"),
+            py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
+            py::arg("seed") = 0
+         );
 
     m.def("SIRS", &SIRS, "Simulate an SIRS process on a flockwork given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
             py::arg("E"),
@@ -201,7 +261,7 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("use_Q_as_P") = false
             );
 
-    m.def("equilibrate_P", &equilibrate_edgelist_seed, "Equilibrates a flockwork given an initial state as an edge list. Returns new edge list.",
+    m.def("equilibrate_P", &equilibrate_edgelist_seed, "Equilibrates a flockwork P-model given an initial state as an edge list. Returns new edge list.",
             py::arg("E"),
             py::arg("N"),
             py::arg("P"),
@@ -210,7 +270,7 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("use_Q_as_P") = true
             );
 
-    m.def("simulate", &simulate_flockwork, "Equilibrates a flockwork given an initial state as an edge list. Returns new edge list.",
+    m.def("simulate", &simulate_flockwork, "Simulates a flockwork given an initial state as an edge list. Returns new edge list.",
             py::arg("E"),
             py::arg("N"),
             py::arg("Q"),
@@ -218,7 +278,7 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("num_timesteps")
             );
 
-    m.def("simulate_P", &simulate_flockwork_P, "Equilibrates a flockwork given an initial state as an edge list. Returns new edge list.",
+    m.def("simulate_P", &simulate_flockwork_P, "Simulates a flockwork P-model given an initial state as an edge list. Returns new edge list.",
             py::arg("E"),
             py::arg("N"),
             py::arg("P"),
@@ -250,6 +310,12 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("SI_of_t", &SIS_result::SI_of_t)
         .def_readwrite("R0_of_t", &SIS_result::R0_of_t)
         .def_readwrite("edge_list", &SIS_result::edge_list);
+
+    py::class_<edge_changes>(m,"edge_changes")
+        .def(py::init<>())
+        .def_readwrite("t", &edge_changes::t)
+        .def_readwrite("edges_out", &edge_changes::edges_out)
+        .def_readwrite("edges_in", &edge_changes::edges_in);
 
 
     return m.ptr();

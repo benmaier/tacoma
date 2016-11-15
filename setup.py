@@ -25,6 +25,7 @@ ext_modules = [
             'cFlockwork/SI.cpp', 
             'cFlockwork/SI_varying.cpp', 
             'cFlockwork/SIS_varying.cpp', 
+            'cFlockwork/FW_P_varying.cpp', 
             'cFlockwork/SIR.cpp', 
             'cFlockwork/SIR_varying.cpp', 
             'cFlockwork/SIRS.cpp', 
@@ -91,7 +92,7 @@ class BuildExt(build_ext):
 
 setup(
     name='cFlockwork',
-    version='0.0.6',
+    version='0.0.8',
     author='Benjamin F. Maier',
     author_email='bfmaier@physik.hu-berlin.de',
     url='https://github.com/benmaier/cFlockwork',

@@ -77,4 +77,40 @@ SIS_result
                  const bool   equilibrate_flockwork,
                  const size_t seed
         );
+
+SIS_result
+     SIS_varying_rates_P_neighbor_affinity(
+                 vector < pair < size_t, size_t > > E, //edgelist
+                 const size_t N,       //number of nodes
+                 vector < double > P,       //probability to reconnect
+                 const double t_run_total,
+                 const double infection_rate,
+                 const double recovery_rate,
+                 vector < pair < double, double > > rewiring_rate,
+                 vector < pair < vector < size_t >, vector < double > > > neighbor_affinity,
+                 const double tmax,
+                 const size_t number_of_vaccinated,
+                 const size_t number_of_infected,
+                 const bool   use_random_rewiring,
+                 const bool   equilibrate_flockwork,
+                 const size_t seed
+        );
+
+SIS_result
+     SIS_varying_rates_P_neighbor_affinity_infected_nodes(
+                 vector < pair < size_t, size_t > > E, //edgelist
+                 const size_t N,       //number of nodes
+                 vector < double > P,       //probability to reconnect
+                 const double t_run_total,
+                 const double infection_rate,
+                 const double recovery_rate,
+                 vector < pair < double, double > > rewiring_rate,
+                 vector < pair < vector < size_t >, vector < double > > > neighbor_affinity,
+                 const double tmax,
+                 vector < size_t > vaccinated_nodes,
+                 vector < size_t > infected_nodes,
+                 const bool   use_random_rewiring,
+                 const bool   equilibrate_flockwork,
+                 const size_t seed
+        );
 #endif
