@@ -254,6 +254,8 @@ edge_changes
                  const double tmax,
                  const bool   use_random_rewiring,
                  const bool   equilibrate_flockwork,
+                 const bool   use_preferential_node_selection,
+                 const bool   use_unweighted_k_for_selection,
                  const size_t seed
         )
 {
@@ -276,6 +278,21 @@ edge_changes
     {
         size_t eq_time = 0;
         E = equilibrate_edgelist_generator(E,N,P[0],generator,uni_distribution,eq_time,true);
+    }
+
+    vector < double > total_affinity(N);
+
+    for(size_t node=0; node<N; node++)
+    {
+        double k_total;
+
+        if (use_unweighted_k_for_selection)
+            k_total = neighbor_affinity[node].first.size();
+        else
+            k_total = accumulate(neighbor_affinity[node].second.begin(), neighbor_affinity[node].second.end(), 0.0);
+
+        total_affinity[node] = k_total;
+
     }
 
     //initialize status vector of nodes and vector of infected
@@ -388,7 +405,16 @@ edge_changes
         {
             pair < vector < pair <size_t,size_t> >, 
                    vector < pair <size_t,size_t> > 
-                 > curr_edge_change = rewire_P_neighbor_affinity(G,P[i_t%N_gamma],neighbor_affinity,generator,uni_distribution,k,SI_E,node_status);
+                 > curr_edge_change = rewire_P_neighbor_affinity(G,
+                                                                 P[i_t%N_gamma],
+                                                                 neighbor_affinity,
+                                                                 total_affinity,
+                                                                 generator,
+                                                                 uni_distribution,
+                                                                 k,
+                                                                 SI_E,
+                                                                 node_status,
+                                                                 use_preferential_node_selection);
 
             if ( (curr_edge_change.first.size()>0) || (curr_edge_change.second.size()>0) )
             {

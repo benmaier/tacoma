@@ -97,6 +97,21 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("seed") = 0
             );
 
+    m.def("SIS_P", &SIS_P, "Simulate an SIS process on a flockwork P-model given an initial state as an edge list. Returns time and number of infected as well as time and current R0.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("P"),
+            py::arg("t_run_total"),
+            py::arg("infection_rate"),
+            py::arg("recovery_rate"),
+            py::arg("rewiring_rate") = 1.,
+            py::arg("number_of_vaccinated") = 0,
+            py::arg("number_of_infected") = 1,
+            py::arg("use_random_rewiring") = false,
+            py::arg("equilibrate_flockwork") = false,
+            py::arg("seed") = 0
+            );
+
     m.def("SIS_varying_rates", &SIS_varying_rates, "Simulate an SIS process on a flockwork given an initial state as an edge list with varying rewiring rate and Q. Returns time and number of infected as well as time and current R0.",
             py::arg("E"),
             py::arg("N"),
@@ -143,10 +158,12 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("number_of_infected") = 1,
             py::arg("use_random_rewiring") = false,
             py::arg("equilibrate_flockwork") = false,
+            py::arg("use_preferential_node_selection") = false,
+            py::arg("use_unweighted_k_for_selection") = false,
             py::arg("seed") = 0
             );
 
-    m.def("SIS_varying_rates_P_neighbor_affinity_infected_nodes", &SIS_varying_rates_P_neighbor_affinity_infected_nodes, "Simulate an SIS process on a flockwork P-model given an initial state as an edge list with varying rewiring rate and P. Accounts for the integrated social structure of the network. Returns time and number of infected as well as time and current R0.",
+    m.def("SIS_varying_rates_P_neighbor_affinity_infected_nodes", &SIS_varying_rates_P_neighbor_affinity_infected_nodes, "Simulate an SIS process on a flockwork P-model with varying rewiring rate and P. Accounts for the accum. social network. Returns time and number of infected as well as time and current R0.",
             py::arg("E"),
             py::arg("N"),
             py::arg("P"),
@@ -160,6 +177,8 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("infected_nodes"),
             py::arg("use_random_rewiring") = false,
             py::arg("equilibrate_flockwork") = false,
+            py::arg("use_preferential_node_selection") = false,
+            py::arg("use_unweighted_k_for_selection") = false,
             py::arg("seed") = 0
             );
 
@@ -216,6 +235,8 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("tmax"),
             py::arg("use_random_rewiring") = false,
             py::arg("equilibrate_flockwork") = false,
+            py::arg("use_preferential_node_selection") = false,
+            py::arg("use_unweighted_k_for_selection") = false,
             py::arg("seed") = 0
          );
 

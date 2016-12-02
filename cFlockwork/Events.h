@@ -68,12 +68,14 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
     rewire_P_neighbor_affinity(
                  vector < set < size_t > * > & G, //Adjacency matrix
                  double P,       //probability to connect with neighbors of neighbor
-                 vector < pair < vector < size_t >, vector < double > > > neighbor_affinity,
+                 vector < pair < vector < size_t >, vector < double > > > &neighbor_affinity,
+                 vector < double > &total_affinity,
                  default_random_engine & generator, 
                  uniform_real_distribution<double> & distribution,
                  double & mean_degree,
                  set < pair < size_t, size_t > > & SI_E, //edge list of SI links
-                 const vector < size_t > & node_status
+                 const vector < size_t > & node_status,
+                 const bool use_preferential_node_selection = false
             );
 
 void random_rewire(

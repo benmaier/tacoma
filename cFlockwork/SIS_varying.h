@@ -93,6 +93,8 @@ SIS_result
                  const size_t number_of_infected,
                  const bool   use_random_rewiring,
                  const bool   equilibrate_flockwork,
+                 const bool   use_preferential_node_selection,
+                 const bool   use_unweighted_k_for_selection,
                  const size_t seed
         );
 
@@ -111,6 +113,8 @@ SIS_result
                  vector < size_t > infected_nodes,
                  const bool   use_random_rewiring,
                  const bool   equilibrate_flockwork,
+                 const bool   use_preferential_node_selection,
+                 const bool   use_unweighted_k_for_selection,
                  const size_t seed
         );
 #endif

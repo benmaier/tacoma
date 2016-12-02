@@ -68,6 +68,8 @@ edge_changes
                  const double tmax,
                  const bool   use_random_rewiring,
                  const bool   equilibrate_flockwork,
+                 const bool   use_preferential_node_selection,
+                 const bool   use_unweighted_k_for_selection,
                  const size_t seed
         );
 

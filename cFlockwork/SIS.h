@@ -60,4 +60,20 @@ SIS_result
                  const size_t seed
         );
 
+SIS_result
+     SIS_P(
+                 vector < pair < size_t, size_t > > E, //edgelist
+                 const size_t N,       //number of nodes
+                 const double P,       //probability to connect with neighbors of neighbor
+                 const double t_run_total,
+                 const double infection_rate,
+                 const double recovery_rate,
+                 const double rewiring_rate,
+                 const size_t number_of_vaccinated,
+                 const size_t number_of_infected,
+                 const bool   use_random_rewiring,
+                 const bool   equilibrate_flockwork,
+                 const size_t seed
+        );
+
 #endif
