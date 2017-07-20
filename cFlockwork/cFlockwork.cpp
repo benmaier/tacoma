@@ -307,6 +307,13 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("num_timesteps")
             );
 
+    m.def("simulate_P_group_lifetimes", &simulate_flockwork_P_group_life_time, "Simulates a flockwork P-model with initial state of all nodes unconnected. Returns a list of group life times.",
+            py::arg("N"),
+            py::arg("P"),
+            py::arg("seed"),
+            py::arg("num_timesteps")
+            );
+
     m.def("gillespie_tau_and_event_varying_gamma",&gillespie_tau_and_event_varying_gamma,"Get a Gillespie tau and event number for varying rewiring rates",
             py::arg("standard_rates"),
             py::arg("gamma"),

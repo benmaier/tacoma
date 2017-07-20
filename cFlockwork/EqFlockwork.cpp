@@ -91,7 +91,7 @@ void flockwork_P_timestep(
     //erase the links from the perspective of i
     G[i]->clear();
 
-    //add as neighbor of i if a random number is smaller than Q
+    //add as neighbor of i if a random number is smaller than P
     if ( distribution(generator) < P )
     {
         //loop through the neighbors of j
@@ -105,6 +105,97 @@ void flockwork_P_timestep(
         G[ j ]->insert( i );
         G[ i ]->insert( j );
     }
+}
+
+size_t flockwork_P_timestep_monitoring_groups(
+                 vector < set < size_t  > * > &G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 size_t t,
+                 vector < size_t > &group_start_times,
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution
+            )
+{
+    //choose two nodes
+    size_t N = G.size();
+    double r1 = distribution(generator);
+    double r2 = distribution(generator);
+    size_t i,j;
+    choose(N,i,j,r1,r2);
+
+    size_t lifetime = 0;
+    bool is_reconnection_event = (distribution(generator) < P);
+    bool j_is_new_neighbor;
+
+    //if ( (G[i]->size()==1) && (is_reconnection_event) && (*(G[i]->begin())==j))
+    //    return 0;
+
+    // check if potentially this is the end of a group
+    // if node cutting its edges is in a pair and it won't reconnect
+    // or if it's in a pair, will reconnect, but not with its former neighbor
+    size_t old_neighbor = N;
+    if ( G[i]->size() == 1 ) 
+    {
+        old_neighbor = *(G[i]->begin());
+    }
+    if ( ( G[i]->size()==1) && 
+         ( (!is_reconnection_event) || ( 
+                                        (is_reconnection_event) && 
+                                        (old_neighbor != j) 
+                                       )
+         )
+       )
+    {
+        lifetime = t+1 - group_start_times[i];
+        group_start_times[i] = 0;
+        group_start_times[old_neighbor] = 0;
+    }
+
+    //loop through the neighbors of i
+    for(auto neigh_i : *G[i] )
+    {
+        //and erase the link to i
+        G[neigh_i]->erase(i);
+    } 
+
+    //erase the links from the perspective of i
+    G[i]->clear();
+
+    //add as neighbor of i if a random number is smaller than P
+    if (is_reconnection_event)
+    {
+
+        if ( (G[j]->size() == 0) && (j != old_neighbor))
+        {
+            group_start_times[i] = t+1;
+            group_start_times[j] = t+1;
+        }
+        else
+        {
+            group_start_times[i] = group_start_times[j];
+            if (group_start_times[i]==0)
+            {
+                throw domain_error("group got started at time 0 which should not happen"); 
+            }
+        }
+
+        //loop through the neighbors of j
+        for(auto neigh_j : *G[j] ) 
+        {
+            G[ neigh_j ]->insert( i );
+            G[ i ]->insert( neigh_j );
+        }
+
+        //add j as neighbor
+        G[ j ]->insert( i );
+        G[ i ]->insert( j );
+    }
+    else
+    {
+        group_start_times[i] = 0;
+    }
+
+    return lifetime;
 }
 
 void equilibrate_neighborset(
@@ -345,3 +436,50 @@ vector < pair < size_t, size_t > >
 
     return new_E;
 }
+
+vector < size_t >
+     simulate_flockwork_P_group_life_time(
+                 const size_t N,       //number of nodes
+                 const double P,       //probability to connect with neighbors of neighbor
+                 const size_t seed,
+                 size_t num_timesteps
+                 )
+{
+    //initialize Graph vector
+    vector < set < size_t > * > G;
+
+    for(size_t node=0; node<N; node++)
+    {
+        G.push_back(new set < size_t >);
+    }
+
+    //get component vector
+    vector < size_t > group_start_times;
+    for(size_t node=0; node<N; node++)
+    {
+        group_start_times.push_back(0);
+    }
+
+    //initialize random generators
+    default_random_engine generator(seed);
+    uniform_real_distribution<double> uni_distribution(0.,1.);
+
+    //simulate
+    vector < size_t > lifetimes;
+    for(size_t t=0; t<num_timesteps; t++)
+    {
+        size_t lifetime = flockwork_P_timestep_monitoring_groups(G,P,t,group_start_times,generator,uni_distribution);
+        if (lifetime>0)
+            lifetimes.push_back(lifetime);
+    }
+
+    //loop through graph
+    for(size_t node=0; node<N; node++)
+    {
+        //delete created set
+        delete G[node];
+    }
+
+    return lifetimes;
+}
+

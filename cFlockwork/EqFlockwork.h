@@ -85,6 +85,15 @@ void flockwork_P_timestep(
                  uniform_real_distribution<double> & distribution
             );
 
+size_t flockwork_P_timestep_monitoring_groups(
+                 vector < set < size_t  > * > &G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 size_t t,
+                 vector < size_t > &group_start_times,
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution
+            );
+
 vector < pair < size_t, size_t > > 
      simulate_flockwork(
                  vector < pair < size_t, size_t > > E, //edgelist
@@ -97,6 +106,14 @@ vector < pair < size_t, size_t > >
 vector < pair < size_t, size_t > > 
      simulate_flockwork_P(
                  vector < pair < size_t, size_t > > E, //edgelist
+                 const size_t N,       //number of nodes
+                 const double P,       //probability to connect with neighbors of neighbor
+                 const size_t seed,
+                 size_t num_timesteps
+                 );
+
+vector < size_t >
+     simulate_flockwork_P_group_life_time(
                  const size_t N,       //number of nodes
                  const double P,       //probability to connect with neighbors of neighbor
                  const size_t seed,
