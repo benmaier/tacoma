@@ -29,6 +29,7 @@ const size_t S = 0;
 const size_t I = 1;
 const size_t R = 2;
 const size_t V = 3;
+const bool EVENT_VERBOSE = false;
 
 using namespace std;
 
@@ -422,10 +423,16 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
                  const bool use_preferential_node_selection
             )
 {
+    if (EVENT_VERBOSE)
+        cout << "entering event function" << endl;
     //choose two nodes
     size_t N = G.size();
 
     size_t i, j;
+
+
+    if (EVENT_VERBOSE)
+        cout << "choosing node" << endl;
 
     if (use_preferential_node_selection)
     {
@@ -437,16 +444,26 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
         i = r1 * N;
     }
 
+
+    if (EVENT_VERBOSE)
+        cout << "chose node " << i << endl;
+
     size_t number_of_old_edges = 0;
     size_t number_of_new_edges = 0;
 
     vector < pair < size_t, size_t > > edges_out;
     vector < pair < size_t, size_t > > edges_in;
 
+    if (EVENT_VERBOSE)
+        cout << "looping through neighbors of " << i << endl;
+
     //loop through the neighbors of i
     for(auto neigh_i : *G[i] )
     {
         //and erase the link to i
+        if (EVENT_VERBOSE)
+            cout << "erasing " << i << " from list of neighbors of node " << neigh_i <<  endl;
+
         G[neigh_i]->erase(i);
         number_of_old_edges++;
         
@@ -463,14 +480,27 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
         }
     } 
 
+    if (EVENT_VERBOSE)
+        cout << "clearing neighbors of " << i << endl;
+
     //erase the links from the perspective of i
     G[i]->clear();
 
     if ( distribution(generator) < P )
     {
         // get node from social network structure
+        if (EVENT_VERBOSE)
+            cout << "getting neighbor node of neighbor " << i << endl;
+
         size_t neighbor_index = arg_choose_from_vector(neighbor_affinity[i].second, generator, distribution);        
+
+        if (EVENT_VERBOSE)
+            cout << "found neighbor index... " << neighbor_index << endl;
+
         j = neighbor_affinity[i].first[neighbor_index];
+
+        if (EVENT_VERBOSE)
+            cout << "found neighbor node... " << j << endl;
 
         //loop through the neighbors of j
         for(auto neigh_j : *G[j] ) 
@@ -512,6 +542,9 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
 
     //calculate new number of edges
     mean_degree += 2.0 * ( double(number_of_new_edges) - double(number_of_old_edges) ) / double(N);
+
+    if (EVENT_VERBOSE)
+        cout << "leaving event function" << endl;
 
     return make_pair(edges_out,edges_in);
 
