@@ -234,3 +234,23 @@ void get_gillespie_tau_and_event_with_varying_gamma(
 
 }
 
+void remove_from_vector(vector <size_t> &vec, const size_t to_be_removed){
+    vec.erase(
+                remove_if(vec.begin(), vec.end(),
+                          [&to_be_removed](const size_t & element) { return (element == to_be_removed); }
+                         ),
+                vec.end()
+             );
+}
+
+void remove_2_from_vector(vector <size_t> &vec, const size_t first_to_be_removed, const size_t second_to_be_removed){
+    vec.erase(
+                remove_if(vec.begin(), vec.end(),
+                          [&first_to_be_removed, &second_to_be_removed](const size_t & element) 
+                            { return ( (element == first_to_be_removed) ||
+                                       (element == second_to_be_removed) ); 
+                            }
+                         ),
+                vec.end()
+             );
+}

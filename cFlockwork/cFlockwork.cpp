@@ -48,6 +48,7 @@
 #include "FW_P_varying.h"
 #include "ResultClasses.h"
 #include "test_varying_rate.h"
+#include "Barrat_model.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -222,6 +223,16 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("tmax"),
             py::arg("use_random_rewiring") = false,
             py::arg("equilibrate_flockwork") = false,
+            py::arg("seed") = 0
+         );
+
+    m.def("ZSBB_model", &ZSBB_model, "Simulate model after Zhao, Stehle, Bianconi, and Barrat.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("lambda"),
+            py::arg("b0"),
+            py::arg("b1"),
+            py::arg("t_run_total"),
             py::arg("seed") = 0
          );
 

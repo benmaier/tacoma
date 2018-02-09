@@ -77,4 +77,7 @@ void get_gillespie_tau_and_event_with_varying_gamma(
                 default_random_engine & generator, 
                 uniform_real_distribution<double> & distribution
              );
+
+void remove_from_vector(vector <size_t> &vec, const size_t to_be_removed);
+void remove_2_from_vector(vector <size_t> &vec, const size_t first_to_be_removed, const size_t second_to_be_removed);
 #endif

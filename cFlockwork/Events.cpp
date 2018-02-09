@@ -439,9 +439,13 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
         i = arg_choose_from_vector(total_affinity, generator, distribution);
     }
     else
-    {
-        double r1 = distribution(generator);
-        i = r1 * N;
+    {   
+        do
+        {
+            double r1 = distribution(generator);
+            i = r1 * N;
+        } while ( neighbor_affinity[i].second.size() == 0 );
+        
     }
 
 
@@ -491,6 +495,7 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
         // get node from social network structure
         if (EVENT_VERBOSE)
             cout << "getting neighbor node of neighbor " << i << endl;
+
 
         size_t neighbor_index = arg_choose_from_vector(neighbor_affinity[i].second, generator, distribution);        
 
