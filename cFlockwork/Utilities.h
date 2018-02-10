@@ -37,6 +37,8 @@
 #include <ctime>
 #include <cstdlib>
 #include <tuple>
+#include <thread>
+#include <map>
 
 using namespace std;
 
@@ -80,4 +82,22 @@ void get_gillespie_tau_and_event_with_varying_gamma(
 
 void remove_from_vector(vector <size_t> &vec, const size_t to_be_removed);
 void remove_2_from_vector(vector <size_t> &vec, const size_t first_to_be_removed, const size_t second_to_be_removed);
+void randomly_seed_engine(
+        default_random_engine &generator
+        );
+void get_component_size_histogram_from_edgelist(
+        size_t N,
+        vector < pair < size_t,size_t > > const &edge_list,
+        map < size_t,size_t > &counter
+        );
+void get_component_size_histogram(
+        map < size_t, size_t > &counter,
+        const vector < set < size_t > > &G
+        );
+void add_nodes_belonging_to_this_component(
+        size_t start_node,
+        const vector < set < size_t > > &G,
+        set < size_t > * comp,
+        vector < bool > &already_visited
+       );
 #endif

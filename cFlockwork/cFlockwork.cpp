@@ -49,6 +49,7 @@
 #include "ResultClasses.h"
 #include "test_varying_rate.h"
 #include "Barrat_model.h"
+#include "dyn_RGG.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -237,6 +238,18 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("verbose") = false
          );
 
+    m.def("dynamic_RGG", &dynamic_RGG, "Simulate dynamic random geometric graph model.",
+            py::arg("N"),
+            py::arg("t_run_total"),
+            py::arg("step_distance") = 0.0,
+            py::arg("mean_link_duration") = 0.0,
+            py::arg("critical_density") = 0.65,
+            py::arg("periodic_boundary_conditions_for_link_building") = false,
+            py::arg("record_sizes_and_durations") = false,
+            py::arg("seed") = 0,
+            py::arg("verbose") = false
+         );
+
     m.def("flockwork_P_varying_rates_neighbor_affinity", &flockwork_P_varying_rates_neighbor_affinity, "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rate and varying P. Rewiring neighbors are chosen according to a neighbor affinity value. Returns time points and concurrent edge changes.",
             py::arg("E"),
             py::arg("N"),
@@ -356,6 +369,18 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("t", &edge_changes::t)
         .def_readwrite("edges_out", &edge_changes::edges_out)
         .def_readwrite("edges_in", &edge_changes::edges_in);
+
+    py::class_<edge_lists>(m,"edge_lists")
+        .def(py::init<>())
+        .def_readwrite("t", &edge_lists::t)
+        .def_readwrite("edges", &edge_lists::edges);
+
+    py::class_<edge_lists_with_histograms>(m,"edge_lists_with_histograms")
+        .def(py::init<>())
+        .def_readwrite("t", &edge_lists_with_histograms::t)
+        .def_readwrite("edges", &edge_lists_with_histograms::edges)
+        .def_readwrite("size_histograms", &edge_lists_with_histograms::size_histograms)
+        .def_readwrite("durations", &edge_lists_with_histograms::durations);
 
 
     return m.ptr();

@@ -24,3 +24,6 @@ pyclean:
 
 matclean:
 	-rm -rf ./matlabbuild/
+
+python:
+	python setup.py develop

@@ -1,6 +1,6 @@
 /* 
  * The MIT License (MIT)
- * Copyright (c) 2016, Benjamin Maier
+ * Copyright (c) 2018, Benjamin Maier
  *
  * Permission is hereby granted, free of charge, to any person 
  * obtaining a copy of this software and associated documentation 
@@ -23,11 +23,12 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef __RESULTCLASSES_H__
-#define __RESULTCLASSES_H__
+#ifndef __DYN_RGG_H__
+#define __DYN_RGG_H__
 
-#include "Events.h"
 #include "Utilities.h"
+#include "ResultClasses.h"
+
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
@@ -41,43 +42,34 @@
 #include <ctime>
 #include <tuple>
 
-struct SIR_result 
-{
-    vector < pair < double, size_t > > I_of_t; 
-    vector < pair < double, size_t > > R_of_t; 
-    vector < pair < double, size_t > > SI_of_t; 
-    vector < pair < double, double > > R0_of_t;
-    set < pair < size_t, size_t > > edge_list;
-};
+using namespace std;
 
-struct SIS_result 
-{
-    vector < pair < double, size_t > > I_of_t; 
-    vector < pair < double, size_t > > SI_of_t; 
-    vector < pair < double, double > > R0_of_t;
-    set < pair < size_t, size_t > > edge_list;
-};
+void dyn_RGG_update_positions(vector < pair < double, double > > &pos,
+                      default_random_engine &generator,
+                      uniform_real_distribution<double> &uni_distribution,
+                      const double &step_distance
+                    );
+        
+void dyn_RGG_write_edge_list(
+                   vector < pair < size_t, size_t > > & edges,
+                   vector < pair < double, double > > const &pos,
+                   const double &R,
+                   const bool &PBC_distance
+        );
 
-struct edge_changes
-{
-    vector < double > t;
-    vector < vector < pair < size_t, size_t > > > edges_out; 
-    vector < vector < pair < size_t, size_t > > > edges_in;
-};
+size_t get_edge_int(pair < size_t, size_t > &edge, const size_t N);
 
-struct edge_lists
-{
-    vector < double > t;
-    vector < vector < pair < size_t, size_t > > > edges;
-};
-
-struct edge_lists_with_histograms
-{
-    vector < double > t;
-    vector < vector < pair < size_t, size_t > > > edges;
-    vector < map < size_t, size_t > > size_histograms;
-    vector < size_t > durations;
-};
-
+edge_lists_with_histograms
+     dynamic_RGG(
+             const size_t N,       //number of nodes
+             const size_t t_run_total,
+             double step_distance,
+             const double mean_link_duration,
+             const double critical_density,
+             const bool   PBC_distance,
+             const bool   record_sizes_and_durations,
+             const size_t seed,
+             const bool verbose
+        );
 
 #endif

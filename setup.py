@@ -21,6 +21,7 @@ ext_modules = [
         [ 
             'cFlockwork/Utilities.cpp', 
             'cFlockwork/Events.cpp', 
+            'cFlockwork/dyn_RGG.cpp', 
             'cFlockwork/SIS.cpp', 
             'cFlockwork/SI.cpp', 
             'cFlockwork/SI_varying.cpp', 
@@ -33,6 +34,7 @@ ext_modules = [
             'cFlockwork/EqFlockwork.cpp', 
             'cFlockwork/cFlockwork.cpp', 
             'cFlockwork/test_varying_rate.cpp', 
+            'cFlockwork/Barrat_model.cpp', 
         ],
         include_dirs=[
             get_pybind_include(),
@@ -92,7 +94,7 @@ class BuildExt(build_ext):
 
 setup(
     name='cFlockwork',
-    version='0.0.9',
+    version='0.0.10',
     author='Benjamin F. Maier',
     author_email='bfmaier@physik.hu-berlin.de',
     url='https://github.com/benmaier/cFlockwork',
