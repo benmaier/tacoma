@@ -57,8 +57,6 @@ void dyn_RGG_write_edge_list(
                    const bool &PBC_distance
         );
 
-size_t get_edge_int(pair < size_t, size_t > &edge, const size_t N);
-
 edge_lists_with_histograms
      dynamic_RGG(
              const size_t N,       //number of nodes

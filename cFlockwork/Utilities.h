@@ -42,6 +42,8 @@
 
 using namespace std;
 
+size_t get_edge_int(pair < size_t, size_t > &edge, const size_t N);
+
 void choose (const size_t N, size_t &first, size_t &second, const double r1, const double r2);
 
 pair <size_t,size_t> get_sorted_pair(size_t i, size_t j);

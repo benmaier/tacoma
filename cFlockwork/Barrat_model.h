@@ -57,6 +57,7 @@ edge_changes
              const double b1,
              const double t_run_simulation,
              const size_t seed,
+             const bool record_sizes_and_durations = false,
              const bool verbose = false
         );
 

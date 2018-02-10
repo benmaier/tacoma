@@ -42,11 +42,6 @@
 
 using namespace std;
 
-size_t get_edge_int(pair < size_t, size_t > &edge, const size_t N)
-{
-    return edge.first * N + edge.second;
-}
-
 void dyn_RGG_update_positions(vector < pair < double, double > > &pos,
                       default_random_engine &generator,
                       uniform_real_distribution<double> &uni_distribution,

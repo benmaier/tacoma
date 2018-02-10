@@ -56,6 +56,7 @@ edge_changes
              const double b1,
              const double t_run_simulation,
              const size_t seed,
+             const bool record_sizes_and_durations,
              const bool verbose
         )
 {
@@ -71,14 +72,13 @@ edge_changes
     vector < size_t > loners;
 
     //initialize Graph vector
-    vector < set < size_t > * > G;
+    vector < set < size_t > > G(N);
 
     //count number of edges in Graph
     size_t number_of_edges = 0;
 
     for(size_t node=0; node<N; node++)
     {
-        G.push_back(new set < size_t >);
         last_time_active.push_back(t);
     }
 
@@ -90,21 +90,40 @@ edge_changes
         size_t j = edge.second;
 
         //check if j is already a neighbor of i
-        const bool already_counted = G[i]->find(j) != G[i]->end();
+        const bool already_counted = G[i].find(j) != G[i].end();
 
         //check if edge has been added already
         if (!(already_counted) && (i!=j)) 
         {
-            G[ i ]->insert( j );
-            G[ j ]->insert( i );
+            G[ i ].insert( j );
+            G[ j ].insert( i );
             number_of_edges++;
         }
+    }
+
+    // get current size histogram
+    vector < map < size_t, int > > group_changes;
+
+    if (record_sizes_and_durations)
+    {
+    }
+
+    // add 
+    vector < size_t > durations;
+    set < size_t > initial_edges;
+    map < size_t, size_t > current_edges;
+    map < size_t, size_t >::iterator current_edge_iterator;
+    for(auto edge: E)
+    {
+        size_t edge_int = get_edge_int(edge,N);
+        initial_edges.insert(edge_int);
+        current_edges[edge_int] = t;
     }
 
     // if a node has zero neighbors he/she is a loner
     for(size_t node=0; node<N; node++)
     {
-        if (G[node]->size() == 0)
+        if (G[node].size() == 0)
         {
             loners.push_back(node);
         }
@@ -119,6 +138,7 @@ edge_changes
     vector < double > time;
 
 
+
     for(t = 1; t<t_run_simulation; t++)
     {
         if (verbose)
@@ -131,7 +151,7 @@ edge_changes
         size_t i = random_node(generator);
         double b;
         double tau = t - last_time_active[i];
-        const bool is_isolated = G[i]->size() == 0;
+        const bool is_isolated = G[i].size() == 0;
 
         if (verbose)
         {
@@ -159,6 +179,7 @@ edge_changes
             // if node will update
             vector < pair <size_t,size_t> > in;
             vector < pair <size_t,size_t> > out;
+            map < size_t, int > this_group_change;
 
             const bool invite_loner = (uni_distribution(generator) < 1.0 - lambda);
 
@@ -195,23 +216,32 @@ edge_changes
                     cout << "invited loner " << j << endl;
 
                 // add loner to all nodes of the group besides i
-                for(auto neigh_i : *G[i] ){
+                for(auto const &neigh_i : G[i] ){
                     last_time_active[neigh_i] = t;
-                    G[neigh_i]->insert(j);
-                    G[j]->insert(neigh_i);
+                    G[neigh_i].insert(j);
+                    G[j].insert(neigh_i);
                     in.push_back( get_sorted_pair(neigh_i, j));
                 }
 
                 // add loner to i
-                G[i]->insert(j);
-                G[j]->insert(i);
+                G[i].insert(j);
+                G[j].insert(i);
                 in.push_back( get_sorted_pair(i,j) );
 
                 // remove formerly isolated nodes from the loner pool
                 if (is_isolated)
+                {
                     remove_2_from_vector(loners,i,j);
+                    this_group_change[1] = -2;
+                    this_group_change[2] = +1;
+                }
                 else
+                {
                     remove_from_vector(loners,j);
+                    this_group_change[1] = -1;
+                    this_group_change[G[i].size()] = -1;
+                    this_group_change[G[i].size()+1] = +1;
+                }
 
             } 
             else // i is member of a group and does not invite anybody
@@ -219,23 +249,38 @@ edge_changes
                 if (verbose)
                     cout << "will leave group " << endl;
 
+                bool const is_pair = G[i].size() == 1;
+                size_t const old_group_size = G[i].size() + 1;
+
                 // => leaves the group
-                for(auto neigh_i : *G[i] ){
+                for(auto const &neigh_i : G[i] ){
 
                     out.push_back( get_sorted_pair(i,neigh_i) );
                     if (verbose)
                         cout << "current_neighbor: " << neigh_i << endl;
 
                     last_time_active[neigh_i] = t;
-                    G[neigh_i]->erase(i);
+                    G[neigh_i].erase(i);
 
                     // if i was part of a pair, i's neighbor is now a loner, too
-                    if (G[neigh_i]->size() == 0)
+                    if (G[neigh_i].size() == 0)
                         loners.push_back(neigh_i);
                 }
 
+                if (is_pair)
+                {
+                    this_group_change[2] = -1;
+                    this_group_change[1] = +2;
+                }
+                else
+                {
+                    this_group_change[old_group_size] = -1;
+                    this_group_change[old_group_size-1] = +1;
+                    this_group_change[1] = +1;
+                }
+
                 // delete all edges
-                G[i]->clear();
+                G[i].clear();
                 loners.push_back(i);
 
                 if (verbose)
@@ -246,6 +291,41 @@ edge_changes
             time.push_back(t);
             edges_in.push_back(in);
             edges_out.push_back(out);
+
+            if(record_sizes_and_durations)
+            {
+                // compute durations
+                vector < size_t > edges_to_delete; 
+                for(auto const &edge: in)
+                {
+                    size_t edge_int = get_edge_int(edge,N);
+                    current_edges[edge_int] = t;
+                }
+                for(auto const &edge: out)
+                {
+                    size_t edge_int = get_edge_int(edge,N);
+                    const bool is_initial_edge =    initial_edges.find(edge_int) 
+                                                 != initial_edges.end();
+                    if (initial_edges.size()==0 ||
+                        not is_initial_edge
+                       )
+                    {
+                        size_t duration = t - current_edge_iterator->second;
+                        durations.push_back(duration);
+                    }
+                    else if (is_initial_edge) {
+                        initial_edges.erase(edge_int);
+                    }
+                    edges_to_delete.push_back(edge_int);
+                }
+                for( auto const &edge_int: edges_to_delete)
+                {
+                    current_edges.erase(edge_int);
+                }
+
+                //compute histogram
+                group_changes.push_back(this_group_change);
+            }
         }
 
 
