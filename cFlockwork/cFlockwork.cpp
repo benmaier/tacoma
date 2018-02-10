@@ -233,7 +233,8 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("b0"),
             py::arg("b1"),
             py::arg("t_run_total"),
-            py::arg("seed") = 0
+            py::arg("seed") = 0,
+            py::arg("verbose") = false
          );
 
     m.def("flockwork_P_varying_rates_neighbor_affinity", &flockwork_P_varying_rates_neighbor_affinity, "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rate and varying P. Rewiring neighbors are chosen according to a neighbor affinity value. Returns time points and concurrent edge changes.",

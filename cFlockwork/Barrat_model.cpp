@@ -55,7 +55,8 @@ edge_changes
              const double b0,
              const double b1,
              const double t_run_simulation,
-             const size_t seed
+             const size_t seed,
+             const bool verbose
         )
 {
 
@@ -66,7 +67,7 @@ edge_changes
     uniform_real_distribution<double> uni_distribution(0.,1.);
     uniform_int_distribution<size_t> random_node(0,N-1);
 
-    vector < size_t > last_time_active(N); // a vector containing zeros
+    vector < size_t > last_time_active;
     vector < size_t > loners;
 
     //initialize Graph vector
@@ -78,6 +79,7 @@ edge_changes
     for(size_t node=0; node<N; node++)
     {
         G.push_back(new set < size_t >);
+        last_time_active.push_back(t);
     }
 
     //loop through edge list and push neighbors
@@ -91,7 +93,7 @@ edge_changes
         const bool already_counted = G[i]->find(j) != G[i]->end();
 
         //check if edge has been added already
-        if (!(already_counted)) 
+        if (!(already_counted) && (i!=j)) 
         {
             G[ i ]->insert( j );
             G[ j ]->insert( i );
@@ -108,6 +110,8 @@ edge_changes
         }
     }
 
+    if (verbose)
+        cout << "initiated" << endl;
 
 
     vector < vector < pair <size_t,size_t> > > edges_out;
@@ -117,12 +121,24 @@ edge_changes
 
     for(t = 1; t<t_run_simulation; t++)
     {
+        if (verbose)
+        {
+            cout << " ============== " << endl;
+            cout << "t = " << t << endl;
+        }
 
         // choose random node
         size_t i = random_node(generator);
         double b;
         double tau = t - last_time_active[i];
         const bool is_isolated = G[i]->size() == 0;
+
+        if (verbose)
+        {
+            cout << "chose node " << i << endl;
+            cout << "tau = " << tau << endl;
+            cout << "is_isolated = " << is_isolated << endl;
+        }
 
         if (is_isolated) {
             b = b0;
@@ -133,6 +149,11 @@ edge_changes
         // determine if node will become active
         if (uni_distribution(generator) < p_n(b,tau,N))
         {
+            if (verbose)
+            {
+                cout << "is active " << endl;
+            }
+
             last_time_active[i] = t;
 
             // if node will update
@@ -141,56 +162,84 @@ edge_changes
 
             const bool invite_loner = (uni_distribution(generator) < 1.0 - lambda);
 
-            if ((is_isolated) || (invite_loner))
+            if ( ((is_isolated) || (invite_loner)) && (loners.size()>0) )
             {
-                if (loners.size()>0) {
-                    vector < double > probabilities;
-                    for(size_t loner_index = 0; loner_index<loners.size(); ++loner_index)
-                    {
-                        double tau_ = t - last_time_active[loners[loner_index]];
-                        probabilities.push_back( p_n(b0,tau_,N) );
-                    }
-                    size_t loner_index = arg_choose_from_vector(
-                                            probabilities,
-                                            generator,
-                                            uni_distribution
-                                            );
-                    size_t j = loners[loner_index];
+                if (verbose)
+                    cout << "will invite a loner" << endl;
 
-                    last_time_active[j] = t;
+                // choose a loner to invite for a group
 
-                    for(auto neigh_i : *G[i] ){
-                        last_time_active[neigh_i] = t;
-                        G[neigh_i]->insert(j);
-                        G[j]->insert(neigh_i);
-                        in.push_back( get_sorted_pair(neigh_i, j));
-                    }
-
-                    G[i]->insert(j);
-                    G[j]->insert(i);
-                    in.push_back( get_sorted_pair(i,j) );
-                    if (is_isolated)
-                        remove_2_from_vector(loners,i,j);
-                    else
-                        remove_from_vector(loners,j);
+                // calculate probabilities for the loners
+                vector < double > probabilities;
+                size_t loner_index;
+                for(loner_index = 0; loner_index<loners.size(); ++loner_index)
+                {
+                    double tau_ = t - last_time_active[loners[loner_index]];
+                    probabilities.push_back( p_n(b0,tau_,N) );
                 }
 
+                // choose a loner proportional to their activation probability
+                do {
+                    loner_index = arg_choose_from_vector(
+                                        probabilities,
+                                        generator,
+                                        uni_distribution
+                                        );
+                } while(loners[loner_index] == i);
+
+                // activate the loner 
+                size_t j = loners[loner_index];
+                last_time_active[j] = t;
+
+                if (verbose)
+                    cout << "invited loner " << j << endl;
+
+                // add loner to all nodes of the group besides i
+                for(auto neigh_i : *G[i] ){
+                    last_time_active[neigh_i] = t;
+                    G[neigh_i]->insert(j);
+                    G[j]->insert(neigh_i);
+                    in.push_back( get_sorted_pair(neigh_i, j));
+                }
+
+                // add loner to i
+                G[i]->insert(j);
+                G[j]->insert(i);
+                in.push_back( get_sorted_pair(i,j) );
+
+                // remove formerly isolated nodes from the loner pool
+                if (is_isolated)
+                    remove_2_from_vector(loners,i,j);
+                else
+                    remove_from_vector(loners,j);
+
             } 
-            else // is member of a group and does not invite anybody
+            else // i is member of a group and does not invite anybody
             {
+                if (verbose)
+                    cout << "will leave group " << endl;
 
                 // => leaves the group
                 for(auto neigh_i : *G[i] ){
 
                     out.push_back( get_sorted_pair(i,neigh_i) );
+                    if (verbose)
+                        cout << "current_neighbor: " << neigh_i << endl;
+
                     last_time_active[neigh_i] = t;
                     G[neigh_i]->erase(i);
 
+                    // if i was part of a pair, i's neighbor is now a loner, too
                     if (G[neigh_i]->size() == 0)
                         loners.push_back(neigh_i);
                 }
+
+                // delete all edges
                 G[i]->clear();
                 loners.push_back(i);
+
+                if (verbose)
+                    cout << "left group " << endl;
 
             }
 
