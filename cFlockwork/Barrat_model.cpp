@@ -109,7 +109,7 @@ edge_changes_with_histograms
     set < size_t > initial_edges;
     map < size_t, size_t > current_edges;
     map < size_t, size_t >::iterator current_edge_iterator;
-    for(auto edge: E)
+    for(auto const &edge: E)
     {
         size_t edge_int = get_edge_int(edge,N);
         initial_edges.insert(edge_int);
