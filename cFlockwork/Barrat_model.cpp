@@ -47,7 +47,7 @@ double p_n(const double b, const double tau, const size_t N)
     return b / (1.0 + tau / N);
 }
         
-edge_changes
+edge_changes_with_histograms
      ZSBB_model(
              vector < pair < size_t, size_t > > E, //edgelist
              const size_t N,       //number of nodes
@@ -103,10 +103,6 @@ edge_changes
 
     // get current size histogram
     vector < map < size_t, int > > group_changes;
-
-    if (record_sizes_and_durations)
-    {
-    }
 
     // add 
     vector < size_t > durations;
@@ -183,30 +179,65 @@ edge_changes
 
             const bool invite_loner = (uni_distribution(generator) < 1.0 - lambda);
 
-            if ( ((is_isolated) || (invite_loner)) && (loners.size()>0) )
+            if ( ((is_isolated) || (invite_loner)) && (loners.size()>1) )
             {
                 if (verbose)
-                    cout << "will invite a loner" << endl;
+                {
+                    cout << "will invite a loner from loner vector of size " << loners.size() << endl;
+                    cout << "      loner vector has content ";
+                    for (auto const &loner: loners)
+                    {
+                        cout << loner << " ";
+                    }
+                    cout << endl;
+                    cout << "      corresponding to probabilities " << endl;
+                }
 
-                // choose a loner to invite for a group
+                // choose a loner to invite to i's group
 
                 // calculate probabilities for the loners
                 vector < double > probabilities;
-                size_t loner_index;
-                for(loner_index = 0; loner_index<loners.size(); ++loner_index)
+                size_t i_loner_index;
+                size_t loner_index = 0;
+                for(auto const &loner: loners)
                 {
-                    double tau_ = t - last_time_active[loners[loner_index]];
-                    probabilities.push_back( p_n(b0,tau_,N) );
+                    // only consider loners which are not i
+                    if (loner != i)
+                    {
+                        double tau_ = t - last_time_active[loner];
+                        probabilities.push_back( p_n(b0,tau_,N) );
+                    } else {
+                        i_loner_index = loner_index;
+                    }
+
+                    loner_index++;
+                }
+
+                if (verbose)
+                {
+                    for(auto const &prob: probabilities)
+                    {
+                        cout << prob << " ";
+                    }
+                    cout << endl;
                 }
 
                 // choose a loner proportional to their activation probability
-                do {
-                    loner_index = arg_choose_from_vector(
-                                        probabilities,
-                                        generator,
-                                        uni_distribution
-                                        );
-                } while(loners[loner_index] == i);
+                loner_index = arg_choose_from_vector(
+                                    probabilities,
+                                    generator,
+                                    uni_distribution
+                                    );
+
+                // in case node i was a loner, too we have to shift the chosen loner
+                // in order to properly ignore i
+                if ((is_isolated) && (loner_index >= i_loner_index))
+                    loner_index += 1;
+
+                if (verbose)
+                {
+                    cout << "chose loner node " << loners[loner_index] << " with loner index " << loner_index << " to invite to group " << endl;
+                }
 
                 // activate the loner 
                 size_t j = loners[loner_index];
@@ -244,7 +275,7 @@ edge_changes
                 }
 
             } 
-            else // i is member of a group and does not invite anybody
+            else if (not is_isolated)// i is member of a group and does not invite anybody
             {
                 if (verbose)
                     cout << "will leave group " << endl;
@@ -300,6 +331,8 @@ edge_changes
                 {
                     size_t edge_int = get_edge_int(edge,N);
                     current_edges[edge_int] = t;
+                    if (verbose)
+                        cout << "new_edge " << edge_int << " at time " << t << endl;
                 }
                 for(auto const &edge: out)
                 {
@@ -310,7 +343,7 @@ edge_changes
                         not is_initial_edge
                        )
                     {
-                        size_t duration = t - current_edge_iterator->second;
+                        size_t duration = t - current_edges[edge_int];
                         durations.push_back(duration);
                     }
                     else if (is_initial_edge) {
@@ -331,11 +364,13 @@ edge_changes
 
     }
 
-    edge_changes result;
+    edge_changes_with_histograms result;
 
     result.t = time;
     result.edges_out = edges_out;
     result.edges_in = edges_in;
+    result.group_changes = group_changes;
+    result.durations = durations;
 
     return result;
 }

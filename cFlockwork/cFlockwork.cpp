@@ -235,6 +235,7 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("b1"),
             py::arg("t_run_total"),
             py::arg("seed") = 0,
+            py::arg("record_sizes_and_durations") = false,
             py::arg("verbose") = false
          );
 
@@ -381,6 +382,15 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("edges", &edge_lists_with_histograms::edges)
         .def_readwrite("size_histograms", &edge_lists_with_histograms::size_histograms)
         .def_readwrite("durations", &edge_lists_with_histograms::durations);
+
+    py::class_<edge_changes_with_histograms>(m,"edge_changes_with_histograms")
+        .def(py::init<>())
+        .def_readwrite("t", &edge_changes_with_histograms::t)
+        .def_readwrite("edges_in", &edge_changes_with_histograms::edges_in)
+        .def_readwrite("edges_out", &edge_changes_with_histograms::edges_out)
+        .def_readwrite("group_changes", &edge_changes_with_histograms::group_changes)
+        .def_readwrite("durations", &edge_changes_with_histograms::durations);
+
 
 
     return m.ptr();

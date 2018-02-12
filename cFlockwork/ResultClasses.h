@@ -65,6 +65,15 @@ struct edge_changes
     vector < vector < pair < size_t, size_t > > > edges_in;
 };
 
+struct edge_changes_with_histograms
+{
+    vector < double > t;
+    vector < vector < pair < size_t, size_t > > > edges_out; 
+    vector < vector < pair < size_t, size_t > > > edges_in;
+    vector < map < size_t, int > > group_changes;
+    vector < size_t > durations;
+};
+
 struct edge_lists
 {
     vector < double > t;

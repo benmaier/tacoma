@@ -21,6 +21,7 @@ ext_modules = [
         [ 
             'cFlockwork/Utilities.cpp', 
             'cFlockwork/Events.cpp', 
+            'cFlockwork/Barrat_model.cpp', 
             'cFlockwork/dyn_RGG.cpp', 
             'cFlockwork/SIS.cpp', 
             'cFlockwork/SI.cpp', 
@@ -34,7 +35,6 @@ ext_modules = [
             'cFlockwork/EqFlockwork.cpp', 
             'cFlockwork/cFlockwork.cpp', 
             'cFlockwork/test_varying_rate.cpp', 
-            'cFlockwork/Barrat_model.cpp', 
         ],
         include_dirs=[
             get_pybind_include(),

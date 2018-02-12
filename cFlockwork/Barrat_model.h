@@ -48,7 +48,7 @@ double p_n(const double b, const double tau, const size_t N);
 
 
         
-edge_changes
+edge_changes_with_histograms
      ZSBB_model(
              vector < pair < size_t, size_t > > E, //edgelist
              const size_t N,       //number of nodes
