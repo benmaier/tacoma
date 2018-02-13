@@ -25,7 +25,7 @@
 
 #include "Utilities.h"
 #include "ResultClasses.h"
-#include "Barrat_model.h"
+#include "ZSBB_model.h"
 
 #include <iostream>
 #include <algorithm>
@@ -55,6 +55,7 @@ edge_changes_with_histograms
              const double b0,
              const double b1,
              const double t_run_simulation,
+             const double t_equilibration,
              const size_t seed,
              const bool record_sizes_and_durations,
              const bool verbose
@@ -64,7 +65,12 @@ edge_changes_with_histograms
     size_t t = 0;
 
     //initialize random generators
-    default_random_engine generator(seed);
+    
+    default_random_engine generator;
+    if (seed == 0)
+        randomly_seed_engine(generator);
+    else
+        generator.seed(seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
     uniform_int_distribution<size_t> random_node(0,N-1);
 
@@ -101,29 +107,25 @@ edge_changes_with_histograms
         }
     }
 
-    // get current size histogram
+    // size histograms
     vector < map < size_t, int > > group_changes;
+    map < size_t, size_t > initial_size_histogram;
+    map < size_t, size_t > final_size_histogram;
 
-    // add 
-    vector < size_t > durations;
+    // duration containers 
+    vector < size_t > contact_durations;
+    vector < size_t > inter_contact_durations;
     set < size_t > initial_edges;
     map < size_t, size_t > current_edges;
     map < size_t, size_t >::iterator current_edge_iterator;
-    for(auto const &edge: E)
-    {
-        size_t edge_int = get_edge_int(edge,N);
-        initial_edges.insert(edge_int);
-        current_edges[edge_int] = t;
-    }
+
+    // group durations 
+    vecto < vector < size_t > > group_durations(N+1);
 
     // if a node has zero neighbors he/she is a loner
     for(size_t node=0; node<N; node++)
-    {
         if (G[node].size() == 0)
-        {
             loners.push_back(node);
-        }
-    }
 
     if (verbose)
         cout << "initiated" << endl;
@@ -135,12 +137,32 @@ edge_changes_with_histograms
 
 
 
-    for(t = 1; t<t_run_simulation; t++)
+    for(t = 1; t<t_equilibration+t_run_simulation; t++)
     {
         if (verbose)
         {
             cout << " ============== " << endl;
             cout << "t = " << t << endl;
+        }
+
+        if (t-1 == t_equilibration)
+        {
+            // initialize duration measurement tools
+            for(size_t node=0; node< N; ++node)
+            {
+                for(auto const &neigh: G[node])
+                {
+                    if (neigh>node)
+                    {
+                        size_t edge_int = get_edge_int(make_pair(node,neigh),N);
+                        initial_edges.insert(edge_int);
+                        current_edges[edge_int] = t;
+                    }
+                }
+            }
+
+            // initialize initial size histogram
+            get_component_size_histogram(initial_size_histogram,G);
         }
 
         // choose random node
@@ -235,19 +257,19 @@ edge_changes_with_histograms
                     loner_index += 1;
 
                 if (verbose)
-                {
                     cout << "chose loner node " << loners[loner_index] << " with loner index " << loner_index << " to invite to group " << endl;
-                }
 
                 // activate the loner 
                 size_t j = loners[loner_index];
+                size_t tau_j = t - last_time_active[j];
                 last_time_active[j] = t;
 
                 if (verbose)
                     cout << "invited loner " << j << endl;
 
                 // add loner to all nodes of the group besides i
-                for(auto const &neigh_i : G[i] ){
+                for(auto const &neigh_i : G[i] )
+                {
                     last_time_active[neigh_i] = t;
                     G[neigh_i].insert(j);
                     G[j].insert(neigh_i);
@@ -263,15 +285,28 @@ edge_changes_with_histograms
                 if (is_isolated)
                 {
                     remove_2_from_vector(loners,i,j);
-                    this_group_change[1] = -2;
-                    this_group_change[2] = +1;
+                    if (record_sizes_and_durations)
+                    {
+                        this_group_change[1] = -2;
+                        this_group_change[2] = +1;
+                        inter_contact_durations.push_back(tau_j);
+                        inter_contact_durations.push_back(tau);
+                        group_durations[1].push_back(tau_j);
+                        group_durations[1].push_back(tau);
+                    }
                 }
                 else
                 {
                     remove_from_vector(loners,j);
-                    this_group_change[1] = -1;
-                    this_group_change[G[i].size()] = -1;
-                    this_group_change[G[i].size()+1] = +1;
+                    if (record_sizes_and_durations)
+                    {
+                        this_group_change[1] = -1;
+                        this_group_change[G[i].size()] = -1;
+                        this_group_change[G[i].size()+1] = +1;
+                        inter_contact_durations.push_back(tau_j);
+                        group_durations[1].push_back(tau_j);
+                        group_durations[G[i].size()].push_back(tau);
+                    }
                 }
 
             } 
@@ -300,14 +335,22 @@ edge_changes_with_histograms
 
                 if (is_pair)
                 {
-                    this_group_change[2] = -1;
-                    this_group_change[1] = +2;
+                    if (record_sizes_and_durations)
+                    {
+                        this_group_change[2] = -1;
+                        this_group_change[1] = +2;
+                        group_durations[2].push_back(tau);
+                    }
                 }
                 else
                 {
-                    this_group_change[old_group_size] = -1;
-                    this_group_change[old_group_size-1] = +1;
-                    this_group_change[1] = +1;
+                    if (record_sizes_and_durations)
+                    {
+                        this_group_change[old_group_size] = -1;
+                        this_group_change[old_group_size-1] = +1;
+                        this_group_change[1] = +1;
+                        group_durations[old_group_size].push_back(tau);
+                    {
                 }
 
                 // delete all edges
@@ -323,7 +366,8 @@ edge_changes_with_histograms
             edges_in.push_back(in);
             edges_out.push_back(out);
 
-            if(record_sizes_and_durations)
+
+            if((record_sizes_and_durations) and (t >= t_equilibration))
             {
                 // compute durations
                 vector < size_t > edges_to_delete; 
@@ -339,12 +383,12 @@ edge_changes_with_histograms
                     size_t edge_int = get_edge_int(edge,N);
                     const bool is_initial_edge =    initial_edges.find(edge_int) 
                                                  != initial_edges.end();
-                    if (initial_edges.size()==0 ||
+                    if (initial_edges.size() == 0 ||
                         not is_initial_edge
                        )
                     {
                         size_t duration = t - current_edges[edge_int];
-                        durations.push_back(duration);
+                        contact_durations.push_back(duration);
                     }
                     else if (is_initial_edge) {
                         initial_edges.erase(edge_int);
@@ -360,17 +404,22 @@ edge_changes_with_histograms
                 group_changes.push_back(this_group_change);
             }
         }
-
-
     }
+
+    // initialize initial size histogram
+    get_component_size_histogram(final_size_histogram,G);
 
     edge_changes_with_histograms result;
 
     result.t = time;
     result.edges_out = edges_out;
     result.edges_in = edges_in;
+    result.initial_size_histogram = initial_size_histogram;
     result.group_changes = group_changes;
-    result.durations = durations;
+    result.final_size_histogram = final_size_histogram;
+    result.contact_durations = contact_durations;
+    result.inter_contact_durations = inter_contact_durations;
+    result.group_durations = group_durations;
 
     return result;
 }

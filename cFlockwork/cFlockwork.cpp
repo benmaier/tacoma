@@ -48,7 +48,7 @@
 #include "FW_P_varying.h"
 #include "ResultClasses.h"
 #include "test_varying_rate.h"
-#include "Barrat_model.h"
+#include "ZSBB_model.h"
 #include "dyn_RGG.h"
 
 using namespace std;
@@ -234,6 +234,7 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("b0"),
             py::arg("b1"),
             py::arg("t_run_total"),
+            py::arg("t_equilibration") = 0,
             py::arg("seed") = 0,
             py::arg("record_sizes_and_durations") = false,
             py::arg("verbose") = false
@@ -388,8 +389,12 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("t", &edge_changes_with_histograms::t)
         .def_readwrite("edges_in", &edge_changes_with_histograms::edges_in)
         .def_readwrite("edges_out", &edge_changes_with_histograms::edges_out)
+        .def_readwrite("initial_size_histogram", &edge_changes_with_histograms::initial_size_histogram)
         .def_readwrite("group_changes", &edge_changes_with_histograms::group_changes)
-        .def_readwrite("durations", &edge_changes_with_histograms::durations);
+        .def_readwrite("final_size_histogram", &edge_changes_with_histograms::final_size_histogram)
+        .def_readwrite("contact_durations", &edge_changes_with_histograms::contact_durations)
+        .def_readwrite("inter_contact_durations", &edge_changes_with_histograms::inter_contact_durations)
+        .def_readwrite("group_durations", &edge_changes_with_histograms::group_durations);
 
 
 

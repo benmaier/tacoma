@@ -21,7 +21,7 @@ ext_modules = [
         [ 
             'cFlockwork/Utilities.cpp', 
             'cFlockwork/Events.cpp', 
-            'cFlockwork/Barrat_model.cpp', 
+            'cFlockwork/ZSBB_model.cpp', 
             'cFlockwork/dyn_RGG.cpp', 
             'cFlockwork/SIS.cpp', 
             'cFlockwork/SI.cpp', 

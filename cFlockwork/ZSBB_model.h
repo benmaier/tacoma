@@ -23,8 +23,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef __BARRAT_H__
-#define __BARRAT_H__
+#ifndef __ZSBB_H__
+#define __ZSBB_H__
 
 #include "Utilities.h"
 #include "ResultClasses.h"
@@ -56,7 +56,8 @@ edge_changes_with_histograms
              const double b0,
              const double b1,
              const double t_run_simulation,
-             const size_t seed,
+             const double t_equilibration = 0,
+             const size_t seed = 0,
              const bool record_sizes_and_durations = false,
              const bool verbose = false
         );

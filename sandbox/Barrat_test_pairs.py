@@ -20,18 +20,18 @@ def get_hist_from_list(l,bins=400):
     x = 0.5*(x[:1]+x[:-1])
     return x,y
 
-N = 50
-t_sim = 1000*N
-t_eq = 1000*N
+N = 1000
+t_sim = 10000*N
+t_eq = 10000*N
 t_total = t_sim + t_eq
-lambda_ = 0.52
+lambda_ = 1.0
 b0 = 0.6
 b1 = 0.8
 
 plot_size = False
 
 print "simulating"
-result = cF.ZSBB_model([],N,lambda_,b0,b1,t_sim,t_equilibration=t_eq,seed=1346,record_sizes_and_durations=True,verbose=True)
+result = cF.ZSBB_model([],N,lambda_,b0,b1,t_sim,t_equilibration=t_eq,seed=1346,record_sizes_and_durations=True)
 print "done"
 
 fig, ax = pl.subplots(1,3,figsize=(12,4))
@@ -39,9 +39,12 @@ fig, ax = pl.subplots(1,3,figsize=(12,4))
 x,y = get_hist_from_list(np.array(result.contact_durations,dtype=float)/float(N))
 #x,y = get_hist_from_counter(Counter(result.contact_durations))
 ax[1].plot(x,y,'s')
+y2 = (1+x)**(-2*b1-1)
+ax[1].plot(x,y2/y2.sum())
 x,y = get_hist_from_list(np.array(result.inter_contact_durations,dtype=float)/float(N))
-ax[1].plot(x,y,'s')
-#ax[1].plot(x,(1+x)**(-2*b0-1))
+ax[1].plot(x,y,'.')
+y2 = (1+x)**(-2*b0-1)
+ax[1].plot(x,y2/y2.sum())
 ax[1].set_yscale('log')
 ax[1].set_xscale('log')
 

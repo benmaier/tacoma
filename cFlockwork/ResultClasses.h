@@ -70,8 +70,12 @@ struct edge_changes_with_histograms
     vector < double > t;
     vector < vector < pair < size_t, size_t > > > edges_out; 
     vector < vector < pair < size_t, size_t > > > edges_in;
+    map < size_t, size_t > initial_size_histogram;
     vector < map < size_t, int > > group_changes;
-    vector < size_t > durations;
+    map < size_t, size_t > final_size_histogram;
+    vector < size_t > contact_durations;
+    vector < size_t > inter_contact_durations;
+    vector < vector < size_t > > group_durations;
 };
 
 struct edge_lists
