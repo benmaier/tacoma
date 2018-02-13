@@ -21,6 +21,7 @@ ext_modules = [
         [ 
             'cFlockwork/Utilities.cpp', 
             'cFlockwork/Events.cpp', 
+            'cFlockwork/measurements.cpp', 
             'cFlockwork/ZSBB_model.cpp', 
             'cFlockwork/dyn_RGG.cpp', 
             'cFlockwork/SIS.cpp', 
@@ -94,12 +95,12 @@ class BuildExt(build_ext):
 
 setup(
     name='cFlockwork',
-    version='0.0.10',
+    version='0.0.12',
     author='Benjamin F. Maier',
     author_email='bfmaier@physik.hu-berlin.de',
     url='https://github.com/benmaier/cFlockwork',
-    license='BSD',
-    description='Runs flockwork simulations in a fast manner.',
+    license='MIT',
+    description='A package to simulate a variety of temporal network models as well as spreading processes on them and analyze contact durations, group sizes and group durations.',
     long_description='',
     ext_modules=ext_modules,
     install_requires=['pybind11'],

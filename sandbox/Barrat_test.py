@@ -24,17 +24,18 @@ N = 50
 t_sim = 1000*N
 t_eq = 1000*N
 t_total = t_sim + t_eq
-lambda_ = 0.52
+lambda_ = 0.7
 b0 = 0.6
 b1 = 0.8
 
 plot_size = False
 
 print "simulating"
-result = cF.ZSBB_model([],N,lambda_,b0,b1,t_sim,t_equilibration=t_eq,seed=1346,record_sizes_and_durations=True,verbose=True)
+result = cF.ZSBB_model([],N,lambda_,b0,b1,t_sim,t_equilibration=t_eq,seed=1346,record_sizes_and_durations=True)
 print "done"
 
-fig, ax = pl.subplots(1,3,figsize=(12,4))
+fig, ax = pl.subplots(2,2,figsize=(12,4))
+ax = ax.flatten()
 
 x,y = get_hist_from_list(np.array(result.contact_durations,dtype=float)/float(N))
 #x,y = get_hist_from_counter(Counter(result.contact_durations))
@@ -83,9 +84,19 @@ print len(ks), len(result.t)
 
 
 ax[2].plot(t,ks,'-')
-ax[2].plot(np.array([t_eq,t_eq],dtype=float)/N,[0,0.25],'-')
+ax[2].plot(np.array([t_eq,t_eq],dtype=float)/N,[0,max(ks)],'-')
 ax[2].set_xscale('log')
 
+group_durations = result.group_durations
+
+size = 1
+max_size = 5
+for size in range(size,max_size+1):
+    x,y = get_hist_from_list(group_durations[size],bins=100)
+    ax[3].plot(x,y,'.')
+
+ax[3].set_xscale('log')
+ax[3].set_yscale('log')
 
 
 

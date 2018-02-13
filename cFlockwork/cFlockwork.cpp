@@ -228,7 +228,7 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("seed") = 0
          );
 
-    m.def("group_sizes_and_durations", &group_sizes_and_durations, "Get a temporal network as a list of edge lists, list of times and number of nodes N and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
+    m.def("measure_group_sizes_and_durations", &measure_group_sizes_and_durations, "Get a temporal network as a list of edge lists, list of times and number of nodes N and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
             py::arg("list_of_edge_lists"),
             py::arg("N"),
             py::arg("verbose") = false

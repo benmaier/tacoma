@@ -312,13 +312,11 @@ void get_components_and_size_histogram(
 
     vector < size_t > component_sizes(G.size());
 
-    for(size_t comp = 0; comp<components.size(); comp++) 
+    for(auto const &comp: components) 
     {
-        size_t size = components[comp]->size();
+        size_t size = comp.size();
         component_sizes[size-1] += 1;
     }
-
-    components.clear();
 
     for(size_t size = 1; size<G.size()+1; size++)
     {
@@ -337,9 +335,9 @@ void get_component_size_histogram(
 
     vector < size_t > component_sizes(G.size());
 
-    for(size_t comp = 0; comp<components.size(); comp++) 
+    for(auto const &comp: components) 
     {
-        size_t size = components[comp]->size();
+        size_t size = comp.size();
         component_sizes[size-1] += 1;
     }
 
