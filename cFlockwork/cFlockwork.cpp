@@ -50,6 +50,7 @@
 #include "test_varying_rate.h"
 #include "ZSBB_model.h"
 #include "dyn_RGG.h"
+#include "measurements.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -227,6 +228,12 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("seed") = 0
          );
 
+    m.def("group_sizes_and_durations", &group_sizes_and_durations, "Get a temporal network as a list of edge lists, list of times and number of nodes N and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
+            py::arg("list_of_edge_lists"),
+            py::arg("N"),
+            py::arg("verbose") = false
+         );
+
     m.def("ZSBB_model", &ZSBB_model, "Simulate model after Zhao, Stehle, Bianconi, and Barrat.",
             py::arg("E"),
             py::arg("N"),
@@ -396,6 +403,11 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("inter_contact_durations", &edge_changes_with_histograms::inter_contact_durations)
         .def_readwrite("group_durations", &edge_changes_with_histograms::group_durations);
 
+    py::class_<group_sizes_and_durations>(m,"group_sizes_and_durations")
+        .def(py::init<>())
+        .def_readwrite("contact_durations", &group_sizes_and_durations::contact_durations)
+        .def_readwrite("size_histograms", &group_sizes_and_durations::size_histograms)
+        .def_readwrite("group_durations", &group_sizes_and_durations::group_durations);
 
 
     return m.ptr();

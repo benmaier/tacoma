@@ -99,7 +99,11 @@ void get_component_size_histogram(
 void add_nodes_belonging_to_this_component(
         size_t start_node,
         const vector < set < size_t > > &G,
-        set < size_t > * comp,
+        set < size_t > &comp,
         vector < bool > &already_visited
        );
+
+void graph_from_edgelist(vector < set < size_t > > &G,
+                         vector < pair < size_t, size_t > > &edge_list
+                         );
 #endif

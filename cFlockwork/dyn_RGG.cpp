@@ -185,7 +185,7 @@ edge_lists_with_histograms
             // check for new edges or terminated edges
             if (t == 0)
             {
-                for(auto edge: these_edges)
+                for(auto const &edge: these_edges)
                 {
                     size_t edge_int = get_edge_int(edge,N);
                     initial_edges.insert(edge_int);
@@ -196,7 +196,7 @@ edge_lists_with_histograms
             {
                 // check if any of the new edges are actually new
                 // by checking wether or not they are in the current_edges dictionary
-                for(auto edge: these_edges)
+                for(auto const &edge: these_edges)
                 {
                     size_t edge_int = get_edge_int(edge,N);
                     const bool already_in = current_edges.find(edge_int) != current_edges.end();

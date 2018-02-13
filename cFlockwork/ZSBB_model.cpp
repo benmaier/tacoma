@@ -120,7 +120,7 @@ edge_changes_with_histograms
     map < size_t, size_t >::iterator current_edge_iterator;
 
     // group durations 
-    vecto < vector < size_t > > group_durations(N+1);
+    vector < vector < size_t > > group_durations(N+1);
 
     // if a node has zero neighbors he/she is a loner
     for(size_t node=0; node<N; node++)
@@ -350,7 +350,7 @@ edge_changes_with_histograms
                         this_group_change[old_group_size-1] = +1;
                         this_group_change[1] = +1;
                         group_durations[old_group_size].push_back(tau);
-                    {
+                    }
                 }
 
                 // delete all edges

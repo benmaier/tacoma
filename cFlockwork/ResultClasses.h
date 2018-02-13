@@ -92,5 +92,13 @@ struct edge_lists_with_histograms
     vector < size_t > durations;
 };
 
+struct group_sizes_and_durations
+{
+
+    vector < double > contact_durations;
+    vector < map < size_t, size_t > > size_histograms;
+    vector < vector < double > > group_durations;
+};
+
 
 #endif

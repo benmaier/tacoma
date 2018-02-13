@@ -264,11 +264,11 @@ void remove_2_from_vector(vector <size_t> &vec, const size_t first_to_be_removed
 void add_nodes_belonging_to_this_component(
         size_t start_node,
         const vector < set < size_t > > &G,
-        set < size_t > * comp,
+        set < size_t > &comp,
         vector < bool > &already_visited
        )
 {
-    comp->insert(start_node);
+    comp.insert(start_node);
     already_visited[start_node] = true;
     for(auto const& neigh: G[start_node])
     {
@@ -279,25 +279,36 @@ void add_nodes_belonging_to_this_component(
     }
 }
 
-void get_component_size_histogram(
-        map < size_t, size_t > &counter,
-        const vector < set < size_t > > &G
+vector < set < size_t > > get_components(
+            const vector < set < size_t > > &G
         )
 {
     vector < bool > already_visited;
     for(size_t node=0; node<G.size(); node++)
         already_visited.push_back(false);
 
-    vector < set <size_t> * > components;
+    vector < set <size_t> > components;
 
     for(size_t node=0; node<G.size(); node++)
     {
         if ( not already_visited[node] )
         {
-            components.push_back(new set <size_t>);
+            set <size_t> this_component;
+            components.push_back(this_component);
             add_nodes_belonging_to_this_component(node,G,components.back(),already_visited);
         }
     }
+
+    return components;
+
+}
+void get_components_and_size_histogram(
+        vector < set <size_t> > &components,
+        map < size_t, size_t > &counter,
+        const vector < set < size_t > > &G
+        )
+{
+    components = get_components(G);
 
     vector < size_t > component_sizes(G.size());
 
@@ -305,10 +316,33 @@ void get_component_size_histogram(
     {
         size_t size = components[comp]->size();
         component_sizes[size-1] += 1;
-        //delete components[size];
     }
 
-    // call destructor for each component
+    components.clear();
+
+    for(size_t size = 1; size<G.size()+1; size++)
+    {
+        size_t count = component_sizes[size-1];
+        if (count > 0)
+            counter[size] = count;
+    }
+}
+
+void get_component_size_histogram(
+        map < size_t, size_t > &counter,
+        const vector < set < size_t > > &G
+        )
+{
+    vector < set <size_t> > components = get_components(G);
+
+    vector < size_t > component_sizes(G.size());
+
+    for(size_t comp = 0; comp<components.size(); comp++) 
+    {
+        size_t size = components[comp]->size();
+        component_sizes[size-1] += 1;
+    }
+
     components.clear();
 
     for(size_t size = 1; size<G.size()+1; size++)
@@ -327,7 +361,7 @@ void get_component_size_histogram_from_edgelist(
 {
     vector < set < size_t > > G(N);
 
-    for(auto edge: edge_list)
+    for(auto const &edge: edge_list)
     {
         G[edge.first].insert(edge.second);
         G[edge.second].insert(edge.first);
@@ -348,4 +382,19 @@ void randomly_seed_engine(
 
     seed_seq seed_value { time_seed, clock_seed, pid_seed };
     generator.seed(seed_value);
+}
+
+void graph_from_edgelist(vector < set < size_t > > &G,
+                         vector < pair < size_t, size_t > > &edge_list
+                         )
+{
+    for(auto &neighbors: G)
+    {
+        neighbors.clear();
+    }
+    for(auto const &edge: edge_list)
+    {
+        G[edge.first].insert(edge.second);
+        G[edge.second].insert(edge.first);
+    }
 }
