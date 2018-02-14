@@ -89,7 +89,7 @@ edge_changes_with_histograms
     }
 
     //loop through edge list and push neighbors
-    for(auto edge: E)
+    for(auto const &edge: E)
     {
         //get nodes belonging to that edge
         size_t i = edge.first;
@@ -192,8 +192,6 @@ edge_changes_with_histograms
                 cout << "is active " << endl;
             }
 
-            last_time_active[i] = t;
-
             // if node will update
             vector < pair <size_t,size_t> > in;
             vector < pair <size_t,size_t> > out;
@@ -262,7 +260,6 @@ edge_changes_with_histograms
                 // activate the loner 
                 size_t j = loners[loner_index];
                 size_t tau_j = t - last_time_active[j];
-                last_time_active[j] = t;
 
                 if (verbose)
                     cout << "invited loner " << j << endl;
@@ -289,10 +286,16 @@ edge_changes_with_histograms
                     {
                         this_group_change[1] = -2;
                         this_group_change[2] = +1;
-                        inter_contact_durations.push_back(tau_j);
-                        inter_contact_durations.push_back(tau);
-                        group_durations[1].push_back(tau_j);
-                        group_durations[1].push_back(tau);
+                        if (last_time_active[j] != 0)
+                        {
+                            inter_contact_durations.push_back(tau_j);
+                            group_durations[1].push_back(tau_j);
+                        }
+                        if (last_time_active[i] != 0)
+                        {
+                            inter_contact_durations.push_back(tau);
+                            group_durations[1].push_back(tau);
+                        }
                     }
                 }
                 else
@@ -303,11 +306,20 @@ edge_changes_with_histograms
                         this_group_change[1] = -1;
                         this_group_change[G[i].size()] = -1;
                         this_group_change[G[i].size()+1] = +1;
-                        inter_contact_durations.push_back(tau_j);
-                        group_durations[1].push_back(tau_j);
-                        group_durations[G[i].size()].push_back(tau);
+                        if (last_time_active[j] != 0)
+                        {
+                            inter_contact_durations.push_back(tau_j);
+                            group_durations[1].push_back(tau_j);
+                        }
+                        if (last_time_active[i] != 0)
+                        {
+                            group_durations[G[i].size()].push_back(tau);
+                        }
                     }
                 }
+
+                // update j's activation time
+                last_time_active[j] = t;
 
             } 
             else if (not is_isolated)// i is member of a group and does not invite anybody
@@ -339,7 +351,10 @@ edge_changes_with_histograms
                     {
                         this_group_change[2] = -1;
                         this_group_change[1] = +2;
-                        group_durations[2].push_back(tau);
+                        if (last_time_active[i] != 0)
+                        {
+                            group_durations[2].push_back(tau);
+                        }
                     }
                 }
                 else
@@ -349,7 +364,10 @@ edge_changes_with_histograms
                         this_group_change[old_group_size] = -1;
                         this_group_change[old_group_size-1] = +1;
                         this_group_change[1] = +1;
-                        group_durations[old_group_size].push_back(tau);
+                        if (last_time_active[i] != 0)
+                        {
+                            group_durations[old_group_size].push_back(tau);
+                        }
                     }
                 }
 
@@ -403,7 +421,11 @@ edge_changes_with_histograms
                 //compute histogram
                 group_changes.push_back(this_group_change);
             }
+
+            // node i became active
+            last_time_active[i] = t;
         }
+
     }
 
     // initialize initial size histogram

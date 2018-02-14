@@ -234,6 +234,14 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("verbose") = false
          );
 
+    m.def("measure_group_sizes_and_durations_for_edge_changes", &measure_group_sizes_and_durations_for_edge_changes, "Get a temporal network as a list of edge lists, list of times and number of nodes N and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("t0"),
+            py::arg("list_of_edge_changes"),
+            py::arg("verbose") = false
+         );
+
     m.def("ZSBB_model", &ZSBB_model, "Simulate model after Zhao, Stehle, Bianconi, and Barrat.",
             py::arg("E"),
             py::arg("N"),
