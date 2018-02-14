@@ -392,7 +392,10 @@ void graph_from_edgelist(vector < set < size_t > > &G,
     }
     for(auto const &edge: edge_list)
     {
-        G[edge.first].insert(edge.second);
-        G[edge.second].insert(edge.first);
+        if (edge.first != edge.second)
+        {
+            G[edge.first].insert(edge.second);
+            G[edge.second].insert(edge.first);
+        }
     }
 }
