@@ -229,16 +229,12 @@ PYBIND11_PLUGIN(cFlockwork) {
          );
 
     m.def("measure_group_sizes_and_durations", &measure_group_sizes_and_durations, "Get a temporal network as a list of edge lists, list of times and number of nodes N and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
-            py::arg("list_of_edge_lists"),
-            py::arg("N"),
+            py::arg("edge_lists"),
             py::arg("verbose") = false
          );
 
     m.def("measure_group_sizes_and_durations_for_edge_changes", &measure_group_sizes_and_durations_for_edge_changes, "Get a temporal network as a list of edge lists, list of times and number of nodes N and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
-            py::arg("E"),
-            py::arg("N"),
-            py::arg("t0"),
-            py::arg("list_of_edge_changes"),
+            py::arg("edge_changes"),
             py::arg("verbose") = false
          );
 
@@ -385,19 +381,27 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def(py::init<>())
         .def_readwrite("t", &edge_changes::t)
         .def_readwrite("edges_out", &edge_changes::edges_out)
-        .def_readwrite("edges_in", &edge_changes::edges_in);
+        .def_readwrite("edges_in", &edge_changes::edges_in)
+        .def_readwrite("N", &edge_changes::N)
+        .def_readwrite("t0", &edge_changes::tmax)
+        .def_readwrite("tmax", &edge_changes::t0)
+        .def_readwrite("edges_initial", &edge_changes::edges_initial);
 
     py::class_<edge_lists>(m,"edge_lists")
         .def(py::init<>())
         .def_readwrite("t", &edge_lists::t)
-        .def_readwrite("edges", &edge_lists::edges);
+        .def_readwrite("edges", &edge_lists::edges)
+        .def_readwrite("N", &edge_lists::N)
+        .def_readwrite("tmax", &edge_lists::tmax);
 
     py::class_<edge_lists_with_histograms>(m,"edge_lists_with_histograms")
         .def(py::init<>())
         .def_readwrite("t", &edge_lists_with_histograms::t)
         .def_readwrite("edges", &edge_lists_with_histograms::edges)
         .def_readwrite("size_histograms", &edge_lists_with_histograms::size_histograms)
-        .def_readwrite("durations", &edge_lists_with_histograms::durations);
+        .def_readwrite("durations", &edge_lists_with_histograms::durations)
+        .def_readwrite("N", &edge_lists_with_histograms::N)
+        .def_readwrite("tmax", &edge_lists_with_histograms::tmax);
 
     py::class_<edge_changes_with_histograms>(m,"edge_changes_with_histograms")
         .def(py::init<>())
@@ -409,14 +413,22 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("final_size_histogram", &edge_changes_with_histograms::final_size_histogram)
         .def_readwrite("contact_durations", &edge_changes_with_histograms::contact_durations)
         .def_readwrite("inter_contact_durations", &edge_changes_with_histograms::inter_contact_durations)
-        .def_readwrite("group_durations", &edge_changes_with_histograms::group_durations);
+        .def_readwrite("group_durations", &edge_changes_with_histograms::group_durations)
+        .def_readwrite("N", &edge_changes_with_histograms::N)
+        .def_readwrite("t0", &edge_changes_with_histograms::tmax)
+        .def_readwrite("tmax", &edge_changes_with_histograms::t0)
+        .def_readwrite("edges_initial", &edge_changes_with_histograms::edges_initial);
 
     py::class_<group_sizes_and_durations>(m,"group_sizes_and_durations")
         .def(py::init<>())
         .def_readwrite("contact_durations", &group_sizes_and_durations::contact_durations)
         .def_readwrite("size_histograms", &group_sizes_and_durations::size_histograms)
-        .def_readwrite("group_durations", &group_sizes_and_durations::group_durations);
+        .def_readwrite("group_durations", &group_sizes_and_durations::group_durations)
+        .def_readwrite("aggregated_network", &group_sizes_and_durations::aggregated_network);
 
+    py::class_<edge_weight>(m,"edge_weight")
+        .def(py::init<>())
+        .def_readwrite("value", &edge_weight::value);
 
     return m.ptr();
 

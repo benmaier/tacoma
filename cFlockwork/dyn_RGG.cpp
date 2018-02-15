@@ -159,7 +159,7 @@ edge_lists_with_histograms
     set < size_t > initial_edges;
     map < size_t, size_t > current_edges;
     map < size_t, size_t >::iterator current_edge_iterator;
-    vector < size_t > durations;
+    vector < size_t > group_durations;
     vector < map < size_t, size_t > > histograms;
 
 
@@ -230,7 +230,7 @@ edge_lists_with_histograms
                            )
                         {
                             size_t duration = t - current_edge_iterator->second;
-                            durations.push_back(duration);
+                            group_durations.push_back(duration);
                         }
                         else if (is_initial_edge) {
                             initial_edges.erase(edge_int);
@@ -257,9 +257,11 @@ edge_lists_with_histograms
     edge_lists_with_histograms result;
 
     result.t = time;
+    result.N = N;
+    result.tmax = t_run_total;
     result.edges = edges;
     result.size_histograms = histograms;
-    result.durations = durations;
+    result.group_durations = group_durations;
 
     return result;
 }

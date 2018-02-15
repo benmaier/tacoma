@@ -63,6 +63,10 @@ struct edge_changes
     vector < double > t;
     vector < vector < pair < size_t, size_t > > > edges_out; 
     vector < vector < pair < size_t, size_t > > > edges_in;
+    size_t N;
+    vector < pair < size_t, size_t > > edges_initial; 
+    double t0;
+    double tmax;
 };
 
 struct edge_changes_with_histograms
@@ -76,12 +80,19 @@ struct edge_changes_with_histograms
     vector < size_t > contact_durations;
     vector < size_t > inter_contact_durations;
     vector < vector < size_t > > group_durations;
+
+    size_t N;
+    vector < pair < size_t, size_t > > edges_initial; 
+    double t0;
+    double tmax;
 };
 
 struct edge_lists
 {
     vector < double > t;
     vector < vector < pair < size_t, size_t > > > edges;
+    size_t N;
+    double tmax;
 };
 
 struct edge_lists_with_histograms
@@ -89,7 +100,9 @@ struct edge_lists_with_histograms
     vector < double > t;
     vector < vector < pair < size_t, size_t > > > edges;
     vector < map < size_t, size_t > > size_histograms;
-    vector < size_t > durations;
+    vector < size_t > group_durations;
+    size_t N;
+    double tmax;
 };
 
 struct group_sizes_and_durations
@@ -98,6 +111,13 @@ struct group_sizes_and_durations
     vector < double > contact_durations;
     vector < map < size_t, size_t > > size_histograms;
     vector < vector < double > > group_durations;
+    map < pair < size_t, size_t >, double > aggregated_network;
+};
+
+struct edge_weight
+{
+    double value;
+    edge_weight(): value(0.0){}
 };
 
 

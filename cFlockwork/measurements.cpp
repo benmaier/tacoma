@@ -44,7 +44,6 @@ using namespace std;
 group_sizes_and_durations
      measure_group_sizes_and_durations(
              edge_lists &list_of_edge_lists,
-             const size_t N,       //number of nodes
              const bool verbose
         )
 {
@@ -59,6 +58,12 @@ group_sizes_and_durations
     auto it_edge_lists = all_edges.begin();
     auto it_time = time.begin();
     double t0 = time[0];
+    double tmax = list_of_edge_lists.tmax;
+    size_t N = list_of_edge_lists.N;
+    double old_t;
+    if (tmax < time.back())
+        throw domain_error("The value tmax is smaller than the last value in the time list.");
+
 
     // container to track activities of nodes
     vector < double > last_time_active(N,t0);
@@ -74,6 +79,7 @@ group_sizes_and_durations
     // vectors and sets dealing with the change of components
     vector < set < size_t > > old_components;
     vector < set < size_t > > components;
+    map < pair < size_t, size_t >, edge_weights > social_network;
 
     // iterate through all states
     while (it_edge_lists != all_edges.end() and it_time != time.end())
@@ -229,19 +235,38 @@ group_sizes_and_durations
                 current_edges.erase(edge_int);
             }
         }
+        // add this state to the social network
+        // if `edge` is not in `social_network` a weighted edge will be
+        // constructed with .value = 0.0;
+        if (t > t0)
+            for(auto const &edge: these_edges)
+                social_network[edge].value += t - old_t;
 
         // advance iterators
         it_edge_lists++;
         it_time++;
+        old_t = t;
 
         // copy this graph and the components for comparisons in next time slice
         old_components = components;
+    }
+
+    // add the remaining edges to the social network
+    for ( current_edge_iterator = current_edges.begin();
+          current_edge_iterator != current_edges.end();
+          ++current_edge_iterator )
+    {
+        size_t i = current_edge_iterator->first / N;
+        size_t j = current_edge_iterator->first % N;
+        double last_time = current_edge_iterator->second;
+        social_network[make_pair(i,j)].value += tmax - last_time;
     }
 
     group_sizes_and_durations result;
     result.contact_durations = contact_durations;
     result.size_histograms = size_histograms;
     result.group_durations = group_durations;
+    result.aggregated_network = social_network;
 
     return result;
     
@@ -250,9 +275,6 @@ group_sizes_and_durations
 
 group_sizes_and_durations
      measure_group_sizes_and_durations_for_edge_changes(
-             vector < pair < size_t, size_t > > E,
-             const size_t N,       //number of nodes
-             double t0,
              edge_changes &list_of_edge_changes,
              const bool verbose
         )
@@ -264,7 +286,11 @@ group_sizes_and_durations
 
     // create graph
     vector < set < size_t > > G(N);
-    graph_from_edgelist(G,E);
+    graph_from_edgelist(G,list_of_edge_changes.edges_initial);
+    double t0 = list_of_edge_changes.t0;
+    double tmax = list_of_edge_changes.tmax;
+    if (tmax < time.back())
+        throw domain_error("The value tmax is smaller than the last time in the time list.");
 
     // create iterators
     auto it_edges_in = all_edges_in.begin();
@@ -287,7 +313,7 @@ group_sizes_and_durations
     vector < set < size_t > > components;
 
     // initialize edges
-    for(auto const &edge: E)
+    for(auto const &edge: list_of_edge_changes.edges_initial)
     {
         size_t edge_int = get_edge_int(edge,N);
         initial_edges.insert(edge_int);
@@ -298,6 +324,9 @@ group_sizes_and_durations
     get_components_and_size_histogram(components,this_size_histogram,G);
     size_histograms.push_back(this_size_histogram);
     old_components = components;
+
+    // for calculation of aggregated network
+    map < pair < size_t, size_t >, edge_weights > social_network;
 
     // iterate through all states
     while (it_edges_in != all_edges_in.end() and it_time != time.end() and it_edges_out != all_edges_out.end() )
@@ -422,16 +451,20 @@ group_sizes_and_durations
             size_t edge_int = get_edge_int(edge,N);
             const bool is_initial_edge =    initial_edges.find(edge_int) 
                                          != initial_edges.end();
+            double duration = t - current_edges[edge_int];
             if (initial_edges.size() == 0 ||
                 not is_initial_edge
                )
             {
-                size_t duration = t - current_edges[edge_int];
                 contact_durations.push_back(duration);
             }
             else if (is_initial_edge) {
                 initial_edges.erase(edge_int);
             }
+
+            // add this edge to the social network
+            social_network[edge].value += duration;
+
             edges_to_delete.push_back(edge_int);
         }
         for( auto const &edge_int: edges_to_delete)
@@ -448,10 +481,22 @@ group_sizes_and_durations
         old_components = components;
     }
 
+    // add the remaining edges to the social network
+    for ( current_edge_iterator = current_edges.begin();
+          current_edge_iterator != current_edges.end();
+          ++current_edge_iterator )
+    {
+        size_t i = current_edge_iterator->first / N;
+        size_t j = current_edge_iterator->first % N;
+        double last_time = current_edge_iterator->second;
+        social_network[make_pair(i,j)].value += tmax - last_time;
+    }
+
     group_sizes_and_durations result;
     result.contact_durations = contact_durations;
     result.size_histograms = size_histograms;
     result.group_durations = group_durations;
+    result.aggregated_network = social_network;
 
     return result;
     

@@ -134,6 +134,7 @@ edge_changes_with_histograms
     vector < vector < pair <size_t,size_t> > > edges_out;
     vector < vector < pair <size_t,size_t> > > edges_in;
     vector < double > time;
+    vector < pair <size_t,size_t> > edges_initial;
 
 
 
@@ -163,6 +164,18 @@ edge_changes_with_histograms
 
             // initialize initial size histogram
             get_component_size_histogram(initial_size_histogram,G);
+
+            // save the initial edge list
+            size_t node = 0;
+            for(auto const &neighbors: G)
+            {
+                for (auto const &neighbor: neighbors)
+                {
+                    if (node < neighbor)
+                        edges_initial.push_back(make_pair(node,neighbor));
+                }
+                node++;
+            }
         }
 
         // choose random node
@@ -282,16 +295,16 @@ edge_changes_with_histograms
                 if (is_isolated)
                 {
                     remove_2_from_vector(loners,i,j);
-                    if (record_sizes_and_durations)
+                    if ((record_sizes_and_durations) and (t > t_equilibration))
                     {
                         this_group_change[1] = -2;
                         this_group_change[2] = +1;
-                        if (last_time_active[j] != 0)
+                        if (last_time_active[j] > t_equilibration)
                         {
                             inter_contact_durations.push_back(tau_j);
                             group_durations[1].push_back(tau_j);
                         }
-                        if (last_time_active[i] != 0)
+                        if (last_time_active[i] > t_equilibration)
                         {
                             inter_contact_durations.push_back(tau);
                             group_durations[1].push_back(tau);
@@ -301,17 +314,17 @@ edge_changes_with_histograms
                 else
                 {
                     remove_from_vector(loners,j);
-                    if (record_sizes_and_durations)
+                    if ((record_sizes_and_durations) and (t > t_equilibration))
                     {
                         this_group_change[1] = -1;
                         this_group_change[G[i].size()] = -1;
                         this_group_change[G[i].size()+1] = +1;
-                        if (last_time_active[j] != 0)
+                        if (last_time_active[j] > t_equilibration)
                         {
                             inter_contact_durations.push_back(tau_j);
                             group_durations[1].push_back(tau_j);
                         }
-                        if (last_time_active[i] != 0)
+                        if (last_time_active[i] > t_equilibration)
                         {
                             group_durations[G[i].size()].push_back(tau);
                         }
@@ -347,11 +360,11 @@ edge_changes_with_histograms
 
                 if (is_pair)
                 {
-                    if (record_sizes_and_durations)
+                    if ((record_sizes_and_durations) and (t > t_equilibration))
                     {
                         this_group_change[2] = -1;
                         this_group_change[1] = +2;
-                        if (last_time_active[i] != 0)
+                        if (last_time_active[i] > t_equilibration)
                         {
                             group_durations[2].push_back(tau);
                         }
@@ -359,12 +372,12 @@ edge_changes_with_histograms
                 }
                 else
                 {
-                    if (record_sizes_and_durations)
+                    if ((record_sizes_and_durations)  and (t > t_equilibration))
                     {
                         this_group_change[old_group_size] = -1;
                         this_group_change[old_group_size-1] = +1;
                         this_group_change[1] = +1;
-                        if (last_time_active[i] != 0)
+                        if (last_time_active[i] > t_equilibration)
                         {
                             group_durations[old_group_size].push_back(tau);
                         }
@@ -385,7 +398,7 @@ edge_changes_with_histograms
             edges_out.push_back(out);
 
 
-            if((record_sizes_and_durations) and (t >= t_equilibration))
+            if((record_sizes_and_durations) and (t > t_equilibration))
             {
                 // compute durations
                 vector < size_t > edges_to_delete; 
@@ -428,12 +441,16 @@ edge_changes_with_histograms
 
     }
 
-    // initialize initial size histogram
+    // get final size histogram
     get_component_size_histogram(final_size_histogram,G);
 
     edge_changes_with_histograms result;
 
     result.t = time;
+    result.t0 = t_equilibration;
+    result.tmax = t_equilibration+t_run_simulation;
+    result.N = N;
+    result.edges_initial = E;
     result.edges_out = edges_out;
     result.edges_in = edges_in;
     result.initial_size_histogram = initial_size_histogram;
