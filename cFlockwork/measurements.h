@@ -47,15 +47,11 @@ using namespace std;
 group_sizes_and_durations
      measure_group_sizes_and_durations(
              edge_lists &list_of_edge_lists,
-             const size_t N,       //number of nodes
              const bool verbose
         );
 
 group_sizes_and_durations
      measure_group_sizes_and_durations_for_edge_changes(
-             vector < pair < size_t, size_t > > E,
-             const size_t N,       //number of nodes
-             double t0,
              edge_changes &list_of_edge_changes,
              const bool verbose
         );

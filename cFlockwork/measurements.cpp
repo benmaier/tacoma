@@ -50,6 +50,7 @@ group_sizes_and_durations
     // get references to edge_list and time
     vector < vector < pair < size_t, size_t > > > & all_edges = list_of_edge_lists.edges;
     vector < double > & time = list_of_edge_lists.t;
+    size_t N = list_of_edge_lists.N;
 
     // create two graphs
     vector < set < size_t > > G(N);
@@ -59,7 +60,6 @@ group_sizes_and_durations
     auto it_time = time.begin();
     double t0 = time[0];
     double tmax = list_of_edge_lists.tmax;
-    size_t N = list_of_edge_lists.N;
     double old_t;
     if (tmax < time.back())
         throw domain_error("The value tmax is smaller than the last value in the time list.");
@@ -79,7 +79,7 @@ group_sizes_and_durations
     // vectors and sets dealing with the change of components
     vector < set < size_t > > old_components;
     vector < set < size_t > > components;
-    map < pair < size_t, size_t >, edge_weights > social_network;
+    map < pair < size_t, size_t >, edge_weight > social_network;
 
     // iterate through all states
     while (it_edge_lists != all_edges.end() and it_time != time.end())
@@ -262,11 +262,20 @@ group_sizes_and_durations
         social_network[make_pair(i,j)].value += tmax - last_time;
     }
 
+    map < pair < size_t, size_t >, double > aggregated_network;
+    for( auto soc_it = social_network.begin();
+         soc_it != social_network.end();
+         soc_it++
+       )
+    {
+        aggregated_network[soc_it->first] = (soc_it->second).value;
+    }
+
     group_sizes_and_durations result;
     result.contact_durations = contact_durations;
     result.size_histograms = size_histograms;
     result.group_durations = group_durations;
-    result.aggregated_network = social_network;
+    result.aggregated_network = aggregated_network;
 
     return result;
     
@@ -284,6 +293,7 @@ group_sizes_and_durations
     vector < vector < pair < size_t, size_t > > > & all_edges_out = list_of_edge_changes.edges_out;
     vector < double > & time = list_of_edge_changes.t;
 
+    size_t N = list_of_edge_changes.N;
     // create graph
     vector < set < size_t > > G(N);
     graph_from_edgelist(G,list_of_edge_changes.edges_initial);
@@ -326,7 +336,7 @@ group_sizes_and_durations
     old_components = components;
 
     // for calculation of aggregated network
-    map < pair < size_t, size_t >, edge_weights > social_network;
+    map < pair < size_t, size_t >, edge_weight > social_network;
 
     // iterate through all states
     while (it_edges_in != all_edges_in.end() and it_time != time.end() and it_edges_out != all_edges_out.end() )
@@ -492,11 +502,21 @@ group_sizes_and_durations
         social_network[make_pair(i,j)].value += tmax - last_time;
     }
 
+    map < pair < size_t, size_t >, double > aggregated_network;
+    for( auto soc_it = social_network.begin();
+         soc_it != social_network.end();
+         soc_it++
+       )
+    {
+        aggregated_network[soc_it->first] = (soc_it->second).value;
+    }
+
+
     group_sizes_and_durations result;
     result.contact_durations = contact_durations;
     result.size_histograms = size_histograms;
     result.group_durations = group_durations;
-    result.aggregated_network = social_network;
+    result.aggregated_network = aggregated_network;
 
     return result;
     

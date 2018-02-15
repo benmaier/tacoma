@@ -399,7 +399,7 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("t", &edge_lists_with_histograms::t)
         .def_readwrite("edges", &edge_lists_with_histograms::edges)
         .def_readwrite("size_histograms", &edge_lists_with_histograms::size_histograms)
-        .def_readwrite("durations", &edge_lists_with_histograms::durations)
+        .def_readwrite("group_durations", &edge_lists_with_histograms::group_durations)
         .def_readwrite("N", &edge_lists_with_histograms::N)
         .def_readwrite("tmax", &edge_lists_with_histograms::tmax);
 
