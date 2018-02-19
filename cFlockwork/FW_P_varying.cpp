@@ -236,8 +236,12 @@ edge_changes
     edge_changes result;
 
     result.t = time;
+    result.tmax = t_run_total;
+    result.t0 = 0;
+    result.edges_initial = E;
     result.edges_out = edges_out;
     result.edges_in = edges_in;
+    result.N = N;
 
     return result;
 }
@@ -434,6 +438,10 @@ edge_changes
     edge_changes result;
 
     result.t = time;
+    result.tmax = t_run_total;
+    result.t0 = 0;
+    result.edges_initial = E;
+    result.N = N;
     result.edges_out = edges_out;
     result.edges_in = edges_in;
 
