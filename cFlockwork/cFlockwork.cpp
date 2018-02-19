@@ -51,6 +51,7 @@
 #include "ZSBB_model.h"
 #include "dyn_RGG.h"
 #include "measurements.h"
+#include "dtu_week.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -432,6 +433,13 @@ PYBIND11_PLUGIN(cFlockwork) {
     py::class_<edge_weight>(m,"edge_weight")
         .def(py::init<>())
         .def_readwrite("value", &edge_weight::value);
+
+    py::class_<dtu_week>(m,"dtu_week")
+        .def(py::init<>())
+        .def_readwrite("N", &dtu_week::N)
+        .def_readwrite("tmax", &dtu_week::tmax)
+        .def_readwrite("gamma", &dtu_week::gamma)
+        .def_readwrite("P", &dtu_week::P);
 
     return m.ptr();
 
