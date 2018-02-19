@@ -423,6 +423,7 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def(py::init<>())
         .def_readwrite("contact_durations", &group_sizes_and_durations::contact_durations)
         .def_readwrite("size_histograms", &group_sizes_and_durations::size_histograms)
+        .def_readwrite("size_histogram_differences", &group_sizes_and_durations::size_histogram_differences)
         .def_readwrite("group_durations", &group_sizes_and_durations::group_durations)
         .def_readwrite("aggregated_network", &group_sizes_and_durations::aggregated_network);
 

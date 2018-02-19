@@ -110,6 +110,7 @@ struct group_sizes_and_durations
 
     vector < double > contact_durations;
     vector < map < size_t, size_t > > size_histograms;
+    vector < map < size_t, long > > size_histogram_differences;
     vector < vector < double > > group_durations;
     map < pair < size_t, size_t >, double > aggregated_network;
 };

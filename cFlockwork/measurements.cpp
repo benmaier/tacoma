@@ -315,7 +315,6 @@ group_sizes_and_durations
     map < size_t, double > current_edges;
     auto current_edge_iterator = current_edges.begin();
     vector < double > contact_durations;
-    vector < map < size_t, size_t > > size_histograms;
     vector < vector < double > > group_durations(N+1);
 
     // vectors and sets dealing with the change of components
@@ -330,15 +329,18 @@ group_sizes_and_durations
         current_edges[edge_int] = t0;
     }
 
-    map < size_t, size_t > this_size_histogram;
-    get_components_and_size_histogram(components,this_size_histogram,G);
-    size_histograms.push_back(this_size_histogram);
+    // size_difference histograms
+    vector < map < size_t, long > > size_histogram_differences;
+    vector < map < size_t, size_t > > size_histograms;
+    map < size_t, size_t > old_size_histogram;
+    get_components_and_size_histogram(components,old_size_histogram,G);
+    size_histograms.push_back(old_size_histogram);
     old_components = components;
 
     // for calculation of aggregated network
     map < pair < size_t, size_t >, edge_weight > social_network;
 
-    // iterate through all states
+    // iterate through all changes
     while (it_edges_in != all_edges_in.end() and it_time != time.end() and it_edges_out != all_edges_out.end() )
     {
         // get time of current state
@@ -390,7 +392,47 @@ group_sizes_and_durations
         map < size_t, size_t > this_size_histogram;
         components.clear();
         get_components_and_size_histogram(components,this_size_histogram,G);
-        size_histograms.push_back(this_size_histogram);
+        
+        //get histogram difference because edge changes tend to be small so the histogram change should be small, too
+        map < size_t, long > this_histogram_difference;
+        for( auto const &this_hist_entry: this_size_histogram )
+        {
+            // get the size of the new group size
+            size_t const & this_size = this_hist_entry.first;
+
+            // if this entry is not in old_size_histogram, this means that there was a zero
+            // and the difference is equal to the new count
+            long difference = (long) this_hist_entry.second;
+
+            // find this size in the old histogram
+            auto old_size = old_size_histogram.find(this_size);
+            if (old_size != old_size_histogram.end())
+            {
+                difference -= old_size->second;
+            }
+            this_histogram_difference[this_size] = difference;
+        }
+
+        //for the old histogram we only need to focus on entries which are not
+        //in the new histogram since those were covered in the loop before
+        for( auto const &old_hist_entry: old_size_histogram )
+        {
+            // get the size of the old group size
+            size_t const & old_size = old_hist_entry.first;
+
+            // find this size in the new histogram
+            auto new_size = this_size_histogram.find(old_size);
+            if (new_size == this_size_histogram.end())
+            {
+                // if entry does not exist, all groups of this
+                // were deleted, so the difference is equal to
+                // the old entry count
+                long difference = -1 * ((long) old_hist_entry.second);
+                this_histogram_difference[old_size] = difference;
+            }
+        }
+        size_histogram_differences.push_back(this_histogram_difference);
+
 
         if (verbose)
         {
@@ -489,6 +531,7 @@ group_sizes_and_durations
 
         // copy this graph and the components for comparisons in next time slice
         old_components = components;
+        old_size_histogram = this_size_histogram;
     }
 
     // add the remaining edges to the social network
@@ -515,6 +558,7 @@ group_sizes_and_durations
     group_sizes_and_durations result;
     result.contact_durations = contact_durations;
     result.size_histograms = size_histograms;
+    result.size_histogram_differences = size_histogram_differences;
     result.group_durations = group_durations;
     result.aggregated_network = aggregated_network;
 
