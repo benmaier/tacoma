@@ -230,11 +230,13 @@ PYBIND11_PLUGIN(cFlockwork) {
 
     m.def("measure_group_sizes_and_durations", &measure_group_sizes_and_durations, "Get a temporal network as a list of edge lists, list of times and number of nodes N and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
             py::arg("edge_lists"),
+            py::arg("ignore_size_histograms") = false,
             py::arg("verbose") = false
          );
 
     m.def("measure_group_sizes_and_durations_for_edge_changes", &measure_group_sizes_and_durations_for_edge_changes, "Get a temporal network as a list of edge lists, list of times and number of nodes N and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
             py::arg("edge_changes"),
+            py::arg("ignore_size_histogram_differences") = false,
             py::arg("verbose") = false
          );
 

@@ -47,12 +47,14 @@ using namespace std;
 group_sizes_and_durations
      measure_group_sizes_and_durations(
              edge_lists &list_of_edge_lists,
-             const bool verbose
+             const bool ignore_size_histograms = false,
+             const bool verbose = false
         );
 
 group_sizes_and_durations
      measure_group_sizes_and_durations_for_edge_changes(
              edge_changes &list_of_edge_changes,
-             const bool verbose
+             const bool ignore_size_histograms_differences = false,
+             const bool verbose = false
         );
 #endif
