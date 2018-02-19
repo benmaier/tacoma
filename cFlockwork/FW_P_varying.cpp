@@ -192,42 +192,46 @@ edge_changes
         t = t + tau;
         last_event = event;
 
-        if (event==1)
+        if (t<t_run_total)
         {
-            pair < vector < pair <size_t,size_t> >, 
-                   vector < pair <size_t,size_t> > 
-                 > curr_edge_change = rewire_P(G,P[i_t%N_gamma],generator,uni_distribution,k,SI_E,node_status);
 
-            if ( (curr_edge_change.first.size()>0) || (curr_edge_change.second.size()>0) )
+            if (event==1)
             {
-                time.push_back(t);
-                edges_out.push_back( curr_edge_change.first );
-                edges_in.push_back( curr_edge_change.second );
-            }
-            /*
+                pair < vector < pair <size_t,size_t> >, 
+                       vector < pair <size_t,size_t> > 
+                     > curr_edge_change = rewire_P(G,P[i_t%N_gamma],generator,uni_distribution,k,SI_E,node_status);
 
-            cout << t << endl;
-
-            cout << "out" << endl;
-
-            for(auto edge: curr_edge_change.first)
-                cout << edge.first << " " << edge.second<< endl;
-
-            cout << "in" << endl;
-            for(auto edge: curr_edge_change.second)
-                cout << edge.first << " " << edge.second<< endl;
-
-            for(size_t u=0; u<N; u++)
-                for( auto v: *G[u])
+                if ( (curr_edge_change.first.size()>0) || (curr_edge_change.second.size()>0) )
                 {
-                    cout << u << " " << v << endl;
-
+                    time.push_back(t);
+                    edges_out.push_back( curr_edge_change.first );
+                    edges_in.push_back( curr_edge_change.second );
                 }
-            */
-        }
-        else
-        {
-            throw length_error("There was an event chosen other than rewiring, this should not happen.");
+                /*
+
+                cout << t << endl;
+
+                cout << "out" << endl;
+
+                for(auto edge: curr_edge_change.first)
+                    cout << edge.first << " " << edge.second<< endl;
+
+                cout << "in" << endl;
+                for(auto edge: curr_edge_change.second)
+                    cout << edge.first << " " << edge.second<< endl;
+
+                for(size_t u=0; u<N; u++)
+                    for( auto v: *G[u])
+                    {
+                        cout << u << " " << v << endl;
+
+                    }
+                */
+            }
+            else
+            {
+                throw length_error("There was an event chosen other than rewiring, this should not happen.");
+            }
         }
             
 
@@ -405,31 +409,35 @@ edge_changes
         t = t + tau;
         last_event = event;
 
-        if (event==1)
+        if (t<t_run_total)
         {
-            pair < vector < pair <size_t,size_t> >, 
-                   vector < pair <size_t,size_t> > 
-                 > curr_edge_change = rewire_P_neighbor_affinity(G,
-                                                                 P[i_t%N_gamma],
-                                                                 neighbor_affinity,
-                                                                 total_affinity,
-                                                                 generator,
-                                                                 uni_distribution,
-                                                                 k,
-                                                                 SI_E,
-                                                                 node_status,
-                                                                 use_preferential_node_selection);
 
-            if ( (curr_edge_change.first.size()>0) || (curr_edge_change.second.size()>0) )
+            if (event==1)
             {
-                time.push_back(t);
-                edges_out.push_back( curr_edge_change.first );
-                edges_in.push_back( curr_edge_change.second );
+                pair < vector < pair <size_t,size_t> >, 
+                       vector < pair <size_t,size_t> > 
+                     > curr_edge_change = rewire_P_neighbor_affinity(G,
+                                                                     P[i_t%N_gamma],
+                                                                     neighbor_affinity,
+                                                                     total_affinity,
+                                                                     generator,
+                                                                     uni_distribution,
+                                                                     k,
+                                                                     SI_E,
+                                                                     node_status,
+                                                                     use_preferential_node_selection);
+
+                if ( (curr_edge_change.first.size()>0) || (curr_edge_change.second.size()>0) )
+                {
+                    time.push_back(t);
+                    edges_out.push_back( curr_edge_change.first );
+                    edges_in.push_back( curr_edge_change.second );
+                }
             }
-        }
-        else
-        {
-            throw length_error("There was an event chosen other than rewiring, this should not happen.");
+            else
+            {
+                throw length_error("There was an event chosen other than rewiring, this should not happen.");
+            }
         }
             
 
