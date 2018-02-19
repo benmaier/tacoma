@@ -11,7 +11,7 @@ gamma = dtu_week.gamma
 N = dtu_week.N
 tmax = dtu_week.tmax
 t_run_total = tmax
-seed = 338905
+seed = 45
 
 edge_changes = cF.flockwork_P_varying_rates(E,N,P,t_run_total,gamma,tmax,seed=seed)
 
@@ -50,7 +50,7 @@ A += A.T
 
 axes[2].imshow(A.todense())
 
-y, x = np.histogram(result.contact_durations,bins=200)
+y, x = np.histogram(np.array(result.contact_durations)/3600.,bins=200)
 x = 0.5*(x[1:] + x[:-1])
 axes[3].plot(x,y,'.')
 axes[3].set_xscale('log')

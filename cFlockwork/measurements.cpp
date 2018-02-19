@@ -528,10 +528,10 @@ group_sizes_and_durations
 
             edges_to_delete.push_back(edge_int);
         }
-        //for( auto const &edge_int: edges_to_delete)
-        //{
-        //    current_edges.erase(edge_int);
-        //}
+        for( auto const &edge_int: edges_to_delete)
+        {
+            current_edges.erase(edge_int);
+        }
 
         // advance iterators
         it_edges_in++;
