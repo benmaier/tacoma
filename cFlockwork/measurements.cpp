@@ -44,6 +44,7 @@ using namespace std;
 group_sizes_and_durations
      measure_group_sizes_and_durations(
              edge_lists &list_of_edge_lists,
+            const bool ignore_size_histograms,
              const bool verbose
         )
 {
@@ -537,7 +538,8 @@ group_sizes_and_durations
 
         // copy this graph and the components for comparisons in next time slice
         old_components = components;
-        old_size_histogram = this_size_histogram;
+        if (not ignore_size_histograms_differences)
+            old_size_histogram = this_size_histogram;
     }
 
     // add the remaining edges to the social network
