@@ -297,10 +297,12 @@ group_sizes_and_durations
     vector < vector < pair < size_t, size_t > > > & all_edges_out = list_of_edge_changes.edges_out;
     vector < double > & time = list_of_edge_changes.t;
 
-    size_t N = list_of_edge_changes.N;
     // create graph
+    size_t N = list_of_edge_changes.N;
     vector < set < size_t > > G(N);
     graph_from_edgelist(G,list_of_edge_changes.edges_initial);
+
+    // set initial and final time
     double t0 = list_of_edge_changes.t0;
     double tmax = list_of_edge_changes.tmax;
     if (tmax < time.back())
