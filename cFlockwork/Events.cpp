@@ -339,6 +339,13 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
     vector < pair < size_t, size_t > > edges_out;
     vector < pair < size_t, size_t > > edges_in;
 
+    //check if new neighbor is actually an old neighbor
+    //and if this is the case return an empty event
+    if (G[i]->find(j) != G[i]->end())
+    {
+        return make_pair(edges_out,edges_in);
+    }
+
     //loop through the neighbors of i
     for(auto neigh_i : *G[i] )
     {
