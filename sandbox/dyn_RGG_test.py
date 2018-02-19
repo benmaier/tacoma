@@ -32,7 +32,7 @@ G.add_nodes_from(range(N))
 size_counter = Counter()
 histograms = edge_lists.size_histograms
 
-duration_counter = Counter(edge_lists.durations)
+duration_counter = Counter(edge_lists.group_durations)
 
 for hist in histograms:
 
@@ -53,6 +53,6 @@ for ia, a in enumerate(ax):
 
     ax[ia].plot(size,count,'s')
 
-print "mean link duration =", np.mean(edge_lists.durations)
+print "mean link duration =", np.mean(edge_lists.group_durations)
 
 pl.show()
