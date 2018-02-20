@@ -17,7 +17,8 @@ edge_changes = cF.flockwork_P_varying_rates(E,N,P,t_run_total,gamma,tmax,seed=se
 
 print "measuring groups and durations, ignore histograms differences =", True
 start = time.time()
-result = cF.measure_group_sizes_and_durations_for_edge_changes(edge_changes,ignore_size_histogram_differences=True)
+result = cF.measure_group_sizes_and_durations_for_edge_changes(edge_changes,
+                                                               ignore_size_histogram_differences = True)
 end = time.time()
 print "took", end - start, "seconds"
 
@@ -25,7 +26,7 @@ print "took", end - start, "seconds"
 new_fig, axes = pl.subplots(2,2)
 axes = axes.flatten()
 
-for group_size in range(1,6):
+for group_size in range(1,10):
     y, x = np.histogram(result.group_durations[group_size],bins=100)
     x = 0.5*(x[1:] + x[:-1])
     axes[0].plot(x,y,'.')
