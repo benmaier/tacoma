@@ -22,6 +22,7 @@ ext_modules = [
             'cFlockwork/Utilities.cpp', 
             'cFlockwork/Events.cpp', 
             'cFlockwork/measurements.cpp', 
+            'cFlockwork/resampling.cpp', 
             'cFlockwork/ZSBB_model.cpp', 
             'cFlockwork/dyn_RGG.cpp', 
             'cFlockwork/SIS.cpp', 
@@ -95,7 +96,7 @@ class BuildExt(build_ext):
 
 setup(
     name='cFlockwork',
-    version='0.0.13',
+    version='0.0.14',
     author='Benjamin F. Maier',
     author_email='bfmaier@physik.hu-berlin.de',
     url='https://github.com/benmaier/cFlockwork',
