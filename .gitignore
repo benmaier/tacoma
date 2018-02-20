@@ -9,6 +9,7 @@ a.out
 *.mexmaci64
 *.m~
 *.pickle
+*.pyc
 
 /*.egg-info/
 /build/
