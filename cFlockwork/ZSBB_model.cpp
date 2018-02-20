@@ -58,6 +58,7 @@ edge_changes_with_histograms
              const double t_equilibration,
              const size_t seed,
              const bool record_sizes_and_durations,
+             const bool return_after_equilibration_only,
              const bool verbose
         )
 {
@@ -134,7 +135,7 @@ edge_changes_with_histograms
     vector < vector < pair <size_t,size_t> > > edges_out;
     vector < vector < pair <size_t,size_t> > > edges_in;
     vector < double > time;
-    vector < pair <size_t,size_t> > edges_initial;
+    vector < pair <size_t,size_t> > edges_equilibrium;
 
 
 
@@ -155,27 +156,17 @@ edge_changes_with_histograms
                 {
                     if (neigh>node)
                     {
-                        size_t edge_int = get_edge_int(make_pair(node,neigh),N);
+                        pair < size_t, size_t > edge = make_pair(node,neigh);
+                        size_t edge_int = get_edge_int(edge,N);
                         initial_edges.insert(edge_int);
                         current_edges[edge_int] = t;
+                        edges_equilibrium.push_back(edge);
                     }
                 }
             }
 
             // initialize initial size histogram
             get_component_size_histogram(initial_size_histogram,G);
-
-            // save the initial edge list
-            size_t node = 0;
-            for(auto const &neighbors: G)
-            {
-                for (auto const &neighbor: neighbors)
-                {
-                    if (node < neighbor)
-                        edges_initial.push_back(make_pair(node,neighbor));
-                }
-                node++;
-            }
         }
 
         // choose random node
@@ -446,13 +437,50 @@ edge_changes_with_histograms
 
     edge_changes_with_histograms result;
 
-    result.t = time;
-    result.t0 = t_equilibration;
     result.tmax = t_equilibration+t_run_simulation;
     result.N = N;
-    result.edges_initial = E;
-    result.edges_out = edges_out;
-    result.edges_in = edges_in;
+    if (return_after_equilibration_only)
+    {
+        result.t0 = t_equilibration;
+        result.edges_initial = edges_equilibrium;
+
+        vector < vector < pair < size_t, size_t > > > new_out;
+        vector < vector < pair < size_t, size_t > > > new_in;
+        vector < double > new_time;
+
+        auto out_it = edges_out.begin();
+        auto in_it = edges_in.begin();
+        auto t_it = time.begin();
+
+        while(*t_it <= t_equilibration)
+        {
+            in_it++;
+            out_it++;
+            t_it++;
+        }
+        while(t_it != time.end())
+        {
+            new_out.push_back(*out_it);
+            new_in.push_back(*in_it);
+            new_time.push_back(*t_it);
+
+            in_it++;
+            out_it++;
+            t_it++;
+        }
+
+        result.t = new_time;
+        result.edges_out = new_out;
+        result.edges_in = new_in;
+    }
+    else
+    {
+        result.t = time;
+        result.t0 = 0;
+        result.edges_initial = E;
+        result.edges_out = edges_out;
+        result.edges_in = edges_in;
+    }
     result.initial_size_histogram = initial_size_histogram;
     result.group_changes = group_changes;
     result.final_size_histogram = final_size_histogram;
