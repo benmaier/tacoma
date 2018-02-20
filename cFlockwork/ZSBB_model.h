@@ -59,6 +59,7 @@ edge_changes_with_histograms
              const double t_equilibration = 0,
              const size_t seed = 0,
              const bool record_sizes_and_durations = false,
+             const bool return_after_equilibration_only = false,
              const bool verbose = false
         );
 
