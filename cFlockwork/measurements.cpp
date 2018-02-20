@@ -305,6 +305,12 @@ group_sizes_and_durations
     // set initial and final time
     double t0 = list_of_edge_changes.t0;
     double tmax = list_of_edge_changes.tmax;
+
+    if (verbose)
+    {
+        cout << "last time in array = " << time.back() << endl;
+        cout << "              tmax = " << tmax << endl;
+    }
     if (tmax < time.back())
         throw domain_error("The value tmax is smaller than the last time in the time list.");
 
