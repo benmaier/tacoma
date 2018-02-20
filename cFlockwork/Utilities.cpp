@@ -399,3 +399,23 @@ void graph_from_edgelist(vector < set < size_t > > &G,
         }
     }
 }
+
+void edgelist_from_graph(
+                         vector < pair < size_t, size_t > > &edge_list,
+                         vector < set < size_t > > &G
+                         )
+{
+    edge_list.clear();
+    size_t node = 0;
+    for(auto const &neighbors: G)
+    {
+        for(auto const &neigh: neighbors)
+        {
+            if (node < neigh)
+            {
+                edge_list.push_back(make_pair(node,neigh));
+            }
+        }
+        node++;
+    }
+}
