@@ -8,6 +8,7 @@ a.out
 *.npy
 *.mexmaci64
 *.m~
+*.pickle
 
 /*.egg-info/
 /build/
