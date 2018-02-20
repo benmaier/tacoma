@@ -10,9 +10,11 @@ N = 400
 
 start = time.time()
 
-edge_lists = cF.dynamic_RGG(N=N,t_run_total=1000,mean_link_duration=5.,
+edge_lists = cF.dynamic_RGG(N = N,
+                            t_run_total = 1000,
+                            mean_link_duration = 5.,
                             periodic_boundary_conditions_for_link_building = True,
-                            record_sizes_and_durations=True,
+                            record_sizes_and_durations = True,
                             #verbose = True)
                             seed = 2335
                             )
@@ -52,6 +54,9 @@ for ia, a in enumerate(ax):
     a.set_yscale('log')
 
     ax[ia].plot(size,count,'s')
+
+ax[0].set_xlabel('group size')
+ax[1].set_xlabel('contact duration [steps]')
 
 print "mean link duration =", np.mean(edge_lists.group_durations)
 
