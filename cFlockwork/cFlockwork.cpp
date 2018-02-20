@@ -52,6 +52,7 @@
 #include "dyn_RGG.h"
 #include "measurements.h"
 #include "dtu_week.h"
+#include "resampling.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -235,6 +236,22 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("verbose") = false
          );
 
+    m.def("resample_from_edge_lists", &resample_from_edge_lists, "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+            py::arg("edge_lists"),
+            py::arg("dt") = 0.0,
+            py::arg("N_time_steps") = 0,
+            py::arg("sample_aggregates") = false,
+            py::arg("verbose") = false
+         );
+
+    m.def("resample_from_edge_changes", &resample_from_edge_changes, "Get a temporal network as a list of edge lists, given an instance of `edge_changes`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+            py::arg("edge_changes"),
+            py::arg("dt") = 0.0,
+            py::arg("N_time_steps") = 0,
+            py::arg("sample_aggregates") = false,
+            py::arg("verbose") = false
+         );
+
     m.def("measure_group_sizes_and_durations_for_edge_changes", &measure_group_sizes_and_durations_for_edge_changes, "Get a temporal network as a list of edge lists, list of times and number of nodes N and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
             py::arg("edge_changes"),
             py::arg("ignore_size_histogram_differences") = false,
@@ -251,6 +268,7 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("t_equilibration") = 0,
             py::arg("seed") = 0,
             py::arg("record_sizes_and_durations") = false,
+            py::arg("return_after_equilibration_only") = false,
             py::arg("verbose") = false
          );
 
@@ -386,8 +404,8 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("edges_out", &edge_changes::edges_out)
         .def_readwrite("edges_in", &edge_changes::edges_in)
         .def_readwrite("N", &edge_changes::N)
-        .def_readwrite("t0", &edge_changes::tmax)
-        .def_readwrite("tmax", &edge_changes::t0)
+        .def_readwrite("t0", &edge_changes::t0)
+        .def_readwrite("tmax", &edge_changes::tmax)
         .def_readwrite("edges_initial", &edge_changes::edges_initial);
 
     py::class_<edge_lists>(m,"edge_lists")
@@ -418,8 +436,8 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("inter_contact_durations", &edge_changes_with_histograms::inter_contact_durations)
         .def_readwrite("group_durations", &edge_changes_with_histograms::group_durations)
         .def_readwrite("N", &edge_changes_with_histograms::N)
-        .def_readwrite("t0", &edge_changes_with_histograms::tmax)
-        .def_readwrite("tmax", &edge_changes_with_histograms::t0)
+        .def_readwrite("t0", &edge_changes_with_histograms::t0)
+        .def_readwrite("tmax", &edge_changes_with_histograms::tmax)
         .def_readwrite("edges_initial", &edge_changes_with_histograms::edges_initial);
 
     py::class_<group_sizes_and_durations>(m,"group_sizes_and_durations")
