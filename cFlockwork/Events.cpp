@@ -333,6 +333,8 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
     size_t i,j;
     choose(N,i,j,r1,r2);
 
+    bool do_rewiring = distribution(generator) < P;
+
     size_t number_of_old_edges = 0;
     size_t number_of_new_edges = 0;
 
@@ -341,7 +343,7 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
 
     //check if new neighbor is actually an old neighbor
     //and if this is the case return an empty event
-    if (G[i]->find(j) != G[i]->end())
+    if ( do_rewiring and (G[i]->find(j) != G[i]->end()) )
     {
         return make_pair(edges_out,edges_in);
     }
@@ -369,7 +371,7 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
     //erase the links from the perspective of i
     G[i]->clear();
 
-    if ( distribution(generator) < P )
+    if ( do_rewiring )
     {
         //loop through the neighbors of j
         for(auto neigh_j : *G[j] ) 
@@ -437,9 +439,17 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
 
     size_t i, j;
 
+    bool do_rewiring = distribution(generator) < P;
+
 
     if (EVENT_VERBOSE)
         cout << "choosing node" << endl;
+
+    size_t number_of_old_edges = 0;
+    size_t number_of_new_edges = 0;
+
+    vector < pair < size_t, size_t > > edges_out;
+    vector < pair < size_t, size_t > > edges_in;
 
     if (use_preferential_node_selection)
     {
@@ -455,15 +465,30 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
         
     }
 
+    // get second node from social network structure
+    if (EVENT_VERBOSE)
+        cout << "getting neighbor node of neighbor " << i << endl;
+
+
+    size_t neighbor_index = arg_choose_from_vector(neighbor_affinity[i].second, generator, distribution);        
+
+    if (EVENT_VERBOSE)
+        cout << "found neighbor index... " << neighbor_index << endl;
+
+    j = neighbor_affinity[i].first[neighbor_index];
+
+    if (EVENT_VERBOSE)
+        cout << "found neighbor node... " << j << endl;
+
+    //check if new neighbor is actually an old neighbor
+    //and if this is the case return an empty event
+    if ( do_rewiring and (G[i]->find(j) != G[i]->end()) )
+    {
+        return make_pair(edges_out,edges_in);
+    }
 
     if (EVENT_VERBOSE)
         cout << "chose node " << i << endl;
-
-    size_t number_of_old_edges = 0;
-    size_t number_of_new_edges = 0;
-
-    vector < pair < size_t, size_t > > edges_out;
-    vector < pair < size_t, size_t > > edges_in;
 
     if (EVENT_VERBOSE)
         cout << "looping through neighbors of " << i << endl;
@@ -497,22 +522,8 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
     //erase the links from the perspective of i
     G[i]->clear();
 
-    if ( distribution(generator) < P )
+    if ( do_rewiring )
     {
-        // get node from social network structure
-        if (EVENT_VERBOSE)
-            cout << "getting neighbor node of neighbor " << i << endl;
-
-
-        size_t neighbor_index = arg_choose_from_vector(neighbor_affinity[i].second, generator, distribution);        
-
-        if (EVENT_VERBOSE)
-            cout << "found neighbor index... " << neighbor_index << endl;
-
-        j = neighbor_affinity[i].first[neighbor_index];
-
-        if (EVENT_VERBOSE)
-            cout << "found neighbor node... " << j << endl;
 
         //loop through the neighbors of j
         for(auto neigh_j : *G[j] ) 
