@@ -400,7 +400,7 @@ PYBIND11_PLUGIN(cFlockwork) {
 
     py::class_<edge_changes>(m,"edge_changes")
         .def(py::init<>())
-        .def_readwrite("copy_from", &edge_lists::copy_from)
+        .def("copy_from", &edge_changes::copy_from)
         .def_readwrite("t", &edge_changes::t)
         .def_readwrite("edges_out", &edge_changes::edges_out)
         .def_readwrite("edges_in", &edge_changes::edges_in)
@@ -411,7 +411,7 @@ PYBIND11_PLUGIN(cFlockwork) {
 
     py::class_<edge_lists>(m,"edge_lists")
         .def(py::init<>())
-        .def_readwrite("copy_from", &edge_lists::copy_from)
+        .def("copy_from", &edge_lists::copy_from)
         .def_readwrite("t", &edge_lists::t)
         .def_readwrite("edges", &edge_lists::edges)
         .def_readwrite("N", &edge_lists::N)

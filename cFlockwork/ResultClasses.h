@@ -58,30 +58,7 @@ struct SIS_result
     set < pair < size_t, size_t > > edge_list;
 };
 
-struct edge_changes
-{
-    vector < double > t;
-    vector < vector < pair < size_t, size_t > > > edges_out; 
-    vector < vector < pair < size_t, size_t > > > edges_in;
-    size_t N;
-    vector < pair < size_t, size_t > > edges_initial; 
-    double t0;
-    double tmax;
-
-    void copy_from( edge_changes_with_histogram const & other) {
-
-        edges_out = other.edges_out;
-        edges_in = other.edges_in;
-        edges_initial = other.edges_initial;
-
-        t = other.t;
-        N = other.N;
-        t0 = other.t0;
-        tmax = other.tmax;
-    }
-};
-
-struct edge_changes_with_histogram
+struct edge_changes_with_histograms
 {
     vector < double > t;
     vector < vector < pair < size_t, size_t > > > edges_out; 
@@ -99,19 +76,25 @@ struct edge_changes_with_histogram
     double tmax;
 };
 
-struct edge_lists
+struct edge_changes
 {
     vector < double > t;
-    vector < vector < pair < size_t, size_t > > > edges;
+    vector < vector < pair < size_t, size_t > > > edges_out; 
+    vector < vector < pair < size_t, size_t > > > edges_in;
     size_t N;
+    vector < pair < size_t, size_t > > edges_initial; 
+    double t0;
     double tmax;
 
-    void copy_from( edge_lists_with_histogram const & other) {
+    void copy_from( const edge_changes_with_histograms & other) {
 
-        edges = other.edges;
+        edges_out = other.edges_out;
+        edges_in = other.edges_in;
+        edges_initial = other.edges_initial;
 
         t = other.t;
         N = other.N;
+        t0 = other.t0;
         tmax = other.tmax;
     }
 };
@@ -124,6 +107,23 @@ struct edge_lists_with_histograms
     vector < size_t > group_durations;
     size_t N;
     double tmax;
+};
+
+struct edge_lists
+{
+    vector < double > t;
+    vector < vector < pair < size_t, size_t > > > edges;
+    size_t N;
+    double tmax;
+
+    void copy_from( const edge_lists_with_histograms & other) {
+
+        edges = other.edges;
+
+        t = other.t;
+        N = other.N;
+        tmax = other.tmax;
+    }
 };
 
 struct group_sizes_and_durations
