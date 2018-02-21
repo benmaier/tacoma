@@ -67,9 +67,21 @@ struct edge_changes
     vector < pair < size_t, size_t > > edges_initial; 
     double t0;
     double tmax;
+
+    void copy_from( edge_changes_with_histogram const & other) {
+
+        edges_out = other.edges_out;
+        edges_in = other.edges_in;
+        edges_initial = other.edges_initial;
+
+        t = other.t;
+        N = other.N;
+        t0 = other.t0;
+        tmax = other.tmax;
+    }
 };
 
-struct edge_changes_with_histograms
+struct edge_changes_with_histogram
 {
     vector < double > t;
     vector < vector < pair < size_t, size_t > > > edges_out; 
@@ -93,6 +105,15 @@ struct edge_lists
     vector < vector < pair < size_t, size_t > > > edges;
     size_t N;
     double tmax;
+
+    void copy_from( edge_lists_with_histogram const & other) {
+
+        edges = other.edges;
+
+        t = other.t;
+        N = other.N;
+        tmax = other.tmax;
+    }
 };
 
 struct edge_lists_with_histograms
