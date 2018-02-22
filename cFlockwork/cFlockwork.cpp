@@ -53,6 +53,7 @@
 #include "measurements.h"
 #include "dtu_week.h"
 #include "resampling.h"
+#include "social_trajectories.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -249,6 +250,34 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
             py::arg("sample_aggregates") = false,
+            py::arg("verbose") = false
+         );
+
+    m.def("binned_social_trajectory_from_edge_changes", &binned_social_trajectory_from_edge_changes, "Get a social trajectory of a node, given an instance of `edge_changes`, binned every dt (list of group indices this node was part of in [t,t+dt) ).",
+            py::arg("edge_changes"),
+            py::arg("node"),
+            py::arg("dt") = 0.0,
+            py::arg("N_time_steps") = 0,
+            py::arg("verbose") = false
+         );
+
+    m.def("social_trajectory_from_edge_changes", &social_trajectory_from_edge_changes, "Get a social trajectory of a node, given an instance of `edge_changes`.",
+            py::arg("edge_changes"),
+            py::arg("node"),
+            py::arg("verbose") = false
+         );
+
+    m.def("social_trajectory_from_edge_lists", &social_trajectory_from_edge_lists, "Get a social trajectory of a node, given an instance of `edge_lists`.",
+            py::arg("edge_lists"),
+            py::arg("node"),
+            py::arg("verbose") = false
+         );
+
+    m.def("binned_social_trajectory_from_edge_lists", &binned_social_trajectory_from_edge_lists, "Get a social trajectory of a node, given an instance of `edge_lists`, binned every dt (list of group indices this node was part of in [t,t+dt) ).",
+            py::arg("edge_lists"),
+            py::arg("node"),
+            py::arg("dt") = 0.0,
+            py::arg("N_time_steps") = 0,
             py::arg("verbose") = false
          );
 
@@ -453,6 +482,12 @@ PYBIND11_PLUGIN(cFlockwork) {
     py::class_<edge_weight>(m,"edge_weight")
         .def(py::init<>())
         .def_readwrite("value", &edge_weight::value);
+
+    py::class_<social_trajectory_entry>(m,"social_trajectory_entry")
+        .def(py::init<>())
+        .def_readwrite("hash", &social_trajectory_entry::hash)
+        .def_readwrite("size", &social_trajectory_entry::size)
+        .def_readwrite("time_pairs", &social_trajectory_entry::time_pairs);
 
     py::class_<dtu_week>(m,"dtu_week")
         .def(py::init<>())

@@ -142,5 +142,11 @@ struct edge_weight
     edge_weight(): value(0.0){}
 };
 
+struct social_trajectory_entry {
+    size_t hash;
+    size_t size;
+    vector < pair < double, double > > time_pairs;
+};
+
 
 #endif

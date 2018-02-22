@@ -87,6 +87,10 @@ void remove_2_from_vector(vector <size_t> &vec, const size_t first_to_be_removed
 void randomly_seed_engine(
         default_random_engine &generator
         );
+set < size_t > get_component_of_node(
+            size_t &node,
+            const vector < set < size_t > > &G
+        );
 void get_components_and_size_histogram(
         vector < set <size_t> > &components,
         map < size_t, size_t > &counter,

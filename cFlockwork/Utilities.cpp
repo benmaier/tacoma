@@ -302,6 +302,19 @@ vector < set < size_t > > get_components(
     return components;
 
 }
+
+set < size_t > get_component_of_node(
+            size_t &node,
+            const vector < set < size_t > > &G
+        )
+{
+    vector < bool > already_visited(G.size(),false);
+
+    set <size_t> this_component;
+    add_nodes_belonging_to_this_component(node,G,this_component,already_visited);
+    return this_component;
+}
+
 void get_components_and_size_histogram(
         vector < set <size_t> > &components,
         map < size_t, size_t > &counter,
