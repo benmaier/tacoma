@@ -53,7 +53,7 @@ group_sizes_and_durations
     vector < double > & time = list_of_edge_lists.t;
     size_t N = list_of_edge_lists.N;
 
-    // create two graphs
+    // create empty graphs
     vector < set < size_t > > G(N);
 
     // create iteratos
@@ -75,6 +75,7 @@ group_sizes_and_durations
     auto current_edge_iterator = current_edges.begin();
     vector < double > contact_durations;
     vector < map < size_t, size_t > > size_histograms;
+    vector < double > aggregated_size_histogram(N+1,0.0);
     vector < vector < double > > group_durations(N+1);
 
     // vectors and sets dealing with the change of components
@@ -242,8 +243,13 @@ group_sizes_and_durations
         // if `edge` is not in `social_network` a weighted edge will be
         // constructed with .value = 0.0;
         if (t > t0)
+        {
             for(auto const &edge: these_edges)
                 social_network[edge].value += t - old_t;
+
+            for(auto const &hist_it: this_size_histogram)
+                aggregated_size_histogram[hist_it.first] += hist_it.second * (t - old_t);
+        }
 
         // advance iterators
         it_edge_lists++;
@@ -265,6 +271,13 @@ group_sizes_and_durations
         social_network[make_pair(i,j)].value += tmax - last_time;
     }
 
+    // add the remaining components to the aggregated size histogram and norm
+    // the whole thang
+    for(auto const &comp: old_components)
+        aggregated_size_histogram[comp.size()] += tmax - old_t;
+    for(auto &count: aggregated_size_histogram)
+        count /= tmax - t0;
+
     map < pair < size_t, size_t >, double > aggregated_network;
     for( auto soc_it = social_network.begin();
          soc_it != social_network.end();
@@ -279,6 +292,7 @@ group_sizes_and_durations
     result.size_histograms = size_histograms;
     result.group_durations = group_durations;
     result.aggregated_network = aggregated_network;
+    result.aggregated_size_histogram = aggregated_size_histogram;
 
     return result;
     
@@ -305,6 +319,7 @@ group_sizes_and_durations
     // set initial and final time
     double t0 = list_of_edge_changes.t0;
     double tmax = list_of_edge_changes.tmax;
+    double old_t = t0; // this is needed for the aggregated size histogram
 
     if (verbose)
     {
@@ -345,6 +360,8 @@ group_sizes_and_durations
     vector < map < size_t, long > > size_histogram_differences;
     vector < map < size_t, size_t > > size_histograms;
     map < size_t, size_t > old_size_histogram;
+    vector < double > aggregated_size_histogram(N+1,0.0);
+
     get_components_and_size_histogram(components,old_size_histogram,G);
     size_histograms.push_back(old_size_histogram);
     old_components = components;
@@ -384,7 +401,8 @@ group_sizes_and_durations
         /*
         if (verbose) 
         {
-            cout << " ============ " << endl;
+            cout <
+            < " ============ " << endl;
             cout << "t = " << t << endl;
             cout << " creating Graph from " << these_edges.size() << " edges" << endl;
         }
@@ -404,6 +422,10 @@ group_sizes_and_durations
         map < size_t, size_t > this_size_histogram;
         components.clear();
         get_components_and_size_histogram(components,this_size_histogram,G);
+
+
+        for(auto const &hist_it: this_size_histogram)
+            aggregated_size_histogram[hist_it.first] += hist_it.second * (t - old_t);
         
 
         if (not ignore_size_histograms_differences)
@@ -543,6 +565,7 @@ group_sizes_and_durations
         it_edges_in++;
         it_edges_out++;
         it_time++;
+        old_t = t;
 
         // copy this graph and the components for comparisons in next time slice
         old_components = components;
@@ -561,6 +584,14 @@ group_sizes_and_durations
         social_network[make_pair(i,j)].value += tmax - last_time;
     }
 
+    // add the remaining components to the aggregated size histogram and norm
+    // the whole thang
+    for(auto const &comp: old_components)
+        aggregated_size_histogram[comp.size()] += tmax - old_t;
+    for(auto &count: aggregated_size_histogram)
+        count /= tmax - t0;
+
+
     map < pair < size_t, size_t >, double > aggregated_network;
     for( auto soc_it = social_network.begin();
          soc_it != social_network.end();
@@ -577,6 +608,7 @@ group_sizes_and_durations
     result.size_histogram_differences = size_histogram_differences;
     result.group_durations = group_durations;
     result.aggregated_network = aggregated_network;
+    result.aggregated_size_histogram = aggregated_size_histogram;
 
     return result;
     

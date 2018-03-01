@@ -477,6 +477,7 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("size_histograms", &group_sizes_and_durations::size_histograms)
         .def_readwrite("size_histogram_differences", &group_sizes_and_durations::size_histogram_differences)
         .def_readwrite("group_durations", &group_sizes_and_durations::group_durations)
+        .def_readwrite("aggregated_size_histogram", &group_sizes_and_durations::aggregated_size_histogram)
         .def_readwrite("aggregated_network", &group_sizes_and_durations::aggregated_network);
 
     py::class_<edge_weight>(m,"edge_weight")
