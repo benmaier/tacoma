@@ -27,7 +27,6 @@
 #define __DYN_GILLESPIE_H__
 
 #include "Utilities.h"
-#include "ResultClasses.h"
 
 #include <iostream>
 #include <algorithm>
@@ -359,6 +358,5 @@ void
         }
     }
 }
-
 
 #endif
