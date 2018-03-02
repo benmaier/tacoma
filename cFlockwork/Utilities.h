@@ -84,9 +84,11 @@ void get_gillespie_tau_and_event_with_varying_gamma(
 
 void remove_from_vector(vector <size_t> &vec, const size_t to_be_removed);
 void remove_2_from_vector(vector <size_t> &vec, const size_t first_to_be_removed, const size_t second_to_be_removed);
+/*
 void randomly_seed_engine(
         default_random_engine &generator
         );
+*/
 set < size_t > get_component_of_node(
             size_t &node,
             const vector < set < size_t > > &G
@@ -120,4 +122,20 @@ void edgelist_from_graph(
                          vector < pair < size_t, size_t > > &edge_list,
                          vector < set < size_t > > &G
                          );
+
+template <typename T>
+void randomly_seed_engine(
+        T &generator
+        )
+//taken from http://stackoverflow.com/a/29190957/4177832
+{
+    const auto time_seed = static_cast<size_t>(time(0));
+    const auto clock_seed = static_cast<size_t>(clock());
+    const size_t pid_seed =
+              hash<thread::id>()(this_thread::get_id());
+
+    seed_seq seed_value { time_seed, clock_seed, pid_seed };
+    generator.seed(seed_value);
+}
+
 #endif

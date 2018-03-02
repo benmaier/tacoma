@@ -381,20 +381,6 @@ void get_component_size_histogram_from_edgelist(
     get_component_size_histogram(counter, G);
 }
 
-void randomly_seed_engine(
-        default_random_engine &generator
-        )
-//taken from http://stackoverflow.com/a/29190957/4177832
-{
-    const auto time_seed = static_cast<size_t>(time(0));
-    const auto clock_seed = static_cast<size_t>(clock());
-    const size_t pid_seed =
-              hash<thread::id>()(this_thread::get_id());
-
-    seed_seq seed_value { time_seed, clock_seed, pid_seed };
-    generator.seed(seed_value);
-}
-
 void graph_from_edgelist(vector < set < size_t > > &G,
                          vector < pair < size_t, size_t > > &edge_list
                          )
