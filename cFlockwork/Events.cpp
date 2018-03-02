@@ -86,6 +86,59 @@ void infect(
     }
 }
                 
+void infect(
+                 vector < set < size_t > > & G, //Adjacency matrix
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 set < pair < size_t, size_t > > & SI_E, //edge list of SI links
+                 vector < size_t > & node_status,
+                 set < size_t > & infected
+           )
+{
+    //get element of SI_E that leads to infection
+    double r = distribution(generator);
+    size_t element = SI_E.size() * r;
+
+    set< pair < size_t, size_t > >::const_iterator edge(SI_E.begin());
+    advance(edge,element);
+
+    //get nodes belonging to that edge
+    size_t i = (*edge).first;
+    size_t j = (*edge).second;
+
+    size_t new_infected;
+
+    if ( ( node_status[i] == I ) && ( node_status[j] == S) )
+    {
+        new_infected = j;
+    } else if ( ( node_status[j] == I ) && ( node_status[i] == S) )
+    {
+        new_infected = i;
+    } else {
+		//cout << "node status: " << node_status[i] << " " << node_status[j] <<endl;
+		//cout << "link: " << i << " " << j <<endl;
+        throw domain_error( "There was a non SI link in the set of SI links. This should not happen." );
+    }
+
+    //change status of that node
+    node_status[new_infected] = I;
+    infected.insert(new_infected);
+
+    //loop through the neighbors of i
+    for(auto const & neigh_of_new_I : G[new_infected] )
+    {
+        //get pair
+        pair <size_t,size_t> current_edge = get_sorted_pair(new_infected,neigh_of_new_I);
+
+        //if the neighbor is infected, then the edge does not belong in SI_E anymore
+        if (node_status[neigh_of_new_I] == I)
+            SI_E.erase(current_edge);
+        //if the neighbor is susceptible, then it belongs in SI_E now
+        else if (node_status[neigh_of_new_I] == S)
+            SI_E.insert(current_edge);
+    }
+}
+
 void SIS_recover(
                  vector < set < size_t > * > & G, //Adjacency matrix
                  default_random_engine & generator, 
@@ -109,6 +162,43 @@ void SIS_recover(
 
     //loop through the neighbors of i
     for(auto neigh_of_new_S : *G[new_recovered] )
+    {
+        //get pair
+        pair <size_t,size_t> current_edge = get_sorted_pair(new_recovered,neigh_of_new_S);
+
+        //if the neighbor is infected, then the edge belongs in SI_E
+        if (node_status[neigh_of_new_S] == I)
+            SI_E.insert(current_edge);
+        //if the neighbor is susceptible, then it does not belong in SI_E anymore
+        else if (node_status[neigh_of_new_S] == S)
+            SI_E.erase(current_edge);
+    }
+
+}
+
+void SIS_recover(
+                 vector < set < size_t > > & G, //Adjacency matrix
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 set < pair < size_t, size_t > > & SI_E, //edge list of SI links
+                 vector < size_t > & node_status,
+                 set < size_t > & infected
+           )
+{
+    //get element of infected that recovers
+    double r = distribution(generator);
+    size_t element = infected.size() * r;
+
+    set< size_t >::const_iterator new_recovered_it(infected.begin());
+    advance(new_recovered_it,element);
+
+    size_t new_recovered = *new_recovered_it;
+    //change status of that node
+    node_status[new_recovered] = S;
+    infected.erase(new_recovered);
+
+    //loop through the neighbors of i
+    for(auto const &neigh_of_new_S : G[new_recovered] )
     {
         //get pair
         pair <size_t,size_t> current_edge = get_sorted_pair(new_recovered,neigh_of_new_S);

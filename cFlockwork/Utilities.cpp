@@ -418,3 +418,23 @@ void edgelist_from_graph(
         node++;
     }
 }
+
+vector<size_t>::iterator choose_random_unique(
+        vector<size_t>::iterator begin, 
+        vector<size_t>::iterator end, 
+        size_t num_random,
+        default_random_engine & generator,
+        uniform_real_distribution<double> & distribution
+    )
+{
+    size_t left = distance(begin, end);
+    while (num_random--) {
+        vector<size_t>::iterator r = begin;
+        advance(r, distribution(generator) * left);
+        swap(*begin, *r);
+        ++begin;
+        --left;
+    }
+    return begin;
+}
+

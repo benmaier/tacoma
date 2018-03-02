@@ -96,8 +96,26 @@ void infect(
                  set < size_t > & infected
            );
 
+void infect(
+                 vector < set < size_t > > & G, //Adjacency matrix
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 set < pair < size_t, size_t > > & SI_E, //edge list of SI links
+                 vector < size_t > & node_status,
+                 set < size_t > & infected
+           );
+
 void SIS_recover(
                  vector < set < size_t > * > & G, //Adjacency matrix
+                 default_random_engine & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 set < pair < size_t, size_t > > & SI_E, //edge list of SI links
+                 vector < size_t > & node_status,
+                 set < size_t > & infected
+           );
+
+void SIS_recover(
+                 vector < set < size_t > > & G, //Adjacency matrix
                  default_random_engine & generator, 
                  uniform_real_distribution<double> & distribution,
                  set < pair < size_t, size_t > > & SI_E, //edge list of SI links
