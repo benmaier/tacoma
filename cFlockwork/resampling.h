@@ -45,7 +45,7 @@
 using namespace std;
 
 edge_lists
-     resample_from_edge_lists(
+     sample_from_edge_lists(
              edge_lists &list_of_edge_lists,
              double dt = 0.0,
              size_t N_time_steps = 0,
@@ -54,11 +54,28 @@ edge_lists
         );
 
 edge_lists
-     resample_from_edge_changes(
+     sample_from_edge_changes(
              edge_changes &list_of_edge_changes,
              double dt = 0.0,
              size_t N_time_steps = 0,
              const bool sample_aggregates = false,
              const bool verbose = false
         );
+
+edge_lists
+     bin_from_edge_lists(
+             edge_lists &list_of_edge_lists,
+             double dt = 0.0,
+             size_t N_time_steps = 0,
+             const bool verbose = false
+        );
+
+edge_lists
+     bin_from_edge_changes(
+             edge_changes &list_of_edge_changes,
+             double dt = 0.0,
+             size_t N_time_steps = 0,
+             const bool verbose = false
+        );
+#endif
 #endif

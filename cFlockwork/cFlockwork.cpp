@@ -237,7 +237,7 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("verbose") = false
          );
 
-    m.def("resample_from_edge_lists", &resample_from_edge_lists, "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+    m.def("sample_from_edge_lists", &sample_from_edge_lists, "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
             py::arg("edge_lists"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -245,11 +245,25 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("verbose") = false
          );
 
-    m.def("resample_from_edge_changes", &resample_from_edge_changes, "Get a temporal network as a list of edge lists, given an instance of `edge_changes`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+    m.def("sample_from_edge_changes", &sample_from_edge_changes, "Get a temporal network as a list of edge lists, given an instance of `edge_changes`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
             py::arg("sample_aggregates") = false,
+            py::arg("verbose") = false
+         );
+
+    m.def("bin_from_edge_lists", &bin_from_edge_lists, "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but binned for every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. This does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+            py::arg("edge_lists"),
+            py::arg("dt") = 0.0,
+            py::arg("N_time_steps") = 0,
+            py::arg("verbose") = false
+         );
+
+    m.def("bin_from_edge_changes", &bin_from_edge_changes, "Get a temporal network as a list of edge lists, given an instance of `edge_changes`, but binned every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. This does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+            py::arg("edge_changes"),
+            py::arg("dt") = 0.0,
+            py::arg("N_time_steps") = 0,
             py::arg("verbose") = false
          );
 
