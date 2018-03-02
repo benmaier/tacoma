@@ -78,4 +78,3 @@ edge_lists
              const bool verbose = false
         );
 #endif
-#endif

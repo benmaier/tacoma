@@ -1,6 +1,6 @@
 import cFlockwork as cF
 
-sample_aggregates = True
+sample_aggregates = False
 N_time_steps = 5
 
 print "===== edge_lists => edge_lists ====="
@@ -23,13 +23,19 @@ L.edges = [
            ]
 
 
-new = cF.resample_from_edge_lists(L,N_time_steps=N_time_steps,sample_aggregates=sample_aggregates,verbose=True)
+new = cF.sample_from_edge_lists(L,N_time_steps=N_time_steps,sample_aggregates=sample_aggregates,verbose=True)
 
 print new.N
 print new.t
 print new.tmax
 print new.edges
 
+new = cF.bin_from_edge_lists(L,N_time_steps=N_time_steps)
+
+print new.N
+print new.t
+print new.tmax
+print new.edges
 
 print "===== edge_changes => edge_lists ====="
 
@@ -57,7 +63,14 @@ C.edges_out = [
                 ],
               ]
 
-new = cF.resample_from_edge_changes(C,N_time_steps=N_time_steps,sample_aggregates=sample_aggregates,verbose=True)
+new = cF.sample_from_edge_changes(C,N_time_steps=N_time_steps,sample_aggregates=sample_aggregates,verbose=True)
+
+print new.N
+print new.t
+print new.tmax
+print new.edges
+
+new = cF.bin_from_edge_changes(C,N_time_steps=N_time_steps)
 
 print new.N
 print new.t

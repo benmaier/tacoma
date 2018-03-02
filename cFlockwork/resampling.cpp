@@ -311,7 +311,7 @@ edge_lists
              )
 {
     return sample_from_edge_changes(
-             list_of_edge_lists,
+             list_of_edge_changes,
              dt,
              N_time_steps,
              true,
