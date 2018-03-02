@@ -46,7 +46,7 @@ using namespace std;
 template <typename T>
 void 
     gillespie_on_edge_lists(
-            edge_lists const & edg_lst,
+            edge_lists & edg_lst,
             T & this_gillespie_object,
             bool verbose = true
             )
@@ -75,8 +75,8 @@ void
     double Lambda;
 
     // create iterators
-    auto next_edges = edg_lst.edges.end();
-    auto next_time = edg_lst.t.end();
+    auto next_edges = (edg_lst.edges).end();
+    auto next_time = (edg_lst.t).end();
     long loop_count = -1;
 
     // draw time to first event
@@ -87,19 +87,19 @@ void
 
         // ======================== UPDATE THE GRAPH ==========================
         
-        if (next_time == time.end())
+        if (next_time == (edg_lst.t).end())
         {
             // if the upcoming edges is the end of the edges vector, this means
             // we've reached tmax. and at tmax, the network is getting looped
             // so we increase the loop count and generate G from the initial
             // edge list at edges.begin()
             loop_count += 1;
-            graph_from_edgelist(G,edg_lst.edges.begin());
+            graph_from_edgelist(G,*((edg_lst.edges).begin()));            
 
             // furthermore, the upcoming change will be the second in the
             // vectors
-            next_edges = edg_lst.edges.begin() + 1;
-            next_time = time.begin() + 1;
+            next_edges = (edg_lst.edges).begin() + 1;
+            next_time = (edg_lst.t).begin() + 1;
         }
         else
         {
@@ -113,7 +113,8 @@ void
 
         // if the upcoming time change points to the end of the edges vector,
         // the upcoming change will happen at tmax
-        if (next_time == time.end())
+        double this_next_time;
+        if (next_time == (edg_lst.t).end())
             this_next_time = tmax;
         else
             this_next_time = *next_time;
@@ -189,7 +190,7 @@ void
 template <typename T>
 void 
     gillespie_on_edge_changes(
-            edge_changes const & edg_chg,
+            edge_changes & edg_chg,
             T & this_gillespie_object,
             bool verbose = true
             )
@@ -218,9 +219,9 @@ void
     double Lambda;
 
     // create iterators
-    auto next_edges_in = edg_chg.edges_in.end();
-    auto next_edges_out = edg_chg.edges_out.end();
-    auto next_time = edg_chg.t.end();
+    auto next_edges_in = (edg_chg.edges_in).end();
+    auto next_edges_out = (edg_chg.edges_out).end();
+    auto next_time = (edg_chg.t).end();
     long loop_count = -1;
 
     // draw time to first event
@@ -231,7 +232,7 @@ void
 
         // ======================== UPDATE THE GRAPH ==========================
         
-        if (next_time == time.end())
+        if (next_time == (edg_chg.t).end())
         {
             // if the upcoming change is the end of the change vector, this means
             // we've reached tmax. and at tmax, the network is getting looped
@@ -242,17 +243,17 @@ void
 
             // furthermore, the upcoming change will be the first in the
             // change vectors
-            next_edges_in = edg_chg.edges_in.begin();
-            next_edges_out = edg_chg.edges_out.begin();
-            next_time = time.begin();
+            next_edges_in = (edg_chg.edges_in).begin();
+            next_edges_out = (edg_chg.edges_out).begin();
+            next_time = (edg_chg.t).begin();
         }
         else
         {
             //update edges in
             for(auto & edge: *next_edges_in)
             {
-                size_t const &i = edge.first;
-                size_t const &j = edge.second;
+                size_t &i = edge.first;
+                size_t &j = edge.second;
 
                 if (i==j)
                     throw domain_error("self loop detected.");
@@ -264,10 +265,10 @@ void
                 G[j].insert(i);
             }
             //update edges out
-            for(auto const & edge: *next_edges_out)
+            for(auto & edge: *next_edges_out)
             {
-                size_t const &i = edge.first;
-                size_t const &j = edge.second;
+                size_t &i = edge.first;
+                size_t &j = edge.second;
 
                 if (i==j)
                     throw domain_error("self loop detected.");
@@ -287,7 +288,9 @@ void
 
         // if the upcoming time change points to the end of the change vector,
         // the upcoming change will happen at tmax
-        if (next_time == time.end())
+        double this_next_time;
+
+        if (next_time == (edg_chg.t).end())
             this_next_time = tmax;
         else
             this_next_time = *next_time;

@@ -44,8 +44,9 @@
 
 using namespace std;
 
-const size_t S = 0;
-const size_t I = 1;
+const size_t _S = 0;
+const size_t _I = 1;
+const size_t _R = 1;
 
 struct Dyn_SIS 
 {
@@ -53,12 +54,12 @@ struct Dyn_SIS
     double t_simulation;
     double infection_rate;
     double recovery_rate;
-    size_t number_of_initially_vaccinated;
     size_t number_of_initially_infected;
+    size_t number_of_initially_vaccinated;
     size_t seed;
 
     default_random_engine generator;
-    uniform_real_distribution<double> randuni(0.0,1.0);
+    uniform_real_distribution<double> randuni;
 
     vector < double > t;
     vector < double > R0;
@@ -72,12 +73,12 @@ struct Dyn_SIS
     vector < double > rates;
 
     Dyn_SIS(
-        size_t const &_N,
-        double const &_t_simulation,
-        double const &_infection_rate,
-        double const &_recovery_rate,
-        size_t const &_number_of_initially_vaccinated,
-        size_t const &_number_of_initially_infected,
+        size_t _N,
+        double _t_simulation,
+        double _infection_rate,
+        double _recovery_rate,
+        size_t _number_of_initially_infected = 1,
+        size_t _number_of_initially_vaccinated = 0,
         size_t _seed = 0
     )
     {
@@ -91,9 +92,11 @@ struct Dyn_SIS
         default_random_engine generator;
 
         if (_seed == 0)
-            randomly_seed_generator(generator);
+            randomly_seed_engine(generator);
         else
             generator.seed(_seed);
+
+        randuni = uniform_real_distribution<double>(0.0,1.0);
 
         //check if number of infected and number of vaccinated does not
         //exceed total node number
@@ -101,7 +104,7 @@ struct Dyn_SIS
             throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
 
         //initialize status vector of nodes and vector of infected
-        vector < size_t > node_status(N,S);
+        vector < size_t > node_status(N,_S);
         set < size_t > infected;
 
 
@@ -120,12 +123,12 @@ struct Dyn_SIS
 
         for(size_t node=0; node<number_of_initially_vaccinated; node++)
         {
-            node_status[node_ints[node]] = R;
+            node_status[node_ints[node]] = _R;
         }
 
         for(size_t node = number_of_initially_vaccinated; node < number_of_initially_vaccinated + number_of_initially_infected; node++)
         {
-            node_status[node_ints[node]] = I;
+            node_status[node_ints[node]] = _I;
             infected.insert( node_ints[node] );
         }
 
@@ -139,15 +142,15 @@ struct Dyn_SIS
 
     void update_network(vector < set < size_t > > G,
                         double t
-                        );
+                        ){};
     void get_rates_and_Lambda(vector < double > &rates,
                               double &Lambda
-                              );
+                              ){};
     void make_event(size_t const &event,
                     double t
-                   );
+                   ){};
 
-    void update_observables();
+    void update_observables(){};
 };
 
 

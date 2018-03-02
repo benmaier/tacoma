@@ -97,7 +97,7 @@ class BuildExt(build_ext):
 
 setup(
     name='cFlockwork',
-    version='0.0.15',
+    version='0.0.16',
     author='Benjamin F. Maier',
     author_email='bfmaier@physik.hu-berlin.de',
     url='https://github.com/benmaier/cFlockwork',

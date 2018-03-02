@@ -54,6 +54,8 @@
 #include "dtu_week.h"
 #include "resampling.h"
 #include "social_trajectories.h"
+#include "dyn_SIS.h"
+#include "dyn_gillespie.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -425,6 +427,11 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("seed")
          );
 
+    m.def("gillespie_SIS_on_edge_lists",&gillespie_on_edge_lists<Dyn_SIS>,"Perform a Gillespie SIS simulation on edge lists. Needs an instance of cFlockwork.edge_lists and an instance of cFlockwork.Dyn_SIS.",
+            py::arg("edge_lists"),
+            py::arg("Dyn_SIS"),
+            py::arg("verbose") = false
+            );
 
     py::class_<SIR_result>(m,"SIR_result")
         .def(py::init<>())
@@ -510,6 +517,13 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("tmax", &dtu_week::tmax)
         .def_readwrite("gamma", &dtu_week::gamma)
         .def_readwrite("P", &dtu_week::P);
+
+    py::class_<Dyn_SIS>(m,"Dyn_SIS")
+        .def(py::init<size_t,double,double,double,size_t,size_t,size_t>(),"Initialize with N, t_simulation, infection_rate, recovery_rate, number_of_initially_infected, number_oof_initially_vaccinated, seed")
+        .def_readwrite("t", &Dyn_SIS::t)
+        .def_readwrite("R0", &Dyn_SIS::R0)
+        .def_readwrite("SI", &Dyn_SIS::SI)
+        .def_readwrite("I", &Dyn_SIS::R0);
 
     return m.ptr();
 

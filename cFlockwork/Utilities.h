@@ -124,14 +124,6 @@ void edgelist_from_graph(
                          );
 
 
-vector<size_t>::iterator choose_random_unique(
-        vector<size_t>::iterator begin, 
-        vector<size_t>::iterator end, 
-        size_t num_random,
-        default_random_engine & generator,
-        uniform_real_distribution<double> & distribution
-    );
-
 template <typename T>
 void randomly_seed_engine(
         T &generator
