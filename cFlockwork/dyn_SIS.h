@@ -46,7 +46,7 @@ using namespace std;
 
 const size_t _S = 0;
 const size_t _I = 1;
-const size_t _R = 1;
+const size_t _R = 2;
 
 struct Dyn_SIS 
 {
@@ -61,14 +61,14 @@ struct Dyn_SIS
     default_random_engine generator;
     uniform_real_distribution<double> randuni;
 
-    vector < double > t;
+    vector < double > time;
     vector < double > R0;
     vector < size_t > SI;
     vector < size_t > I;
 
-    set < size_t > infected;
+    vector < size_t > infected;
     vector < size_t > node_status;
-    set < pair < size_t, size_t > > SI_E;
+    vector < size_t > susceptibles_of_SI_edges;
 
     vector < double > rates;
 
@@ -131,10 +131,7 @@ struct Dyn_SIS
             node_status[node_ints[node]] = _I;
             infected.insert( node_ints[node] );
         }
-
-
     }
-
 
     bool simulation_ended() {
         return infected.size() == 0;
@@ -142,15 +139,16 @@ struct Dyn_SIS
 
     void update_network(vector < set < size_t > > G,
                         double t
-                        ){};
+                        );
     void get_rates_and_Lambda(vector < double > &rates,
                               double &Lambda
-                              ){};
+                              );
+
     void make_event(size_t const &event,
                     double t
-                   ){};
+                   );
 
-    void update_observables(){};
+    void update_observables(double const &t);
 };
 
 
