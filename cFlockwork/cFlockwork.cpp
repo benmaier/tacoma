@@ -433,6 +433,12 @@ PYBIND11_PLUGIN(cFlockwork) {
             py::arg("verbose") = false
             );
 
+    m.def("gillespie_SIS_on_edge_changes",&gillespie_on_edge_changes<Dyn_SIS>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of cFlockwork.edge_changes and an instance of cFlockwork.Dyn_SIS.",
+            py::arg("edge_lists"),
+            py::arg("Dyn_SIS"),
+            py::arg("verbose") = false
+            );
+
     py::class_<SIR_result>(m,"SIR_result")
         .def(py::init<>())
         .def_readwrite("I_of_t", &SIR_result::I_of_t)
@@ -519,11 +525,20 @@ PYBIND11_PLUGIN(cFlockwork) {
         .def_readwrite("P", &dtu_week::P);
 
     py::class_<Dyn_SIS>(m,"Dyn_SIS")
-        .def(py::init<size_t,double,double,double,size_t,size_t,size_t>(),"Initialize with N, t_simulation, infection_rate, recovery_rate, number_of_initially_infected, number_oof_initially_vaccinated, seed")
-        .def_readwrite("t", &Dyn_SIS::t)
+        .def(py::init<size_t,double,double,double,size_t,size_t,size_t,bool>(),
+                py::arg("N"),
+                py::arg("t_simulation"),
+                py::arg("infection_rate"),
+                py::arg("recovery_rate"),
+                py::arg("number_of_initially_infected") = 1, 
+                py::arg("number_of_initially_vaccinated") = 0, 
+                py::arg("seed") = 0,
+                py::arg("verbose") = false
+            )
+        .def_readwrite("time", &Dyn_SIS::time)
         .def_readwrite("R0", &Dyn_SIS::R0)
         .def_readwrite("SI", &Dyn_SIS::SI)
-        .def_readwrite("I", &Dyn_SIS::R0);
+        .def_readwrite("I", &Dyn_SIS::I);
 
     return m.ptr();
 

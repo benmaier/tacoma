@@ -26,30 +26,42 @@
 #include "dyn_SIS.h"
 
 using namespace std;
-using namespace sis = Dyn_SIS;
+//namespace sis = Dyn_SIS;
 
-void sis::update_network(
-                    vector < set < size_t > > G,
+void Dyn_SIS::update_network(
+                    vector < set < size_t > > &_G,
                     double t
                     )
 {
+    // map this network to the current network
+    G = &_G;
+
+    // compute degree and R0
+    size_t number_of_edges_times_two = 0;
+
+    for(auto const &neighbors: *G)
+        number_of_edges_times_two += neighbors.size();
+
+    mean_degree = number_of_edges_times_two / (double) N;
+
+    size_t old_N_SI = SI_edges.size();
 
     // update infected
-    susceptibles_of_SI_edges.clear();
+    SI_edges.clear();
 
     // for each infected, check its neighbors.
     // if the neighbor is susceptible, push it to the
     // endangered susceptible vector
     for(auto const &inf: infected)
-        for(auto const &neighbor_of_infected: G[inf])
+        for(auto const &neighbor_of_infected: (*G)[inf])
             if (node_status[neighbor_of_infected] == _S)
-                susceptibles_of_SI_edges.push_back(neighbor_of_infected);
+                SI_edges.push_back( make_pair( inf, neighbor_of_infected ) );
 
     // update the arrays containing the observables
     update_observables(t);
 }
 
-void sis::get_rates_and_Lambda(
+void Dyn_SIS::get_rates_and_Lambda(
                     vector < double > &_rates,
                     double &_Lambda
                   )
@@ -58,7 +70,7 @@ void sis::get_rates_and_Lambda(
     rates.clear();
 
     // compute rates of infection
-    rates.push_back(infection_rate * susceptibles_of_SI_edges.size());
+    rates.push_back(infection_rate * SI_edges.size());
 
     // compute rates of recovery
     rates.push_back(recovery_rate * infected.size());
@@ -68,72 +80,172 @@ void sis::get_rates_and_Lambda(
     _Lambda = accumulate(rates.begin(),rates.end(),0.0);
 }
 
-void sis::make_event(
+void Dyn_SIS::make_event(
                 size_t const &event,
                 double t
                )
 {
-    // this is an infection event
     if (event == 0)
-    {
-        // initialize uniform integer random distribution
-        uniform_int_distribution<size_t> random_susceptible(0,susceptibles_of_SI_edges.size()-1);
-
-        // find the index of the susceptible which will become infected
-        size_t this_infected_index = random_susceptible(generator);
-
-        // get the node number of this susceptible
-        size_t this_infected = *(susceptibles_of_SI_edges.begin() + this_infected_index);
-        infected.push_back(this_infected); // save this infected
-
-        // erase all occurences of this susceptible
-        susceptibles_of_SI_edges.erase( 
-                remove( 
-                        susceptibles_of_SI_edges.begin(), 
-                        susceptibles_of_SI_edges.end(),
-                        this_infected ),
-                susceptibles_of_SI_edges.end() 
-                );
-    }
-    // this is a recovery event
+        infection_event();
     else if (event == 1)
-    {
-
-        // initialize uniform integer random distribution
-        uniform_int_distribution<size_t> random_infected(0,infected.size()-1);
-
-        // find the index of the susceptible which will become infected
-        size_t this_recovered_index = random_infected(generator);
-        auto it_recovered = infected.begin() + this_recovered_index;
-
-        // get the node id of this infected about to be recovered
-        size_t this_recovered = *(it_recovered);
-
-        // delete this from the infected vector
-        infected.erase( it_recovered );
-    }
+        recovery_event();
     else
-        throw domain_error("Dyn_SIS: chose event larger than rate vector which should not happen.");
+        throw length_error("Dyn_SIS: chose event larger than rate vector which should not happen.");
 
-    update_observables();
+    update_observables(t);
 }
 
-void sis:update_observables(
+void Dyn_SIS::infection_event()
+{
+    // initialize uniform integer random distribution
+    uniform_int_distribution < size_t > random_susceptible(0,SI_edges.size()-1);
+
+    // find the index of the susceptible which will become infected
+    size_t this_susceptible_index = random_susceptible(generator);
+
+    if (verbose)
+    {
+        cout << "====================== INFECTION EVENT =====================" << endl;
+        cout << "found SI edge with index " << this_susceptible_index << endl;
+    }
+
+    // get the node number of this susceptible
+    size_t this_susceptible = (SI_edges.begin() + this_susceptible_index)->second;
+
+    // save this node as an infected
+    infected.push_back(this_susceptible);
+
+    if (verbose)
+        cout << "changing node status of susceptible " << this_susceptible << " to infected" << endl;
+
+    // change node status of this node
+    node_status[this_susceptible] = _I;
+
+    if (verbose)
+        cout << "erasing all SI edges which " << this_susceptible << " was part of" << endl;
+
+    // erase all edges in the SI set where this susceptible is part of
+    SI_edges.erase( 
+            remove_if( 
+                    SI_edges.begin(), 
+                    SI_edges.end(),
+                [&this_susceptible](const pair < size_t, size_t > & edge) { 
+                        return edge.second == this_susceptible;
+                }),
+            SI_edges.end() 
+        );
+
+    if (verbose)
+    {
+        cout << " SI edges after erasing " << endl;
+        print_SI_edges();
+        cout << "finding all edges which " << this_susceptible << " is part of and is connected to a susceptible " << endl;
+    }
+
+    // push the new SI edges
+    size_t & this_infected = this_susceptible;
+    for(auto const &neighbor: (*G)[this_infected])
+    {
+        if (verbose)
+            cout << "new infected " << this_susceptible << " has neighbor " << neighbor << " with status " << node_status[neighbor] << endl;
+
+        if (node_status[neighbor] == _S)
+            SI_edges.push_back( make_pair(this_infected, neighbor) );
+    }
+
+    if (verbose)
+    {
+        cout << "  SI edges after pushing = " << endl;
+        print_SI_edges();
+    }
+}
+
+void Dyn_SIS::recovery_event()
+{
+    // initialize uniform integer random distribution
+    uniform_int_distribution < size_t > random_infected(0,infected.size()-1);
+
+    // find the index of the susceptible which will become infected
+    size_t this_infected_index = random_infected(generator);
+    auto it_infected = infected.begin() + this_infected_index;
+
+    if (verbose)
+    {
+        cout << "====================== RECOVERY EVENT =====================" << endl;
+        cout << "found infected with index " << this_infected_index << endl;
+    }
+
+    // get the node id of this infected about to be recovered
+    size_t this_infected = *(it_infected);
+
+    // delete this from the infected vector
+    infected.erase( it_infected );
+
+    if (verbose)
+        cout << "changing node status of infected " << this_infected << " to susceptible" << endl;
+
+    // change node status of this node
+    node_status[this_infected] = _S;
+
+    if (verbose)
+        cout << "erasing all SI edges which " << this_infected << " was part of" << endl;
+
+    // erase all edges in the SI set which this infected is part of
+    SI_edges.erase( 
+            remove_if( 
+                    SI_edges.begin(), 
+                    SI_edges.end(),
+                [&this_infected](const pair < size_t, size_t > & edge) { 
+                        return edge.first == this_infected;
+                }),
+            SI_edges.end() 
+        );
+
+    if (verbose)
+    {
+        cout << "  SI edges after erasing = " << endl;
+        print_SI_edges();
+    }
+
+    size_t const & this_susceptible = this_infected;
+
+    if (verbose)
+    {
+        cout << "finding all edges which " << this_susceptible << " is part of and is connected to an infected " << endl;
+        cout << "graph has size " << G->size() << endl;
+        cout << "neighbor list to look at is "; 
+        for(auto const &neighbor: (*G)[this_susceptible])
+            cout << neighbor << " ";
+        cout << endl;
+    }
+
+    // push the new SI edges
+    for(auto const &neighbor: (*G)[this_susceptible])
+    {
+        if (verbose)
+            cout << "new susceptible " << this_susceptible << " has neighbor " << neighbor << " with status " << node_status[neighbor] << endl;
+
+        if (node_status[neighbor] == _I)
+            SI_edges.push_back( make_pair(neighbor, this_susceptible) );
+    }
+
+    if (verbose)
+    {
+        cout << "  SI edges after pushing = " << endl;
+        print_SI_edges();
+    }
+
+}
+
+void Dyn_SIS::update_observables(
                 double t
                )
 {
-    // compute degree and R0
-    size_t number_of_edges_times_two = 0;
-
-    for(auto const &neighbors: G)
-        number_of_edges_times_two += neighbors.size();
-
-    double degree = number_of_edges_times_two / (double) N;
-    double _R0 = infection_rate * degree / recovery_rate;
+    double _R0 = infection_rate * mean_degree / recovery_rate;
     R0.push_back(_R0);
 
     // compute SI
-    SI.push_back(susceptibles_of_SI_edges.size());
+    SI.push_back(SI_edges.size());
 
     // compute I
     I.push_back(infected.size());

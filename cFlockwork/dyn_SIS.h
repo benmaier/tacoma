@@ -48,107 +48,154 @@ const size_t _S = 0;
 const size_t _I = 1;
 const size_t _R = 2;
 
-struct Dyn_SIS 
+class Dyn_SIS 
 {
-    size_t N;
-    double t_simulation;
-    double infection_rate;
-    double recovery_rate;
-    size_t number_of_initially_infected;
-    size_t number_of_initially_vaccinated;
-    size_t seed;
-
-    default_random_engine generator;
-    uniform_real_distribution<double> randuni;
-
-    vector < double > time;
-    vector < double > R0;
-    vector < size_t > SI;
-    vector < size_t > I;
-
-    vector < size_t > infected;
-    vector < size_t > node_status;
-    vector < size_t > susceptibles_of_SI_edges;
-
-    vector < double > rates;
-
-    Dyn_SIS(
-        size_t _N,
-        double _t_simulation,
-        double _infection_rate,
-        double _recovery_rate,
-        size_t _number_of_initially_infected = 1,
-        size_t _number_of_initially_vaccinated = 0,
-        size_t _seed = 0
-    )
-    {
-        N = _N;
-        t_simulation = _t_simulation;
-        infection_rate = _infection_rate;
-        recovery_rate = _recovery_rate;
-        number_of_initially_vaccinated = _number_of_initially_vaccinated;
-        number_of_initially_infected = _number_of_initially_infected;
+    public:
+        size_t N;
+        double t_simulation;
+        double infection_rate;
+        double recovery_rate;
+        size_t number_of_initially_infected;
+        size_t number_of_initially_vaccinated;
+        size_t seed;
+        bool verbose;
 
         default_random_engine generator;
+        uniform_real_distribution<double> randuni;
 
-        if (_seed == 0)
-            randomly_seed_engine(generator);
-        else
-            generator.seed(_seed);
+        vector < double > time;
+        vector < double > R0;
+        vector < size_t > SI;
+        vector < size_t > I;
 
-        randuni = uniform_real_distribution<double>(0.0,1.0);
-
-        //check if number of infected and number of vaccinated does not
-        //exceed total node number
-        if (number_of_initially_vaccinated + number_of_initially_infected > N) 
-            throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
-
-        //initialize status vector of nodes and vector of infected
-        vector < size_t > node_status(N,_S);
-        set < size_t > infected;
-
-
-        vector < size_t > node_ints;
-        for(size_t n=0; n<N; n++)
+        Dyn_SIS(
+            size_t _N,
+            double _t_simulation,
+            double _infection_rate,
+            double _recovery_rate,
+            size_t _number_of_initially_infected = 1,
+            size_t _number_of_initially_vaccinated = 0,
+            size_t _seed = 0,
+            bool _verbose = false
+        )
         {
-            node_ints.push_back(n);            
+            N = _N;
+            t_simulation = _t_simulation;
+            infection_rate = _infection_rate;
+            recovery_rate = _recovery_rate;
+            number_of_initially_vaccinated = _number_of_initially_vaccinated;
+            number_of_initially_infected = _number_of_initially_infected;
+            verbose = _verbose;
+
+            default_random_engine generator;
+
+            if (_seed == 0)
+                randomly_seed_engine(generator);
+            else
+                generator.seed(_seed);
+
+            randuni = uniform_real_distribution < double > (0.0, 1.0);
+
+            //check if number of infected and number of vaccinated does not
+            //exceed total node number
+            if (number_of_initially_vaccinated + number_of_initially_infected > N) 
+                throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
+
+            //initialize status vector of nodes and vector of infected
+            node_status = vector < size_t >(N,_S);
+            infected = vector < size_t >();
+
+
+            vector < size_t > node_ints;
+            for(size_t n=0; n<N; n++)
+            {
+                node_ints.push_back(n);            
+            }
+
+            if (_verbose) 
+            {
+                cout << "choosing " << number_of_initially_vaccinated
+                     << " vaccinated and " << number_of_initially_infected
+                     << " infected at random" << endl;
+            }
+
+            choose_random_unique(node_ints.begin(),
+                                 node_ints.end(),
+                                 number_of_initially_vaccinated + number_of_initially_infected,
+                                 generator,
+                                 randuni
+                                 );
+
+            for(size_t node=0; node<number_of_initially_vaccinated; node++)
+            {
+                node_status[node_ints[node]] = _R;
+            }
+
+            for(size_t node = number_of_initially_vaccinated; node < number_of_initially_vaccinated + number_of_initially_infected; node++)
+            {
+                node_status[node_ints[node]] = _I;
+                infected.push_back( node_ints[node] );
+            }
+
+            if (_verbose)
+            {
+                cout << "infected set has size = " << infected.size() << endl;
+                print_infected();
+            }
         }
 
-        choose_random_unique(node_ints.begin(),
-                             node_ints.end(),
-                             number_of_initially_vaccinated + number_of_initially_infected,
-                             generator,
-                             randuni
-                             );
-
-        for(size_t node=0; node<number_of_initially_vaccinated; node++)
+        bool simulation_ended() 
         {
-            node_status[node_ints[node]] = _R;
-        }
+            return infected.size() == 0;
+        };
 
-        for(size_t node = number_of_initially_vaccinated; node < number_of_initially_vaccinated + number_of_initially_infected; node++)
-        {
-            node_status[node_ints[node]] = _I;
-            infected.insert( node_ints[node] );
-        }
-    }
+        void get_rates_and_Lambda(vector < double > &rates,
+                                  double &Lambda
+                                  );
 
-    bool simulation_ended() {
-        return infected.size() == 0;
-    };
-
-    void update_network(vector < set < size_t > > G,
+        void update_network(vector < set < size_t > > &G,
+                            double t
+                            );
+        void make_event(size_t const &event,
                         double t
-                        );
-    void get_rates_and_Lambda(vector < double > &rates,
-                              double &Lambda
-                              );
+                       );
 
-    void make_event(size_t const &event,
-                    double t
-                   );
+        void update_observables(double t);
 
-    void update_observables(double const &t);
+        void print()
+        {
+            print_infected();
+            print_SI_edges();
+        }
+
+    private:
+        vector < size_t > infected;
+        vector < size_t > node_status;
+        vector < pair < size_t, size_t > > SI_edges;
+        double mean_degree;
+        vector < set < size_t > > * G;
+
+        vector < double > rates;
+
+        void infection_event();
+        void recovery_event();
+
+        void print_infected()
+        {
+            cout << "infected = [ ";
+            for( auto const &inf: infected)
+                cout << inf << " ";
+            cout << " ]" << endl;
+        };
+
+        void print_SI_edges()
+        {
+            cout << "SI_edges = [ ";
+            for( auto const &edge: SI_edges)
+                cout << "( "<< edge.first << ", " << edge.second << " ) ";
+            cout << " ]" << endl;
+        };
+
 };
 
 

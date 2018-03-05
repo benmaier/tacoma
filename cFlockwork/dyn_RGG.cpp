@@ -131,7 +131,12 @@ edge_lists_with_histograms
         step_distance = 1.12 * R / ( mean_link_duration - 0.26 );
 
     //initialize random generators
-    default_random_engine generator(seed);
+    default_random_engine generator;
+    if (seed == 0)
+        randomly_seed_engine(generator);
+    else
+        generator.seed(seed);
+
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     vector < pair < double, double > > pos;

@@ -21,6 +21,7 @@ ext_modules = [
         [ 
             'cFlockwork/Utilities.cpp', 
             'cFlockwork/Events.cpp', 
+            'cFlockwork/Dyn_SIS.cpp', 
             'cFlockwork/measurements.cpp', 
             'cFlockwork/resampling.cpp', 
             'cFlockwork/social_trajectories.cpp', 
