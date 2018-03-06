@@ -123,7 +123,7 @@ if __name__ == "__main__":
     P = test.P
 
     fw = tc.flockwork_P_varying_rates([],100,P,24*3600,rewiring_rate,tmax=24*3600*7)
-    fw_binned = tc.bin_temporal_network(fw,dt=300)
+    fw_binned = tc.sample_temporal_network(fw,dt=300)
     fw_binned_result = tc.measure_group_sizes_and_durations(fw_binned)
 
     kwargs = estimate_ZSBB_parameters(fw_binned,fw_binned_result)
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     print "b1 =", kwargs['b1']
     kwargs['t_run_total'] = (len(fw_binned.t) + 1)*kwargs['N']
     zsbb = tc.ZSBB_model(**kwargs)
-    zsbb_binned = tc.bin_temporal_network(zsbb,dt=kwargs['N'])
+    zsbb_binned = tc.sample_temporal_network(zsbb,dt=kwargs['N'])
     zsbb_binned_result = tc.measure_group_sizes_and_durations(zsbb_binned)
 
 
