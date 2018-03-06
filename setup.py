@@ -29,7 +29,7 @@ ext_modules = [
             '_tacoma/ZSBB_model.cpp', 
             '_tacoma/dyn_RGG.cpp', 
             '_tacoma/FW_P_varying.cpp', 
-            '_tacoma/EqFlockwork.cpp', 
+            '_tacoma/Flockwork.cpp', 
             '_tacoma/_tacoma.cpp', 
         ],
         include_dirs=[
