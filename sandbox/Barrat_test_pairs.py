@@ -1,4 +1,4 @@
-import cFlockwork as cF
+import tacoma as tc
 import matplotlib.pyplot as pl
 from collections import Counter
 from itertools import izip
@@ -31,7 +31,7 @@ b1 = 0.8
 plot_size = False
 
 print "simulating"
-result = cF.ZSBB_model([],N,lambda_,b0,b1,t_sim,t_equilibration=t_eq,seed=1346,record_sizes_and_durations=True)
+result = tc.ZSBB_model([],N,lambda_,b0,b1,t_sim,t_equilibration=t_eq,seed=1346,record_sizes_and_durations=True)
 print "done"
 
 fig, ax = pl.subplots(1,3,figsize=(12,4))

@@ -1,4 +1,4 @@
-import cFlockwork as cF
+import tacoma as tc
 import matplotlib.pyplot as pl
 import DynGillEpi as gill
 import numpy as np
@@ -8,7 +8,7 @@ N_time_steps = 5
 
 print "===== edge_lists => edge_lists ====="
 
-L = cF.edge_lists()
+L = tc.edge_lists()
 
 L.N = 3
 L.t = [0.0,1.0,2.0]
@@ -25,9 +25,9 @@ L.edges = [
             ],
            ]
 
-L_sis = cF.Dyn_SIS(L.N, 100, 1.0, 0.1,3,0,12234235,True)
+L_sis = tc.Dyn_SIS(L.N, 100, 1.0, 0.1,3,0,12234235,True)
 
-cF.gillespie_SIS_on_edge_lists(L,L_sis,verbose=True)
+tc.gillespie_SIS_on_edge_lists(L,L_sis,verbose=True)
 
 pl.plot(L_sis.time,L_sis.I)
 pl.plot(L_sis.time,L_sis.SI)
@@ -35,7 +35,7 @@ pl.plot(L_sis.time,L_sis.R0)
 
 print "===== edge_changes => edge_lists ====="
 
-C = cF.edge_changes()
+C = tc.edge_changes()
 
 C.N = 3
 C.edges_initial = [ (0,1) ]
@@ -59,9 +59,9 @@ C.edges_out = [
                 ],
               ]
 
-C_sis = cF.Dyn_SIS(C.N, 100, 1.0, 0.1,3,0,12234235,True)
+C_sis = tc.Dyn_SIS(C.N, 100, 1.0, 0.1,3,0,12234235,True)
 
-cF.gillespie_SIS_on_edge_changes(C,C_sis,verbose=True)
+tc.gillespie_SIS_on_edge_changes(C,C_sis,verbose=True)
 
 pl.plot(C_sis.time,C_sis.I,'--')
 pl.plot(C_sis.time,C_sis.SI,'--')

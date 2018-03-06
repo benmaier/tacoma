@@ -1,10 +1,10 @@
 import numpy as np
-import cFlockwork as cF
+import tacoma as tc
 import matplotlib.pyplot as pl
 import scipy.sparse as sprs
 import time
 
-dtu_week = cF.dtu_week()
+dtu_week = tc.dtu_week()
 E = []
 P = dtu_week.P
 gamma = dtu_week.gamma
@@ -13,11 +13,11 @@ tmax = dtu_week.tmax
 t_run_total = tmax
 seed = 45
 
-edge_changes = cF.flockwork_P_varying_rates(E,N,P,t_run_total,gamma,tmax,seed=seed)
+edge_changes = tc.flockwork_P_varying_rates(E,N,P,t_run_total,gamma,tmax,seed=seed)
 
 print "measuring groups and durations, ignore histograms differences =", True
 start = time.time()
-result = cF.measure_group_sizes_and_durations_for_edge_changes(edge_changes,
+result = tc.measure_group_sizes_and_durations_for_edge_changes(edge_changes,
                                                                ignore_size_histogram_differences = True)
 end = time.time()
 print "took", end - start, "seconds"

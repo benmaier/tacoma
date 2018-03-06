@@ -1,4 +1,4 @@
-import cFlockwork as cF
+import tacoma as tc
 import networkx as nx
 import numpy as np
 import pylab as pl
@@ -31,7 +31,7 @@ sax[0].imshow(A)
 
 
 
-edge_changes = cF.flockwork_P_varying_rates_neighbor_affinity([],N,[0.4,0.],600000,[ (0, 1./3600.), (300,2./3600.) ],neighbor_affinity, 600,seed=2545,use_preferential_node_selection=True)
+edge_changes = tc.flockwork_P_varying_rates_neighbor_affinity([],N,[0.4,0.],600000,[ (0, 1./3600.), (300,2./3600.) ],neighbor_affinity, 600,seed=2545,use_preferential_node_selection=True)
 
 
 
@@ -53,7 +53,7 @@ for it in xrange(1,len(fw_t)):
         for v in G.neighbors(u):
             A_fw[u,v] += dt
 
-    fw_k.append(np.mean(G.degree().values()))
+    fw_k.append(np.mean([v for k,v in G.degree()]))
     G.remove_edges_from(edges_out[it-1])
     G.add_edges_from(edges_in[it-1])
 

@@ -1,9 +1,9 @@
-import cFlockwork as cF
+import tacoma as tc
 import numpy as np
 
 print "===== edge_lists => edge_lists ====="
 
-L = cF.edge_lists()
+L = tc.edge_lists()
 
 L.N = 3
 L.t = [0.0,1.0,2.0]
@@ -20,7 +20,7 @@ L.edges = [
             ],
            ]
 
-result = cF.measure_group_sizes_and_durations(L)
+result = tc.measure_group_sizes_and_durations_for_edge_lists(L)
 
 print "N_m =", result.aggregated_size_histogram
 print "sum(m*N_m) =", np.dot(np.arange(0,L.N+1),result.aggregated_size_histogram), "should be N =", L.N
@@ -28,7 +28,7 @@ print "sum(m*N_m) =", np.dot(np.arange(0,L.N+1),result.aggregated_size_histogram
 
 print "===== edge_changes => edge_lists ====="
 
-C = cF.edge_changes()
+C = tc.edge_changes()
 
 C.N = 3
 C.edges_initial = [ (0,1) ]
@@ -52,7 +52,7 @@ C.edges_out = [
                 ],
               ]
 
-result = cF.measure_group_sizes_and_durations_for_edge_changes(C)
+result = tc.measure_group_sizes_and_durations_for_edge_changes(C)
 
 print "N_m =", result.aggregated_size_histogram
 print "sum(m*N_m) =", np.dot(np.arange(0,C.N+1),result.aggregated_size_histogram), "should be N =", C.N

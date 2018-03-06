@@ -1,4 +1,4 @@
-import cFlockwork as cF
+import tacoma as tc
 
 sample_aggregates = True
 N_time_steps = 2
@@ -7,7 +7,7 @@ print "======================== BINNING =============================="
 
 print "===== edge_lists => edge_lists ====="
 
-L = cF.edge_lists()
+L = tc.edge_lists()
 
 L.N = 3
 L.t = [0.0,1.0,2.0]
@@ -25,11 +25,11 @@ L.edges = [
            ]
 
 
-traj = cF.binned_social_trajectory_from_edge_lists(L,2,N_time_steps=N_time_steps,verbose=True)
+traj = tc.binned_social_trajectory_from_edge_lists(L,2,N_time_steps=N_time_steps,verbose=True)
 
 print traj
 
-traj = cF.social_trajectory_from_edge_lists(L,2,verbose=True)
+traj = tc.social_trajectory_from_edge_lists(L,2,verbose=True)
 for entry in traj:
     print 
     print "    hash =", entry.hash
@@ -40,7 +40,7 @@ for entry in traj:
 
 print "===== edge_changes => edge_lists ====="
 
-C = cF.edge_changes()
+C = tc.edge_changes()
 
 C.N = 3
 C.edges_initial = [ (0,1) ]
@@ -64,10 +64,10 @@ C.edges_out = [
                 ],
               ]
 
-traj = cF.binned_social_trajectory_from_edge_changes(C,2,N_time_steps=N_time_steps,verbose=True)
+traj = tc.binned_social_trajectory_from_edge_changes(C,2,N_time_steps=N_time_steps,verbose=True)
 print traj
 
-traj = cF.social_trajectory_from_edge_changes(C,2,verbose=True)
+traj = tc.social_trajectory_from_edge_changes(C,2,verbose=True)
 for entry in traj:
     print 
     print "    hash =", entry.hash

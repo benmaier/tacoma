@@ -1,11 +1,11 @@
-import cFlockwork as cF
+import tacoma as tc
 import numpy as np
 import matplotlib.pyplot as pl
 from itertools import izip
 
 N = 100
 
-dtu_week = cF.dtu_week()
+dtu_week = tc.dtu_week()
 E = []
 P = dtu_week.P
 gamma = dtu_week.gamma
@@ -15,11 +15,11 @@ seed = 45
 plot_size = False
 
 print "simulating"
-result = cF.flockwork_P_varying_rates(E,N,P,t_run_total,gamma,tmax,seed=seed)
+result = tc.flockwork_P_varying_rates(E,N,P,t_run_total,gamma,tmax,seed=seed)
 print "done"
 
 
-this = cF.edge_changes()
+this = tc.edge_changes()
 this.t = result.t
 this.N = result.N
 this.edges_initial = result.edges_initial
@@ -30,7 +30,7 @@ this.edges_out = result.edges_out
 print len(this.t), len(this.edges_in)
 print "first time point: ", this.t[0]
 
-second_result = cF.measure_group_sizes_and_durations_for_edge_changes(
+second_result = tc.measure_group_sizes_and_durations_for_edge_changes(
                                                      this,
                                                      #verbose=True,
                                                      )

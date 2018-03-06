@@ -1,4 +1,4 @@
-import cFlockwork as cF
+import tacoma as tc
 import numpy as np
 import matplotlib.pyplot as pl
 from itertools import izip
@@ -14,11 +14,11 @@ b1 = 0.8
 plot_size = False
 
 print "simulating"
-result = cF.ZSBB_model([],N,lambda_,b0,b1,t_sim,t_equilibration=t_eq,seed=1346,record_sizes_and_durations=True)
+result = tc.ZSBB_model([],N,lambda_,b0,b1,t_sim,t_equilibration=t_eq,seed=1346,record_sizes_and_durations=True)
 print "done"
 
 
-this = cF.edge_changes()
+this = tc.edge_changes()
 this.t = result.t
 this.N = result.N
 this.edges_initial = result.edges_initial
@@ -29,7 +29,7 @@ this.edges_out = result.edges_out
 print len(this.t), len(this.edges_in)
 print "first time point: ", this.t[0]
 
-second_result = cF.measure_group_sizes_and_durations_for_edge_changes(
+second_result = tc.measure_group_sizes_and_durations_for_edge_changes(
                                                      this,
                                                      #verbose=True,
                                                      )

@@ -1,4 +1,4 @@
-import cFlockwork as cF
+import tacoma as tc
 import numpy as np
 import matplotlib.pyplot as pl
 
@@ -6,7 +6,7 @@ import matplotlib.pyplot as pl
 N = 10
 t_run = 10000
 
-result = cF.dynamic_RGG(N=N,t_run_total=t_run,mean_link_duration=10.,
+result = tc.dynamic_RGG(N=N,t_run_total=t_run,mean_link_duration=10.,
                             periodic_boundary_conditions_for_link_building = False,
                             record_sizes_and_durations = True,
                             critical_density = 1.0,
@@ -14,12 +14,9 @@ result = cF.dynamic_RGG(N=N,t_run_total=t_run,mean_link_duration=10.,
                             seed = 2335
                             )
 
-this = cF.edge_lists()
-this.t = result.t
-this.edges = result.edges
+this = tc.edge_lists(result)
 
-second_result = cF.measure_group_sizes_and_durations(this,
-                                                     N,
+second_result = tc.measure_group_sizes_and_durations_for_edge_lists(this,
                                                      #verbose=True,
                                                      )
 
@@ -29,7 +26,7 @@ second_result = cF.measure_group_sizes_and_durations(this,
 #print second_result.size_histograms
 
 print "all size histograms are the same:", all([ hist1 == hist2 for hist1, hist2 in zip(result.size_histograms, second_result.size_histograms)])
-print "all durations are the same:", all([ float(dur1) == float(dur2) for dur1, dur2 in zip(result.durations,second_result.contact_durations)])
+print "all durations are the same:", all([ float(dur1) == float(dur2) for dur1, dur2 in zip(result.group_durations,second_result.contact_durations)])
 
 
 for size, group_dur in enumerate(second_result.group_durations):

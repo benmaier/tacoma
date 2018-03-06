@@ -1,4 +1,4 @@
-import cFlockwork as cF
+import tacoma as tc
 from rocsNWL import draw
 import matplotlib.pyplot as pl
 import networkx as nx
@@ -10,7 +10,7 @@ N = 400
 
 start = time.time()
 
-edge_lists = cF.dynamic_RGG(N = N,
+edge_lists = tc.dynamic_RGG(N = N,
                             t_run_total = 1000,
                             mean_link_duration = 5.,
                             periodic_boundary_conditions_for_link_building = True,
