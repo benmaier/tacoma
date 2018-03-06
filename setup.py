@@ -1,6 +1,7 @@
 #This file is forked from https://github.com/pybind/pbtest, original author: Sylvain Corlay
 
 from setuptools import setup, Extension
+import setuptools
 from setuptools.command.build_ext import build_ext
 import setuptools
 import os, sys
@@ -17,33 +18,24 @@ class get_pybind_include(object):
 
 ext_modules = [
     Extension(
-        'cFlockwork',
+        '_tacoma',
         [ 
-            'cFlockwork/Utilities.cpp', 
-            'cFlockwork/Events.cpp', 
-            'cFlockwork/Dyn_SIS.cpp', 
-            'cFlockwork/measurements.cpp', 
-            'cFlockwork/resampling.cpp', 
-            'cFlockwork/social_trajectories.cpp', 
-            'cFlockwork/ZSBB_model.cpp', 
-            'cFlockwork/dyn_RGG.cpp', 
-            'cFlockwork/SIS.cpp', 
-            'cFlockwork/SI.cpp', 
-            'cFlockwork/SI_varying.cpp', 
-            'cFlockwork/SIS_varying.cpp', 
-            'cFlockwork/FW_P_varying.cpp', 
-            'cFlockwork/SIR.cpp', 
-            'cFlockwork/SIR_varying.cpp', 
-            'cFlockwork/SIRS.cpp', 
-            'cFlockwork/SIRS_varying.cpp', 
-            'cFlockwork/EqFlockwork.cpp', 
-            'cFlockwork/cFlockwork.cpp', 
-            'cFlockwork/test_varying_rate.cpp', 
+            '_tacoma/Utilities.cpp', 
+            '_tacoma/Events.cpp', 
+            '_tacoma/Dyn_SIS.cpp', 
+            '_tacoma/measurements.cpp', 
+            '_tacoma/resampling.cpp', 
+            '_tacoma/social_trajectories.cpp', 
+            '_tacoma/ZSBB_model.cpp', 
+            '_tacoma/dyn_RGG.cpp', 
+            '_tacoma/FW_P_varying.cpp', 
+            '_tacoma/EqFlockwork.cpp', 
+            '_tacoma/_tacoma.cpp', 
         ],
         include_dirs=[
             get_pybind_include(),
             get_pybind_include(user=True),
-            "./cFlockwork/"
+            "./_tacoma/"
         ],
         language='c++',
     ),
@@ -97,16 +89,17 @@ class BuildExt(build_ext):
         build_ext.build_extensions(self)
 
 setup(
-    name='cFlockwork',
-    version='0.0.16',
-    author='Benjamin F. Maier',
-    author_email='bfmaier@physik.hu-berlin.de',
-    url='https://github.com/benmaier/cFlockwork',
-    license='MIT',
-    description='A package to simulate a variety of temporal network models as well as spreading processes on them and analyze contact durations, group sizes and group durations.',
-    long_description='',
-    ext_modules=ext_modules,
-    install_requires=['pybind11'],
-    cmdclass={'build_ext': BuildExt},
-    zip_safe=False,
+    name = 'tacoma',
+    version = '0.0.17',
+    author = 'Benjamin F. Maier',
+    author_email = 'bfmaier@physik.hu-berlin.de',
+    url = 'https://github.com/benmaier/tacoma',
+    license = 'MIT',
+    description = 'A package to both analyze real-world temporal networks as well as to simulate a variety of temporal network models and spreading processes on them. Analyze contact durations, group sizes, group durations, social trajectories, aggregated social network, etc.',
+    long_description = '',
+    packages = setuptools.find_packages(),
+    ext_modules = ext_modules,
+    install_requires = ['pybind11'],
+    cmdclass = {'build_ext': BuildExt},
+    zip_safe = False,
 )
