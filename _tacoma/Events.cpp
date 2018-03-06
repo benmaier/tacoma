@@ -34,7 +34,7 @@ using namespace std;
 void rewire(
                  vector < set < size_t > * > & G, //Adjacency matrix
                  double Q,       //probability to connect with neighbors of neighbor
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution,
                  double & mean_degree,
                  set < pair < size_t, size_t > > & SI_E, //edge list of SI links
@@ -115,7 +115,7 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
     rewire_P(
                  vector < set < size_t > * > & G, //Adjacency matrix
                  double P,       //probability to connect with neighbors of neighbor
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution,
                  double & mean_degree,
                  set < pair < size_t, size_t > > & SI_E, //edge list of SI links
@@ -220,7 +220,7 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
                  double P,       //probability to connect with neighbors of neighbor
                  vector < pair < vector < size_t >, vector < double > > > &neighbor_affinity,
                  vector < double > &total_affinity,
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution,
                  double & mean_degree,
                  set < pair < size_t, size_t > > & SI_E, //edge list of SI links
@@ -371,7 +371,7 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
 
 void random_rewire(
                  vector < set < size_t > * > & G, //Adjacency matrix
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution,
                  set < pair < size_t, size_t > > & SI_E, //edge list of SI links
                  const vector < size_t > & node_status,

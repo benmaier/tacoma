@@ -59,7 +59,7 @@ void
     }
 
     // deal with random numbers
-    default_random_engine &generator = this_gillespie_object.generator;
+    mt19937_64 &generator = this_gillespie_object.generator;
     exponential_distribution<double> randexp(1.0);
     uniform_real_distribution<double> randuni(0.0,1.0);
 
@@ -262,7 +262,7 @@ void
 {
 
     // deal with random numbers
-    default_random_engine &generator = this_gillespie_object.generator;
+    mt19937_64 &generator = this_gillespie_object.generator;
     exponential_distribution<double> randexp(1.0);
     uniform_real_distribution<double> randuni(0.0,1.0);
 

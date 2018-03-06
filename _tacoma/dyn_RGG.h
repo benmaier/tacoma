@@ -45,7 +45,7 @@
 using namespace std;
 
 void dyn_RGG_update_positions(vector < pair < double, double > > &pos,
-                      default_random_engine &generator,
+                      mt19937_64 &generator,
                       uniform_real_distribution<double> &uni_distribution,
                       const double &step_distance
                     );

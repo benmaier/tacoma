@@ -17,7 +17,7 @@ tuple < int, double, int > gillespie_tau_and_event_varying_gamma(
                )
 {
     //initialize random generators
-    default_random_engine generator(seed);
+    mt19937_64 generator(seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     double tau = 0.0;

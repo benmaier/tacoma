@@ -43,7 +43,7 @@
 using namespace std;
 
 void dyn_RGG_update_positions(vector < pair < double, double > > &pos,
-                      default_random_engine &generator,
+                      mt19937_64 &generator,
                       uniform_real_distribution<double> &uni_distribution,
                       const double &step_distance)
 {
@@ -131,7 +131,7 @@ edge_lists_with_histograms
         step_distance = 1.12 * R / ( mean_link_duration - 0.26 );
 
     //initialize random generators
-    default_random_engine generator;
+    mt19937_64 generator;
     if (seed == 0)
         randomly_seed_engine(generator);
     else

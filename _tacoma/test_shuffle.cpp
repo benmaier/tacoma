@@ -29,7 +29,7 @@ int main()
 
 
     //initialize random generators
-    default_random_engine generator(time(nullptr));
+    mt19937_64 generator(time(nullptr));
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     random_rewire(G,generator,uni_distribution,SI_E,node_status,node_ints);

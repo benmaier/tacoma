@@ -50,7 +50,7 @@ pair <size_t,size_t> get_sorted_pair(size_t i, size_t j);
 
 size_t arg_choose_from_vector(
         vector < double > const & weights, 
-        default_random_engine & generator, 
+        mt19937_64 & generator, 
         uniform_real_distribution<double> & distribution
       );
 
@@ -58,7 +58,7 @@ void get_gillespie_tau_and_event(
                 vector < double > const & rates,
                 double & tau,
                 size_t & event,
-                default_random_engine & generator, 
+                mt19937_64 & generator, 
                 uniform_real_distribution<double> & distribution
              );
 
@@ -66,7 +66,7 @@ vector<size_t>::iterator choose_random_unique(
         vector<size_t>::iterator begin, 
         vector<size_t>::iterator end, 
         size_t num_random,
-        default_random_engine & generator,
+        mt19937_64 & generator,
         uniform_real_distribution<double> & distribution
         ); 
 
@@ -78,7 +78,7 @@ void get_gillespie_tau_and_event_with_varying_gamma(
                 size_t & ti,
                 double & tau,
                 size_t & event,
-                default_random_engine & generator, 
+                mt19937_64 & generator, 
                 uniform_real_distribution<double> & distribution
              );
 
@@ -86,7 +86,7 @@ void remove_from_vector(vector <size_t> &vec, const size_t to_be_removed);
 void remove_2_from_vector(vector <size_t> &vec, const size_t first_to_be_removed, const size_t second_to_be_removed);
 /*
 void randomly_seed_engine(
-        default_random_engine &generator
+        mt19937_64 &generator
         );
 */
 set < size_t > get_component_of_node(

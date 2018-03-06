@@ -67,7 +67,7 @@ edge_changes_with_histograms
 
     //initialize random generators
     
-    default_random_engine generator;
+    mt19937_64 generator;
     if (seed == 0)
         randomly_seed_engine(generator);
     else

@@ -56,7 +56,7 @@ class Dyn_SIS
         size_t seed;
         bool verbose;
 
-        default_random_engine generator;
+        mt19937_64 generator;
         uniform_real_distribution<double> randuni;
 
         vector < double > time;
@@ -83,7 +83,7 @@ class Dyn_SIS
             number_of_initially_infected = _number_of_initially_infected;
             verbose = _verbose;
 
-            default_random_engine generator;
+            mt19937_64 generator;
 
             if (_seed == 0)
                 randomly_seed_engine(generator);

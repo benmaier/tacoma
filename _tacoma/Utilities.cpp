@@ -62,7 +62,7 @@ bidiiter choose_random_unique(
                  bidiiter begin, 
                  bidiiter end, 
                  size_t num_random, 
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution
                )
 {
@@ -82,7 +82,7 @@ vector<size_t>::iterator choose_random_unique(
         vector<size_t>::iterator begin, 
         vector<size_t>::iterator end, 
         size_t num_random,
-        default_random_engine & generator,
+        mt19937_64 & generator,
         uniform_real_distribution<double> & distribution
     ) 
 {
@@ -99,7 +99,7 @@ vector<size_t>::iterator choose_random_unique(
 
 size_t arg_choose_from_vector(
         vector < double > const & weights, 
-        default_random_engine & generator, 
+        mt19937_64 & generator, 
         uniform_real_distribution<double> & distribution
       )
 {
@@ -129,7 +129,7 @@ void get_gillespie_tau_and_event(
                 vector < double > const & rates,
                 double & tau,
                 size_t & event,
-                default_random_engine & generator, 
+                mt19937_64 & generator, 
                 uniform_real_distribution<double> & distribution
              )
 {
@@ -162,7 +162,7 @@ void get_gillespie_tau_and_event_with_varying_gamma(
                 size_t & i_t,
                 double & tau,
                 size_t & event,
-                default_random_engine & generator, 
+                mt19937_64 & generator, 
                 uniform_real_distribution<double> & distribution
              )
 {

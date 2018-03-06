@@ -56,7 +56,7 @@ vector < pair < size_t, size_t > >
                  vector < pair < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
                  const double Q,       //probability to connect with neighbors of neighbor
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution,
                  size_t t_max,
                  const bool use_Q_as_P = false
@@ -65,7 +65,7 @@ vector < pair < size_t, size_t > >
 void equilibrate_neighborset(
                  vector < set < size_t > * > &G, //edgelist
                  const double Q,       //probability to connect with neighbors of neighbor
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution,
                  size_t t_max = 0,
                  const bool use_Q_as_P = false
@@ -74,14 +74,14 @@ void equilibrate_neighborset(
 void flockwork_timestep(
                  vector < set < size_t >  * > &G, //Adjacency matrix
                  double Q,       //probability to connect with neighbors of neighbor
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution
                 );
 
 void flockwork_P_timestep(
                  vector < set < size_t  > * > &G, //Adjacency matrix
                  double P,       //probability to connect with neighbors of neighbor
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution
             );
 
@@ -90,7 +90,7 @@ size_t flockwork_P_timestep_monitoring_groups(
                  double P,       //probability to connect with neighbors of neighbor
                  size_t t,
                  vector < size_t > &group_start_times,
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution
             );
 

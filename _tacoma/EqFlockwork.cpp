@@ -30,7 +30,7 @@ using namespace std;
 void flockwork_timestep(
                  vector < set < size_t  > * > &G, //Adjacency matrix
                  double Q,       //probability to connect with neighbors of neighbor
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution
             )
 {
@@ -70,7 +70,7 @@ void flockwork_timestep(
 void flockwork_P_timestep(
                  vector < set < size_t  > * > &G, //Adjacency matrix
                  double P,       //probability to connect with neighbors of neighbor
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution
             )
 {
@@ -112,7 +112,7 @@ size_t flockwork_P_timestep_monitoring_groups(
                  double P,       //probability to connect with neighbors of neighbor
                  size_t t,
                  vector < size_t > &group_start_times,
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution
             )
 {
@@ -200,7 +200,7 @@ size_t flockwork_P_timestep_monitoring_groups(
 void equilibrate_neighborset(
                  vector < set < size_t > * > &G, //neighborset
                  const double PQ,       //probability to connect with neighbors of neighbor
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution,
                  size_t t_max,
                  const bool use_P_as_Q
@@ -233,7 +233,7 @@ vector < pair < size_t, size_t > >
                  vector < pair < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
                  const double PQ,       //probability to connect with neighbors of neighbor
-                 default_random_engine & generator, 
+                 mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution,
                  size_t t_max,
                  const bool use_Q_as_P
@@ -306,7 +306,7 @@ vector < pair < size_t, size_t > >
     }
 
     //initialize random generators
-    default_random_engine generator(seed);
+    mt19937_64 generator(seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     equilibrate_neighborset(G,PQ,generator,uni_distribution,t_max,use_Q_as_P);
@@ -357,7 +357,7 @@ vector < pair < size_t, size_t > >
     }
 
     //initialize random generators
-    default_random_engine generator(seed);
+    mt19937_64 generator(seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     //equilibrate
@@ -410,7 +410,7 @@ vector < pair < size_t, size_t > >
     }
 
     //initialize random generators
-    default_random_engine generator(seed);
+    mt19937_64 generator(seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     //equilibrate
@@ -460,7 +460,7 @@ vector < size_t >
     }
 
     //initialize random generators
-    default_random_engine generator(seed);
+    mt19937_64 generator(seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     //simulate
