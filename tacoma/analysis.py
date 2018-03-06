@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from math import log10
 
 import numpy as np
@@ -34,9 +36,15 @@ def temporal_network_group_analysis(result,
                                     time_unit = None,
                                     plot_step = False,
                                     fit_power_law = False,
+                                    ax = None,
                                    ):
-    fig, ax = pl.subplots(2,2)
-    ax = ax.flatten()
+
+    if ax is None:
+        fig, ax = pl.subplots(2,2)
+        ax = ax.flatten()
+    else:
+        fig = None
+
     res = {}
     res_sizes = plot_group_size_histogram(result,
                                           ax[0],
@@ -241,9 +249,7 @@ if __name__ == "__main__":
                                 seed = 2335
                                 )
 
-    RGG_edges = tc.edge_lists(RGG_edge_lists)
-
-    RGG_result = tc.measure_group_sizes_and_durations_for_edge_lists(RGG_edges)
+    RGG_result = tc.measure_group_sizes_and_durations(RGG_edge_lists)
 
     fig, ax, data = temporal_network_group_analysis(RGG_result,time_normalization_factor = 300./3600., time_unit = 'h')
     fig.tight_layout()

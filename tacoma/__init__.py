@@ -43,9 +43,9 @@ def measure_group_sizes_and_durations(temporal_network,*args,**kwargs):
         if "ignore_size_histograms" in kwargs:
             val = kwargs.pop("ignore_size_histograms")
             kwargs["ignore_size_histogram_differences"] = val
-        result = tc.measure_group_sizes_and_durations_for_edge_changes(temporal_network,*args,**kwargs)
+        result = measure_group_sizes_and_durations_for_edge_changes(temporal_network,*args,**kwargs)
     elif type(temporal_network) == el:
-        result = tc.measure_group_sizes_and_durations_for_edge_lists(temporal_network,*args,**kwargs)
+        result = measure_group_sizes_and_durations_for_edge_lists(temporal_network,*args,**kwargs)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
@@ -70,9 +70,9 @@ def bin_temporal_network(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = tc.bin_from_edge_changes(temporal_network,*args,**kwargs)
+        result = bin_from_edge_changes(temporal_network,*args,**kwargs)
     elif type(temporal_network) == el:
-        result = tc.bin_from_edge_lists(temporal_network,*args,**kwargs)
+        result = bin_from_edge_lists(temporal_network,*args,**kwargs)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
@@ -96,9 +96,9 @@ def sample_temporal_network(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = tc.sample_from_edge_changes(temporal_network,*args,**kwargs)
+        result = sample_from_edge_changes(temporal_network,*args,**kwargs)
     elif type(temporal_network) == el:
-        result = tc.sample_from_edge_lists(temporal_network,*args,**kwargs)
+        result = sample_from_edge_lists(temporal_network,*args,**kwargs)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
@@ -122,9 +122,9 @@ def binned_social_trajectory(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = tc.binned_social_trajectory_from_edge_changes(temporal_network,*args,**kwargs)
+        result = binned_social_trajectory_from_edge_changes(temporal_network,*args,**kwargs)
     elif type(temporal_network) == el:
-        result = tc.binned_social_trajectory_from_edge_lists(temporal_network,*args,**kwargs)
+        result = binned_social_trajectory_from_edge_lists(temporal_network,*args,**kwargs)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
@@ -146,9 +146,9 @@ def social_trajectory(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = tc.social_trajectory_from_edge_changes(temporal_network,*args,**kwargs)
+        result = social_trajectory_from_edge_changes(temporal_network,*args,**kwargs)
     elif type(temporal_network) == el:
-        result = tc.social_trajectory_from_edge_lists(temporal_network,*args,**kwargs)
+        result = social_trajectory_from_edge_lists(temporal_network,*args,**kwargs)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
@@ -169,9 +169,9 @@ def gillespie_SIS(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = tc.gillespie_SIS_on_edge_changes(temporal_network,*args,**kwargs)
+        result = gillespie_SIS_on_edge_changes(temporal_network,*args,**kwargs)
     elif type(temporal_network) == el:
-        result = tc.gillespie_SIS_on_edge_lists(temporal_network,*args,**kwargs)
+        result = gillespie_SIS_on_edge_lists(temporal_network,*args,**kwargs)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
