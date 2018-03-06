@@ -243,6 +243,10 @@ void
                 }
             }
 
+            // add the last value of the observables at time t_simulation
+            if (t - t0 >= t_simulation)
+                this_gillespie_object.update_observables(t_simulation);
+
             // update tau because we'll advance to the next network
             // change
             tau -= xi * Lambda * dt_to_next_change;
@@ -437,6 +441,10 @@ void
                     tau = randexp(generator);
                 }
             }
+
+            // add the last value of the observables at time t_simulation
+            if (t - t0 >= t_simulation)
+                this_gillespie_object.update_observables(t_simulation);
 
             // update tau because we'll advance to the next network
             // change
