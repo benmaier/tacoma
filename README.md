@@ -1,35 +1,12 @@
-# cFlockwork
+# Tacoma
 
-For fast simulations of epidemic spreading on flockworks, random rewiring networks and static networks.
+TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks, produce surrogate networks using qualitative models and simulate Gillespie processes on them.
 
 ## Install
 
-For all systems, first clone this repository.
+If you get compiling errors, make sure that [https://github.com/pybind/pybind11](pybind11) is installed.
 
-### Matlab (Mac OSX)
-
-You need to have the current XCode version installed (free in AppStore). Open Matlab and change into the directory of the repository. At first, there's two files you need to change.
-
-```matlab
->>> cd /path/to/repository
->>> edit ([matlabroot '/bin/maci64/mexopts/clang++_maci64.xml'])
->>> edit ([matlabroot '/bin/maci64/mexopts/clang_maci64.xml'])
-```
-
-In both files, copy lines matching occurences of `MacOSX10.x.sdk` and change `MacOSX10.x.sdk` to `MacOSX10.11.sdk`(or whichever current version of XCode you're using).
-
-Now, run
-
-
-```matlab
->>> setup
->>> cd sandbox
->>> flockworktest
-```
-
-### Python
-
-    $ sudo pip install ./cFlockwork
+    $ pip install ./tacoma
 
 ## Some Explanations
 
@@ -114,15 +91,8 @@ Naturally, those models need an initial state which has to be passed to the func
 There's two data formats which we can pass to the measurement function, as described above. The first one is the `edge_lists` for, e.g.
 real-world data or the dynamic RGG model. The second one is `edge_changes` for, e.g. the Flockwork models or the ZSBB model.
 
-
-
-## Example
+## Examples
 
 ### Python
 
     $ python sandbox/meanfieldtest.py
-
-### Matlab
-
-    >>> cd sandbox
-    >>> flockworktest
