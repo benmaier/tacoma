@@ -25,7 +25,7 @@ L.edges = [
             ],
            ]
 
-L_sis = cF.Dyn_SIS(L.N, 8, 1.0, 0.1,3,0,12234235,True)
+L_sis = cF.Dyn_SIS(L.N, 100, 1.0, 0.1,3,0,12234235,True)
 
 cF.gillespie_SIS_on_edge_lists(L,L_sis,verbose=True)
 
@@ -59,7 +59,7 @@ C.edges_out = [
                 ],
               ]
 
-C_sis = cF.Dyn_SIS(C.N, 8, 1.0, 0.1,3,0,12234235,True)
+C_sis = cF.Dyn_SIS(C.N, 100, 1.0, 0.1,3,0,12234235,True)
 
 cF.gillespie_SIS_on_edge_changes(C,C_sis,verbose=True)
 
@@ -67,7 +67,8 @@ pl.plot(C_sis.time,C_sis.I,'--')
 pl.plot(C_sis.time,C_sis.SI,'--')
 pl.plot(C_sis.time,C_sis.R0,'--')
 
-result = gill.SIS_Poisson_homogeneous(L.N,L.edges,1.0,0.1,8,seed=12234235,initial_number_of_infected=3)
+print "================ SIS vestergaard =============="
+result = gill.SIS_Poisson_homogeneous(L.N,L.edges,1.0,0.1,100,seed=12234235,initial_number_of_infected=3,verbose=True)
 
 print result
 
@@ -78,6 +79,7 @@ I = result.I[0]
 t = np.arange(len(result.I[0]))
 
 pl.plot(t,I,'--')
+#pl.plot(result.true_t,result.true_I,'--')
 #pl.plot(result.t,result.SI,'--')
 
 pl.show()

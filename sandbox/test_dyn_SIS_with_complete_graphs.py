@@ -18,6 +18,7 @@ N_meas = 10
 L_ = cF.dynamic_RGG(50,t_run_total=t_run_total,mean_link_duration=2)
 L = cF.edge_lists()
 L.copy_from(L_)
+L.t = [0., 0.1,4.0, 4.1,5.2,6.9,7.5,8.1,8.5,9.0]
 #print len(L.edges)
 
 L.edges = new_list
@@ -51,12 +52,18 @@ for ieta,eta in enumerate(etas):
             I_mean = 0
 
         start = time.time()
-        result = gill.SIS_Poisson_homogeneous(L.N,L.edges,eta,rho,100,seed=seed,initial_number_of_infected=25)
+        result = gill.SIS_Poisson_homogeneous(L.N,L.edges,eta,rho,100,seed=seed,initial_number_of_infected=25,verbose=False)
         end = time.time()
         #print "dynGillEpi needed", end-start, "seconds"
 
         I_2_mean = np.mean(np.array(result.I[0][:-1],dtype=float))
         I_2_mean = result.I[0][-1]
+        if result.I[0][-1] == 0:
+            I_2_mean = 0
+
+        t = np.array(result.true_t)
+        dt = t[1:] - t[:-1]
+        I_2_mean = np.array(dt).dot(result.true_I[:-1])/sum(dt)
         if result.I[0][-1] == 0:
             I_2_mean = 0
 
@@ -81,11 +88,12 @@ dyn_means = dyn_vals.mean(axis=1)
 print R0
 print etas
 
-pl.plot(R0,cF_means/N)
-pl.plot(R0,dyn_means/N)
+pl.plot(R0,cF_means/N,label='cF')
+pl.plot(R0,dyn_means/N,label='dyn')
 pl.plot(R0[R0>1],1-1/R0[R0>1])
 pl.xscale("log")
 #pl.yscale("log")
+pl.legend()
 
 
 pl.show()

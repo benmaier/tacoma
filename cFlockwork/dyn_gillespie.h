@@ -108,6 +108,14 @@ void
         
         if (next_time == (edg_lst.t).end())
         {
+            // calculate the current time
+            // technically, this is unnecessary since we've covered
+            // that in 
+            //              t -= tau / Lambda
+            // but this prevents the buildup of errors
+            double this_time = tmax;
+            t = this_time + t_network_total * loop_count;
+
             // if the upcoming edges is the end of the edges vector, this means
             // we've reached tmax. and at tmax, the network is getting looped
             // so we increase the loop count and generate G from the initial
@@ -129,6 +137,14 @@ void
         }
         else
         {
+            // calculate the current time
+            // technically, this is unnecessary since we've covered
+            // that in 
+            //              t -= tau / Lambda
+            // but this prevents the buildup of errors
+            double this_time = *next_time;
+            t = this_time + t_network_total * loop_count;
+
             // advance from the edges vector
             graph_from_edgelist(G,*next_edges);
 
@@ -220,6 +236,13 @@ void
                     auto this_rate = rates.begin();
                     double rProduct = randuni(generator) * Lambda;
                     double sum_event = 0.0;
+                    if (verbose)
+                    {
+                        cout << "Beta = " << rates[0] << endl;
+                        cout << "mu = " << rates[1] << endl;
+                        cout << "Lambda = " << rates[1]+rates[0] << endl;
+                    }
+
                     while ( (this_rate != rates.end() ) and 
                             not ( (sum_event < rProduct) and (rProduct <= sum_event+(*this_rate)) ) )
                     {
@@ -245,6 +268,9 @@ void
                     if (verbose)
                     {
                         cout << "event happened" << event << endl;
+                        cout << "Beta = " << rates[0] << endl;
+                        cout << "mu = " << rates[1] << endl;
+                        cout << "Lambda = " << rates[1]+rates[0] << endl;
                     }
                 }
             }
@@ -314,6 +340,15 @@ void
         
         if (next_time == (edg_chg.t).end())
         {
+
+            // calculate the current time
+            // technically, this is unnecessary since we've covered
+            // that in 
+            //              t -= tau / Lambda
+            // but this prevents the buildup of errors
+            double this_time = tmax;
+            t = this_time + t_network_total * loop_count;
+
             // if the upcoming change is the end of the change vector, this means
             // we've reached tmax. and at tmax, the network is getting looped
             // so we increase the loop count and generate G from the initial
@@ -329,6 +364,14 @@ void
         }
         else
         {
+            // calculate the current time
+            // technically, this is unnecessary since we've covered
+            // that in 
+            //              t -= tau / Lambda
+            // but this prevents the buildup of errors
+            double this_time = *next_time;
+            t = this_time + t_network_total * loop_count;
+
             //update edges in
             for(auto & edge: *next_edges_in)
             {
