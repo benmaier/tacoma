@@ -419,3 +419,28 @@ void edgelist_from_graph(
     }
 }
 
+void randomly_seed_engine(
+        mt19937_64 &generator
+        )
+//taken from http://stackoverflow.com/a/29190957/4177832
+{
+    const auto time_seed = static_cast<size_t>(time(0));
+    const auto clock_seed = static_cast<size_t>(clock());
+    const size_t pid_seed =
+              hash<thread::id>()(this_thread::get_id());
+
+    seed_seq seed_value { time_seed, clock_seed, pid_seed };
+    generator.seed(seed_value);
+}
+
+void seed_engine(
+        mt19937_64 &generator, 
+        size_t seed
+        )
+{
+    if (seed == 0)
+        randomly_seed_engine(generator);
+    else
+        generator.seed(seed);
+}
+

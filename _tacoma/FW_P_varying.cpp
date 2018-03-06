@@ -72,7 +72,8 @@ edge_changes
         throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
 
     //initialize random generators
-    mt19937_64 generator(seed);
+    mt19937_64 generator;
+    seed_engine(generator,seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     if (equilibrate_flockwork)
@@ -273,7 +274,8 @@ edge_changes
         throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
 
     //initialize random generators
-    mt19937_64 generator(seed);
+    mt19937_64 generator;
+    seed_engine(generator,seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     if (equilibrate_flockwork)
