@@ -36,7 +36,7 @@
 #include <tuple>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "EqFlockwork.h"
+#include "Flockwork.h"
 #include "FW_P_varying.h"
 #include "ResultClasses.h"
 #include "test_varying_rate.h"

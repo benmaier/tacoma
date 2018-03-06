@@ -23,7 +23,7 @@
  * IN THE SOFTWARE.
  */
 
-#include "EqFlockwork.h"
+#include "Flockwork.h"
 
 using namespace std;
 
@@ -306,7 +306,8 @@ vector < pair < size_t, size_t > >
     }
 
     //initialize random generators
-    mt19937_64 generator(seed);
+    mt19937_64 generator;
+    seed_engine(generator);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     equilibrate_neighborset(G,PQ,generator,uni_distribution,t_max,use_Q_as_P);
@@ -357,7 +358,8 @@ vector < pair < size_t, size_t > >
     }
 
     //initialize random generators
-    mt19937_64 generator(seed);
+    mt19937_64 generator;
+    seed_engine(generator);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     //equilibrate
@@ -410,7 +412,8 @@ vector < pair < size_t, size_t > >
     }
 
     //initialize random generators
-    mt19937_64 generator(seed);
+    mt19937_64 generator;
+    seed_engine(generator);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     //equilibrate
@@ -460,7 +463,8 @@ vector < size_t >
     }
 
     //initialize random generators
-    mt19937_64 generator(seed);
+    mt19937_64 generator;
+    seed_generator(seed)
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
     //simulate

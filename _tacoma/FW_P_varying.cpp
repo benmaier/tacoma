@@ -26,7 +26,7 @@
 #include "Events.h"
 #include "Utilities.h"
 #include "ResultClasses.h"
-#include "EqFlockwork.h"
+#include "Flockwork.h"
 
 #include <iostream>
 #include <algorithm>

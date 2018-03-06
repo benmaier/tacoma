@@ -23,8 +23,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef __EQFLOCKWORK_H__
-#define __EQFLOCKWORK_H__
+#ifndef __FLOCKWORK_H__
+#define __FLOCKWORK_H__
 
 #include <iostream>
 #include <vector>

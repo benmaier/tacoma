@@ -139,4 +139,16 @@ void randomly_seed_engine(
     generator.seed(seed_value);
 }
 
+template <typename T>
+void seed_engine(
+        T &generator, 
+        size_t seed
+        )
+{
+    if (seed == 0)
+        randomly_seed_engine(generator);
+    else
+        generator.seed(seed);
+}
+
 #endif
