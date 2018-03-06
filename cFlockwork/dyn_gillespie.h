@@ -99,12 +99,8 @@ void
     while ( (t-t0 < t_simulation) and (not this_gillespie_object.simulation_ended()) )
     {
 
-        // ======================== UPDATE THE GRAPH ==========================
-        //
         if (verbose)
-        {
             cout << "=================== UPDATING THE GRAPH ================ " << endl;
-        }
         
         if (next_time == (edg_lst.t).end())
         {
@@ -167,20 +163,9 @@ void
         else
             this_next_time = *next_time;
 
-        if (verbose)
-        {
-            cout << "the upcoming network time = " << this_next_time << endl;
-            cout << "the upcoming network time with loops = " << this_next_time + t_network_total * loop_count << endl;
-        }
-
         // compute the next dt while keeping in mind that the whole thing
         // might have looped already
         dt_to_next_change = this_next_time + t_network_total * loop_count - t;
-
-        if (verbose)
-        {
-            cout << "dt_to_next_change = " << dt_to_next_change << endl;
-        }
 
         // update all the stuff that might have changed for this Gillespie object
         // because G changed
@@ -188,6 +173,9 @@ void
 
         if (verbose)
         {
+            cout << "the upcoming network time = " << this_next_time << endl;
+            cout << "the upcoming network time with loops = " << this_next_time + t_network_total * loop_count << endl;
+            cout << "dt_to_next_change = " << dt_to_next_change << endl;
             cout << "updated graph in Gillespie instance" << endl;
             this_gillespie_object.print();
             cout << "========== PERFORMING GILLESPIE =========" << endl;
@@ -204,9 +192,7 @@ void
             t += dt_to_next_change;
             
             if (verbose)
-            {
                 cout << "no events happening in this time bin" << endl;
-            }
         }
         else
         {
@@ -225,9 +211,7 @@ void
                 t +=  tau / Lambda;
 
                 if (verbose)
-                {
                     cout << "advanced time to t = " << t << endl;
-                }
 
                 if ((t - t0) < t_simulation)
                 {
@@ -236,12 +220,6 @@ void
                     auto this_rate = rates.begin();
                     double rProduct = randuni(generator) * Lambda;
                     double sum_event = 0.0;
-                    if (verbose)
-                    {
-                        cout << "Beta = " << rates[0] << endl;
-                        cout << "mu = " << rates[1] << endl;
-                        cout << "Lambda = " << rates[1]+rates[0] << endl;
-                    }
 
                     while ( (this_rate != rates.end() ) and 
                             not ( (sum_event < rProduct) and (rProduct <= sum_event+(*this_rate)) ) )
@@ -252,9 +230,7 @@ void
                     }
 
                     if (verbose)
-                    {
                         cout << "event happening in this time bin = " << event << endl;
-                    }
 
                     // let the event take place
                     this_gillespie_object.make_event(event,t);
@@ -264,14 +240,6 @@ void
 
                     // get time till next event
                     tau = randexp(generator);
-
-                    if (verbose)
-                    {
-                        cout << "event happened" << event << endl;
-                        cout << "Beta = " << rates[0] << endl;
-                        cout << "mu = " << rates[1] << endl;
-                        cout << "Lambda = " << rates[1]+rates[0] << endl;
-                    }
                 }
             }
 
@@ -280,15 +248,6 @@ void
             tau -= xi * Lambda * dt_to_next_change;
             t += xi * dt_to_next_change;
         }
-
-        /*
-        if (verbose)
-        {
-            cout << "status of simulation with t-t0 = " << t-t0 << endl;
-            cout << "t_simulation = " << t_simulation << endl;
-            cout << "simulation_ended = " << this_gillespie_object.simulation_ended() << endl;
-        }
-        */
     }
 }
 

@@ -103,14 +103,26 @@ void Dyn_SIS::infection_event()
     // find the index of the susceptible which will become infected
     size_t this_susceptible_index = random_susceptible(generator);
 
+    if (verbose)
+    {
+        cout << "====================== INFECTION EVENT =====================" << endl;
+        cout << "found SI edge with index " << this_susceptible_index << endl;
+    }
+
     // get the node number of this susceptible
     size_t this_susceptible = (SI_edges.begin() + this_susceptible_index)->second;
 
     // save this node as an infected
     infected.push_back(this_susceptible);
 
+    if (verbose)
+        cout << "changing node status of susceptible " << this_susceptible << " to infected" << endl;
+
     // change node status of this node
     node_status[this_susceptible] = _I;
+
+    if (verbose)
+        cout << "erasing all SI edges which " << this_susceptible << " was part of" << endl;
 
     // erase all edges in the SI set where this susceptible is part of
     SI_edges.erase( 
@@ -123,11 +135,29 @@ void Dyn_SIS::infection_event()
             SI_edges.end() 
         );
 
+    if (verbose)
+    {
+        cout << " SI edges after erasing " << endl;
+        print_SI_edges();
+        cout << "finding all edges which " << this_susceptible << " is part of and is connected to a susceptible " << endl;
+    }
+
     // push the new SI edges
     size_t & this_infected = this_susceptible;
     for(auto const &neighbor: (*G)[this_infected])
+    {
+        if (verbose)
+            cout << "new infected " << this_susceptible << " has neighbor " << neighbor << " with status " << node_status[neighbor] << endl;
+
         if (node_status[neighbor] == _S)
             SI_edges.push_back( make_pair(this_infected, neighbor) );
+    }
+
+    if (verbose)
+    {
+        cout << "  SI edges after pushing = " << endl;
+        print_SI_edges();
+    }
 }
 
 void Dyn_SIS::recovery_event()
@@ -139,14 +169,26 @@ void Dyn_SIS::recovery_event()
     size_t this_infected_index = random_infected(generator);
     auto it_infected = infected.begin() + this_infected_index;
 
+    if (verbose)
+    {
+        cout << "====================== RECOVERY EVENT =====================" << endl;
+        cout << "found infected with index " << this_infected_index << endl;
+    }
+
     // get the node id of this infected about to be recovered
     size_t this_infected = *(it_infected);
 
     // delete this from the infected vector
     infected.erase( it_infected );
 
+    if (verbose)
+        cout << "changing node status of infected " << this_infected << " to susceptible" << endl;
+
     // change node status of this node
     node_status[this_infected] = _S;
+
+    if (verbose)
+        cout << "erasing all SI edges which " << this_infected << " was part of" << endl;
 
     // erase all edges in the SI set which this infected is part of
     SI_edges.erase( 
@@ -159,12 +201,40 @@ void Dyn_SIS::recovery_event()
             SI_edges.end() 
         );
 
+    if (verbose)
+    {
+        cout << "  SI edges after erasing = " << endl;
+        print_SI_edges();
+    }
+
     size_t const & this_susceptible = this_infected;
+
+    if (verbose)
+    {
+        cout << "finding all edges which " << this_susceptible << " is part of and is connected to an infected " << endl;
+        cout << "graph has size " << G->size() << endl;
+        cout << "neighbor list to look at is "; 
+        for(auto const &neighbor: (*G)[this_susceptible])
+            cout << neighbor << " ";
+        cout << endl;
+    }
 
     // push the new SI edges
     for(auto const &neighbor: (*G)[this_susceptible])
+    {
+        if (verbose)
+            cout << "new susceptible " << this_susceptible << " has neighbor " << neighbor << " with status " << node_status[neighbor] << endl;
+
         if (node_status[neighbor] == _I)
             SI_edges.push_back( make_pair(neighbor, this_susceptible) );
+    }
+
+    if (verbose)
+    {
+        cout << "  SI edges after pushing = " << endl;
+        print_SI_edges();
+    }
+
 }
 
 void Dyn_SIS::update_observables(
