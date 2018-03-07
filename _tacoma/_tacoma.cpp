@@ -46,7 +46,9 @@
 #include "dtu_week.h"
 #include "resampling.h"
 #include "social_trajectories.h"
-#include "dyn_SIS.h"
+#include "SIS.h"
+#include "SIR.h"
+#include "SI.h"
 #include "dyn_gillespie.h"
 
 using namespace std;
@@ -219,15 +221,42 @@ PYBIND11_PLUGIN(_tacoma) {
             py::arg("verbose") = false
          );
 
-    m.def("gillespie_SIS_on_edge_lists",&gillespie_on_edge_lists<Dyn_SIS>,"Perform a Gillespie SIS simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.Dyn_SIS.",
+    m.def("gillespie_SIS_on_edge_lists",&gillespie_on_edge_lists<SIS>,"Perform a Gillespie SIS simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SIS.",
             py::arg("edge_lists"),
-            py::arg("Dyn_SIS"),
+            py::arg("SIS"),
+            py::arg("is_static") = false,
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_SIS_on_edge_changes",&gillespie_on_edge_changes<Dyn_SIS>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.Dyn_SIS.",
+    m.def("gillespie_SIS_on_edge_changes",&gillespie_on_edge_changes<SIS>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIS.",
+            py::arg("edge_changes"),
+            py::arg("SIS"),
+            py::arg("verbose") = false
+            );
+
+    m.def("gillespie_SI_on_edge_lists",&gillespie_on_edge_lists<SI>,"Perform a Gillespie SI simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SI.",
             py::arg("edge_lists"),
-            py::arg("Dyn_SIS"),
+            py::arg("SI"),
+            py::arg("is_static") = false,
+            py::arg("verbose") = false
+            );
+
+    m.def("gillespie_SI_on_edge_changes",&gillespie_on_edge_changes<SI>,"Perform a Gillespie SI simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SI.",
+            py::arg("edge_changes"),
+            py::arg("SI"),
+            py::arg("verbose") = false
+            );
+
+    m.def("gillespie_SIR_on_edge_lists",&gillespie_on_edge_lists<SIR>,"Perform a Gillespie SIS simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SIR.",
+            py::arg("edge_lists"),
+            py::arg("SIR"),
+            py::arg("is_static") = false,
+            py::arg("verbose") = false
+            );
+
+    m.def("gillespie_SIR_on_edge_changes",&gillespie_on_edge_changes<SIR>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIR.",
+            py::arg("edge_changes"),
+            py::arg("SIR"),
             py::arg("verbose") = false
             );
 
@@ -307,7 +336,7 @@ PYBIND11_PLUGIN(_tacoma) {
         .def_readwrite("gamma", &dtu_week::gamma)
         .def_readwrite("P", &dtu_week::P);
 
-    py::class_<Dyn_SIS>(m,"Dyn_SIS")
+    py::class_<SIS>(m,"SIS")
         .def(py::init<size_t,double,double,double,size_t,size_t,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
@@ -318,10 +347,41 @@ PYBIND11_PLUGIN(_tacoma) {
                 py::arg("seed") = 0,
                 py::arg("verbose") = false
             )
-        .def_readwrite("time", &Dyn_SIS::time)
-        .def_readwrite("R0", &Dyn_SIS::R0)
-        .def_readwrite("SI", &Dyn_SIS::SI)
-        .def_readwrite("I", &Dyn_SIS::I);
+        .def_readwrite("time", &SIS::time)
+        .def_readwrite("R0", &SIS::R0)
+        .def_readwrite("SI", &SIS::SI)
+        .def_readwrite("I", &SIS::I);
+
+    py::class_<SI>(m,"SI")
+        .def(py::init<size_t,double,double,size_t,size_t,size_t,bool>(),
+                py::arg("N"),
+                py::arg("t_simulation"),
+                py::arg("infection_rate"),
+                py::arg("number_of_initially_infected") = 1, 
+                py::arg("number_of_initially_vaccinated") = 0, 
+                py::arg("seed") = 0,
+                py::arg("verbose") = false
+            )
+        .def_readwrite("time", &SI::time)
+        .def_readwrite("SI", &SI::_SI)
+        .def_readwrite("I", &SI::I);
+
+    py::class_<SIR>(m,"SIR")
+        .def(py::init<size_t,double,double,double,size_t,size_t,size_t,bool>(),
+                py::arg("N"),
+                py::arg("t_simulation"),
+                py::arg("infection_rate"),
+                py::arg("recovery_rate"),
+                py::arg("number_of_initially_infected") = 1, 
+                py::arg("number_of_initially_vaccinated") = 0, 
+                py::arg("seed") = 0,
+                py::arg("verbose") = false
+            )
+        .def_readwrite("time", &SIR::time)
+        .def_readwrite("R0", &SIR::R0)
+        .def_readwrite("SI", &SIR::SI)
+        .def_readwrite("I", &SIR::I)
+        .def_readwrite("R", &SIR::R);
 
     return m.ptr();
 

@@ -15,6 +15,28 @@ from _tacoma import edge_changes_with_histograms as ec_h
 color_sequence = [ u'#1f77b4', u'#ff7f0e', u'#2ca02c', u'#d62728', u'#9467bd', u'#8c564b', u'#e377c2', u'#7f7f7f', u'#bcbd22', u'#17becf' ]
 marker_sequence = ['s','d','o','X','v','<','^','.','>','h','p','P','*','8','H']
 
+def complete_graph(N):
+    """
+        Get a single frame of a complete network.
+
+        N -- number of nodes
+
+        Returns an instance of `tacoma.edge_lists` with t = [0.0], tmax = 1.0
+    """
+
+    edge_list = []
+    for i in range(N-1):
+        for j in range(i+1,N):
+            edge_list.append((i,j))
+
+    this = el()
+    this.t = [0.]
+    this.tmax = 1.
+    this.edges = [edge_list]
+    this.N = N
+
+    return this
+
 def _get_raw_temporal_network(temporal_network):
 
     if type(temporal_network) == ec_h:
@@ -160,10 +182,10 @@ def gillespie_SIS(temporal_network,*args,**kwargs):
         Simulates an SIS process on the provided temporal network
 
         py::arg("temporal_network"),
-        py::arg("Dyn_SIS"),
+        py::arg("SIS"),
         py::arg("verbose") = false
 
-        Returns `None`, but the observables are saved in the `Dyn_SIS` object.
+        Returns `None`, but the observables are saved in the `SIS` object.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -177,6 +199,49 @@ def gillespie_SIS(temporal_network,*args,**kwargs):
 
     return result
     
+def gillespie_SI(temporal_network,*args,**kwargs):
+    """
+        Simulates an SI process on the provided temporal network
 
+        py::arg("temporal_network"),
+        py::arg("SI"),
+        py::arg("verbose") = false
 
+        Returns `None`, but the observables are saved in the `SI` object.
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == ec:
+        result = gillespie_SI_on_edge_changes(temporal_network,*args,**kwargs)
+    elif type(temporal_network) == el:
+        result = gillespie_SI_on_edge_lists(temporal_network,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+
+    return result
+    
+
+def gillespie_SIR(temporal_network,*args,**kwargs):
+    """
+        Simulates an SIR process on the provided temporal network
+
+        py::arg("temporal_network"),
+        py::arg("SIR"),
+        py::arg("verbose") = false
+
+        Returns `None`, but the observables are saved in the `SIR` object.
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == ec:
+        result = gillespie_SIR_on_edge_changes(temporal_network,*args,**kwargs)
+    elif type(temporal_network) == el:
+        result = gillespie_SIR_on_edge_lists(temporal_network,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+
+    return result
+    
 

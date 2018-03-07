@@ -23,8 +23,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef __DYN_SIS_H__
-#define __DYN_SIS_H__
+#ifndef __SIS_H__
+#define __SIS_H__
 
 #include "Utilities.h"
 #include "ResultClasses.h"
@@ -44,7 +44,7 @@
 
 using namespace std;
 
-class Dyn_SIS 
+class SIS 
 {
     public:
         size_t N;
@@ -64,7 +64,7 @@ class Dyn_SIS
         vector < size_t > SI;
         vector < size_t > I;
 
-        Dyn_SIS(
+        SIS(
             size_t _N,
             double _t_simulation,
             double _infection_rate,
@@ -82,15 +82,28 @@ class Dyn_SIS
             number_of_initially_vaccinated = _number_of_initially_vaccinated;
             number_of_initially_infected = _number_of_initially_infected;
             verbose = _verbose;
+            seed = _seed;
 
             mt19937_64 generator;
 
-            if (_seed == 0)
+            randuni = uniform_real_distribution < double > (0.0, 1.0);
+        }
+
+        void reset() 
+        {
+            // reset observables
+            //
+            time.clear();
+            R0.clear();
+            SI.clear();
+            I.clear();
+
+            // seed engine
+            if (seed == 0)
                 randomly_seed_engine(generator);
             else
-                generator.seed(_seed);
+                generator.seed(seed);
 
-            randuni = uniform_real_distribution < double > (0.0, 1.0);
 
             //check if number of infected and number of vaccinated does not
             //exceed total node number
@@ -108,7 +121,7 @@ class Dyn_SIS
                 node_ints.push_back(n);            
             }
 
-            if (_verbose) 
+            if (verbose) 
             {
                 cout << "choosing " << number_of_initially_vaccinated
                      << " vaccinated and " << number_of_initially_infected
@@ -133,7 +146,7 @@ class Dyn_SIS
                 infected.push_back( node_ints[node] );
             }
 
-            if (_verbose)
+            if (verbose)
             {
                 cout << "infected set has size = " << infected.size() << endl;
                 print_infected();
@@ -142,7 +155,7 @@ class Dyn_SIS
 
         bool simulation_ended() 
         {
-            return infected.size() == 0;
+            return (infected.size() == 0) or (infected.size() == N);
         };
 
         void get_rates_and_Lambda(vector < double > &rates,
@@ -181,7 +194,7 @@ class Dyn_SIS
             cout << "infected = [ ";
             for( auto const &inf: infected)
                 cout << inf << " ";
-            cout << " ]" << endl;
+            cout << "]" << endl;
         };
 
         void print_SI_edges()
@@ -189,10 +202,9 @@ class Dyn_SIS
             cout << "SI_edges = [ ";
             for( auto const &edge: SI_edges)
                 cout << "( "<< edge.first << ", " << edge.second << " ) ";
-            cout << " ]" << endl;
+            cout << "]" << endl;
         };
 
 };
-
 
 #endif

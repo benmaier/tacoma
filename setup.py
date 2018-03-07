@@ -22,7 +22,9 @@ ext_modules = [
         [ 
             '_tacoma/Utilities.cpp', 
             '_tacoma/Events.cpp', 
-            '_tacoma/Dyn_SIS.cpp', 
+            '_tacoma/SIS.cpp', 
+            '_tacoma/SIR.cpp',             
+            '_tacoma/SI.cpp', 
             '_tacoma/measurements.cpp', 
             '_tacoma/resampling.cpp', 
             '_tacoma/social_trajectories.cpp', 

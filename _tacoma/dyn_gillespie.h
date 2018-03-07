@@ -48,6 +48,7 @@ void
     gillespie_on_edge_lists(
             edge_lists & edg_lst,
             T & this_gillespie_object,
+            bool is_static = false,
             bool verbose = false
             )
 {
@@ -57,6 +58,9 @@ void
         cout << "N = " << this_gillespie_object.N << endl;
         this_gillespie_object.print();
     }
+
+    // reset the simulation object
+    this_gillespie_object.reset();
 
     // deal with random numbers
     mt19937_64 &generator = this_gillespie_object.generator;
@@ -117,7 +121,9 @@ void
             // so we increase the loop count and generate G from the initial
             // edge list at edges.begin()
             loop_count += 1;
-            graph_from_edgelist(G,*((edg_lst.edges).begin()));
+
+            if ((not is_static) or (t == t0))
+                graph_from_edgelist(G,*((edg_lst.edges).begin()));
 
             // furthermore, the upcoming change will be the second in the
             // vectors
@@ -142,7 +148,8 @@ void
             t = this_time + t_network_total * loop_count;
 
             // advance from the edges vector
-            graph_from_edgelist(G,*next_edges);
+            if (not is_static)
+                graph_from_edgelist(G,*next_edges);
 
             //advance to the upcoming change
             next_time++;
@@ -169,7 +176,8 @@ void
 
         // update all the stuff that might have changed for this Gillespie object
         // because G changed
-        this_gillespie_object.update_network(G,t);
+        if ((not is_static) or (t == t0))
+            this_gillespie_object.update_network(G,t);
 
         if (verbose)
         {
@@ -264,6 +272,9 @@ void
             bool verbose = false
             )
 {
+
+    // reset the simulation object
+    this_gillespie_object.reset();
 
     // deal with random numbers
     mt19937_64 &generator = this_gillespie_object.generator;
