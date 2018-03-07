@@ -47,27 +47,51 @@ def get_mean_coordination_number(group_sizes_and_durations):
 
 def estimate_ZSBB_parameters(temporal_network,
                              group_sizes_and_durations = None,
+                             fit_discrete = False,
+                             dt = None,
                             ):
+
+    if fit_discrete and dt is None:
+        raise ValueError('If the data is supposed to be treated as discrete, a value for `dt` must be provided in order to norm the group size durations.')
+    elif not fit_discrete:
+        dt = 1.
 
     result = group_sizes_and_durations
     if result is None:
         result = tc.measure_group_sizes_and_durations(temporal_network)
 
+    N = temporal_network.N
+
     # let's estimate b1 with the distribution of group_durations (pairs)
+    #group_size = 2
+    #b_ones = []
+    #while group_size <= N: 
+    #    values = result.group_durations[group_size] 
+    #    alpha_1, err, xmin = fit_power_law_clauset(values)
+    #    if (err/alpha_1)>0.05:
+    #        break
+    #    b_ones.append((alpha_1-1)/group_size)
+    #    print b_ones
+    #    group_size += 1
+    #b1 = np.mean(b_ones)
+    #print alpha_1
+
     values = result.group_durations[2] 
     alpha_1, err, xmin = fit_power_law_clauset(values)
-
     b1 = (alpha_1 - 1) / 2.0
     if b1 < 0.5:
         b1 = 0.51
     elif b1 > 1:
         b1 = 1.0
 
-    N = temporal_network.N
-
     # let's estimate b0 with the distribution of inter-contact durations
-    values = result.group_durations[1]
-    alpha_0, err, xmin = fit_power_law_clauset(values)
+
+    if fit_discrete:
+        values = np.array(result.group_durations[1]) / dt
+        values = np.array(values,dtype=int)
+        alpha_0, err, xmin = fit_power_law_clauset(values+1,discrete=True)
+    else:
+        alpha_0, err, xmin = fit_power_law_clauset(result.group_durations[1])
 
     mean_n = get_mean_coordination_number(result)
 
@@ -93,9 +117,12 @@ def estimate_ZSBB_parameters(temporal_network,
         lam = 1
 
     if b0 < 0.5:
-        lam = 0.51
+        b0 = 0.51
     elif b0 > 1:
-        lam = 1
+        b0 = 1
+
+    if b0 <= (2*lam-1) / (3*lam-1.0):
+        b0 = (2*lam-1) / (3*lam-1.0) + 0.01
 
 
     kwargs = {}
@@ -126,7 +153,7 @@ if __name__ == "__main__":
     fw_binned = tc.sample_temporal_network(fw,dt=300)
     fw_binned_result = tc.measure_group_sizes_and_durations(fw_binned)
 
-    kwargs = estimate_ZSBB_parameters(fw_binned,fw_binned_result)
+    kwargs = estimate_ZSBB_parameters(fw_binned,fw_binned_result,fit_discrete=True,dt=300.)
     print "lambda =", kwargs['lambda']
     print "b0 =", kwargs['b0']
     print "b1 =", kwargs['b1']
