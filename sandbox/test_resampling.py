@@ -1,6 +1,6 @@
 import tacoma as tc
 
-sample_aggregates = True
+sample_aggregates = False
 N_time_steps = 2
 
 print "===== edge_lists => edge_lists ====="
@@ -30,7 +30,9 @@ print new.t
 print new.tmax
 print new.edges
 
-new = tc.bin_from_edge_lists(L,N_time_steps=N_time_steps)
+print "=====binning from edge lists======="
+
+new = tc.bin_from_edge_lists(L,N_time_steps=N_time_steps,verbose=True)
 
 print new.N
 print new.t
@@ -70,7 +72,7 @@ print new.t
 print new.tmax
 print new.edges
 
-new = tc.bin_from_edge_changes(C,N_time_steps=N_time_steps)
+new = tc.bin_from_edge_changes(C,N_time_steps=N_time_steps,verbose=True)
 
 print new.N
 print new.t
