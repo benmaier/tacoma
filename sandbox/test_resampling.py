@@ -1,7 +1,7 @@
 import tacoma as tc
 
-sample_aggregates = False
-N_time_steps = 5
+sample_aggregates = True
+N_time_steps = 2
 
 print "===== edge_lists => edge_lists ====="
 
