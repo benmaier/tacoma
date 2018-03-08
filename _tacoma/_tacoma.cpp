@@ -46,6 +46,7 @@
 #include "dtu_week.h"
 #include "resampling.h"
 #include "social_trajectories.h"
+#include "verify_formats.h"
 #include "SIS.h"
 #include "SIR.h"
 #include "SI.h"
@@ -194,6 +195,16 @@ PYBIND11_PLUGIN(_tacoma) {
          );
 
     m.def("edge_trajectories_from_edge_changes", &edge_trajectories_from_edge_changes, "For each edge, get all time pairs where the edge existed, given an instance of `edge_changes`.",
+            py::arg("edge_changes"),
+            py::arg("verbose") = false
+         );
+
+    m.def("verify_edge_lists", &verify_edge_lists, "For each edge, get all time pairs where the edge existed, given an instance of `edge_lists`.",
+            py::arg("edge_lists"),
+            py::arg("verbose") = false
+         );
+
+    m.def("verify_edge_changes", &verify_edge_changes, "For each edge, get all time pairs where the edge existed, given an instance of `edge_changes`.",
             py::arg("edge_changes"),
             py::arg("verbose") = false
          );

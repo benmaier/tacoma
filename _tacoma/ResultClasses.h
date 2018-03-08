@@ -155,5 +155,6 @@ struct edge_trajectory_entry {
     pair < size_t, size_t > edge;
     vector < pair < double, double > > time_pairs;
     double last_time_active;
+    bool is_active;
 };
 #endif
