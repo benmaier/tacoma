@@ -52,6 +52,7 @@
 #include "SI.h"
 #include "SIRS.h"
 #include "dyn_gillespie.h"
+#include "conversion.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -205,6 +206,16 @@ PYBIND11_PLUGIN(_tacoma) {
          );
 
     m.def("verify_edge_changes", &verify_edge_changes, "For each edge, get all time pairs where the edge existed, given an instance of `edge_changes`.",
+            py::arg("edge_changes"),
+            py::arg("verbose") = false
+         );
+
+    m.def("convert_edge_lists", &convert_edge_lists, "Convert an instance of `edge_lists` to an instance of `edge_changes`.",
+            py::arg("edge_lists"),
+            py::arg("verbose") = false
+         );
+
+    m.def("convert_edge_changes", &convert_edge_changes, "Convert an instance of `edge_changes` to an instance of `edge_lists`.",
             py::arg("edge_changes"),
             py::arg("verbose") = false
          );
