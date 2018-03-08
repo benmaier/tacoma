@@ -10,4 +10,4 @@ L.edges = [
             [ (1,2) ],
         ]
 
-tc.verify_edge_lists(L)
+tc.verify(L)

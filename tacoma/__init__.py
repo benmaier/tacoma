@@ -73,7 +73,7 @@ def measure_group_sizes_and_durations(temporal_network,*args,**kwargs):
 
     return result
     
-def bin_temporal_network(temporal_network,*args,**kwargs):
+def bin(temporal_network,*args,**kwargs):
     """
         Bins a temporal network for each `dt` (after each step, respectively,
         if `N_time_steps` was provided).
@@ -100,7 +100,7 @@ def bin_temporal_network(temporal_network,*args,**kwargs):
 
     return result
     
-def sample_temporal_network(temporal_network,*args,**kwargs):
+def sample(temporal_network,*args,**kwargs):
     """
         Samples a temporal network after each `dt` (after each step, respectively,
         if `N_time_steps` was provided).
@@ -244,4 +244,66 @@ def gillespie_SIR(temporal_network,*args,**kwargs):
 
     return result
     
+def gillespie_SIRS(temporal_network,*args,**kwargs):
+    """
+        Simulates an SIRS process on the provided temporal network
 
+        py::arg("temporal_network"),
+        py::arg("SIRS"),
+        py::arg("verbose") = false
+
+        Returns `None`, but the observables are saved in the `SIRS` object.
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == ec:
+        result = gillespie_SIRS_on_edge_changes(temporal_network,*args,**kwargs)
+    elif type(temporal_network) == el:
+        result = gillespie_SIRS_on_edge_lists(temporal_network,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+
+
+def edge_trajectories(temporal_network,*args,**kwargs):
+    """
+        Computes the times in which each edge existed.
+
+        py::arg("temporal_network"),
+        py::arg("verbose") = false
+
+        Returns a list of `edge_trajectory_entry` objects, which contain
+        the `.time_pairs` attributes, a list of time pairs (t0, t1)
+        for time t0 <= t <= t1 in which the edge existed.
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == ec:
+        result = edge_trajectories_from_edge_changes(temporal_network,*args,**kwargs)
+    elif type(temporal_network) == el:
+        result = edge_trajectories_from_edge_lists(temporal_network,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+
+    return result
+
+def verify(temporal_network,*args,**kwargs):
+    """
+        Checks wether the temporal network is compliant with the demanded
+        formats for analyses. Writes remarks on violations in the console.
+
+        py::arg("temporal_network"),
+        py::arg("verbose") = false
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == ec:
+        result = verify_edge_changes(temporal_network,*args,**kwargs)
+    elif type(temporal_network) == el:
+        result = verify_edge_lists(temporal_network,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+
+    return result
