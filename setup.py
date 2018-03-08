@@ -24,6 +24,7 @@ ext_modules = [
             '_tacoma/Events.cpp', 
             '_tacoma/social_trajectories.cpp', 
             '_tacoma/conversion.cpp', 
+            '_tacoma/concatenation.cpp', 
             '_tacoma/verify_formats.cpp', 
             '_tacoma/SIS.cpp', 
             '_tacoma/SIR.cpp',             

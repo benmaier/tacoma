@@ -53,6 +53,7 @@
 #include "SIRS.h"
 #include "dyn_gillespie.h"
 #include "conversion.h"
+#include "concatenation.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -217,6 +218,16 @@ PYBIND11_PLUGIN(_tacoma) {
 
     m.def("convert_edge_changes", &convert_edge_changes, "Convert an instance of `edge_changes` to an instance of `edge_lists`.",
             py::arg("edge_changes"),
+            py::arg("verbose") = false
+         );
+
+    m.def("concatenate_edge_lists", &concatenate_edge_lists, "Concatenate a list of `edge_lists` to a single instance of `edge_lists`.",
+            py::arg("list_of_edge_lists"),
+            py::arg("verbose") = false
+         );
+
+    m.def("concatenate_edge_changes", &concatenate_edge_changes, "Convert a list of `edge_changes` to a single instance of `edge_changes`.",
+            py::arg("list_of_edge_changes"),
             py::arg("verbose") = false
          );
 
