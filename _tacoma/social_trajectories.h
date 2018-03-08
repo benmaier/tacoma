@@ -83,4 +83,24 @@ vector < social_trajectory_entry >
             size_t node,
             const bool verbose
         );
+
+size_t hash_edge(const pair < size_t, size_t > &p, const size_t &N);
+
+size_t get_edge_integer(
+            const size_t &N,
+            pair < size_t, size_t > const &edge,
+            map < size_t, size_t > &hash_to_int
+        );
+
+vector < edge_trajectory_entry >
+        edge_trajectories_from_edge_lists(
+            edge_lists &list_of_edge_lists,
+            const bool verbose
+        );
+
+vector < edge_trajectory_entry >
+        edge_trajectories_from_edge_changes(
+            edge_changes &list_of_edge_changes,
+            const bool verbose
+        );
 #endif

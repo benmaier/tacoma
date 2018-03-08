@@ -29,6 +29,31 @@
 
 using namespace std;
 
+size_t hash_edge(const pair < size_t, size_t > &p, const size_t &N)
+{
+    return N * p.first + p.second;
+}
+
+size_t get_edge_integer(
+            const size_t &N,
+            pair < size_t, size_t > const &edge,
+            map < size_t, size_t > &hash_to_int
+        )
+{
+    size_t N_hashes = hash_to_int.size();
+
+    size_t this_hash = hash_edge(edge,N);
+
+    auto current_hash_pair = hash_to_int.find(this_hash);
+    if (current_hash_pair != hash_to_int.end())
+        return current_hash_pair->second;
+    else
+    {
+        hash_to_int[this_hash] = N_hashes;
+        return N_hashes;
+    }
+}
+
 size_t get_group_integer(
             size_t const &N,
             set < size_t > const &component,
@@ -665,5 +690,201 @@ vector < social_trajectory_entry >
     }
 
     return social_trajectory;
+    
+}
+
+vector < edge_trajectory_entry >
+        edge_trajectories_from_edge_changes(
+            edge_changes &list_of_edge_changes,
+            const bool verbose
+        )
+{
+    // get references to edge_list and time
+    vector < vector < pair < size_t, size_t > > > & all_edges_in = list_of_edge_changes.edges_in;
+    vector < vector < pair < size_t, size_t > > > & all_edges_out = list_of_edge_changes.edges_out;
+    vector < double > & time = list_of_edge_changes.t;
+
+    // create graph
+    size_t N = list_of_edge_changes.N;
+
+    // set initial and final time
+    double t0 = list_of_edge_changes.t0;
+    double tmax = list_of_edge_changes.tmax;
+
+    if (verbose)
+    {
+        cout << "last time in array = " << time.back() << endl;
+        cout << "              tmax = " << tmax << endl;
+    }
+
+    if (tmax < time.back())
+        throw domain_error("The value tmax is smaller than the last time in the time list.");
+
+    // create iterators
+    auto it_edges_in = all_edges_in.begin();
+    auto it_edges_out = all_edges_out.begin();
+    auto it_time = time.begin();
+
+
+    // vectors and sets dealing with the change of edges
+    map < size_t, size_t > hash_to_int;
+
+    vector < edge_trajectory_entry > edge_trajectories;
+
+    for(auto &edge: list_of_edge_changes.edges_initial)
+    {
+        if (edge.first > edge.second)
+            swap(edge.first,edge.second);
+        size_t edge_int = get_edge_integer(N,edge,hash_to_int);
+        edge_trajectory_entry this_entry;
+        if (edge_int == edge_trajectories.size())
+        {
+            this_entry.edge = edge;
+            this_entry.last_time_active = t0;
+        }
+        else
+            throw domain_error("Doubling of edges in edge_changes.edges_initial");
+
+        edge_trajectories.push_back(this_entry);
+    }
+
+
+    // iterate through all changes
+    while (it_edges_in != all_edges_in.end() and it_time != time.end() and it_edges_out != all_edges_out.end() )
+    {
+        // get time of current state
+        double t = *it_time;
+
+        // get a sorted edge list
+        vector < pair < size_t, size_t > > & these_edges_in = (*it_edges_in);
+        vector < pair < size_t, size_t > > & these_edges_out = (*it_edges_out);
+
+        for(auto &edge: these_edges_out)
+        {
+            if (edge.first > edge.second)
+                swap(edge.first,edge.second);
+
+            size_t edge_int = get_edge_integer(N,edge,hash_to_int);
+
+            if (edge_int == edge_trajectories.size())
+                throw length_error("an edge was in edges_out, but did not exist before");
+
+            edge_trajectory_entry &this_entry = edge_trajectories[edge_int];
+            this_entry.time_pairs.push_back(make_pair(this_entry.last_time_active, t));
+            this_entry.last_time_active = t0 - 1000.0;
+        }
+
+        for(auto &edge: these_edges_in)
+        {
+            if (edge.first > edge.second)
+                swap(edge.first,edge.second);
+
+            size_t edge_int = get_edge_integer(N,edge,hash_to_int);
+
+            if (edge_int == edge_trajectories.size())
+            {
+                edge_trajectory_entry this_entry;
+                this_entry.edge = edge;
+                this_entry.last_time_active = t;
+                edge_trajectories.push_back(this_entry);
+            }
+            else
+            {
+                edge_trajectories[edge_int].last_time_active = t;
+            }
+
+        }
+
+        it_edges_in++;
+        it_edges_out++;
+        it_time++;
+    }
+
+    for(auto &this_entry: edge_trajectories)
+    {
+        if (this_entry.last_time_active >= t0)
+            this_entry.time_pairs.push_back(make_pair(this_entry.last_time_active,tmax));
+    }
+
+    return edge_trajectories;
+    
+}
+
+vector < edge_trajectory_entry >
+        edge_trajectories_from_edge_lists(
+            edge_lists &list_of_edge_lists,
+            const bool verbose
+        )
+{
+    // get references to edge_list and time
+    vector < vector < pair < size_t, size_t > > > & all_edges = list_of_edge_lists.edges;
+    vector < double > & time = list_of_edge_lists.t;
+
+    // create graph
+    size_t N = list_of_edge_lists.N;
+
+    // set initial and final time
+    double tmax = list_of_edge_lists.tmax;
+
+    if (verbose)
+    {
+        cout << "last time in array = " << time.back() << endl;
+        cout << "              tmax = " << tmax << endl;
+    }
+
+    if (tmax < time.back())
+        throw domain_error("The value tmax is smaller than the last time in the time list.");
+
+    // create iterators
+    auto it_edges = all_edges.begin();
+    auto it_time = time.begin();
+
+    // vectors and sets dealing with the change of edges
+    map < size_t, size_t > hash_to_int;
+
+    vector < edge_trajectory_entry > edge_trajectories;
+
+    // iterate through all changes
+    while (it_edges != all_edges.end() and it_time != time.end() )
+    {
+        // get time of current and next state
+        double t = *it_time;
+        double next_time;
+
+        if (it_time+1 == time.end())
+            next_time = tmax;
+        else
+            next_time = *(it_time+1);
+
+        for(auto &edge: *it_edges)
+        {
+            if (edge.first > edge.second)
+                swap(edge.first,edge.second);
+
+            size_t edge_int = get_edge_integer(N,edge,hash_to_int);
+
+            if (edge_int == edge_trajectories.size())
+            {
+                edge_trajectory_entry this_entry;
+                this_entry.edge = edge;
+                this_entry.time_pairs.push_back(make_pair(t,next_time));
+                edge_trajectories.push_back(this_entry);
+            }
+            else
+            {
+                edge_trajectory_entry &this_entry = edge_trajectories[edge_int];
+                if (this_entry.time_pairs.back().second == t)
+                    this_entry.time_pairs.back().second = next_time;
+                else
+                    this_entry.time_pairs.push_back(make_pair(t,next_time));
+            }
+
+        }
+
+        it_edges++;
+        it_time++;
+    }
+
+    return edge_trajectories;
     
 }
