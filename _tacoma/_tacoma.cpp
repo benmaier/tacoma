@@ -54,12 +54,13 @@
 #include "dyn_gillespie.h"
 #include "conversion.h"
 #include "concatenation.h"
+#include "flockwork_parameter_estimation.h"
 
 using namespace std;
 namespace py = pybind11;
 
-PYBIND11_PLUGIN(_tacoma) {
-    py::module m("_tacoma", "TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks and simulate Gillespie processes on them.");
+PYBIND11_MODULE(_tacoma, m) {
+    m.doc() = "TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks and simulate Gillespie processes on them.";
     
     m.def("flockwork_P_varying_rates", &flockwork_P_varying_rates, "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rate and varying P. Returns time points and concurrent edge changes.",
             py::arg("E"),
@@ -193,11 +194,13 @@ PYBIND11_PLUGIN(_tacoma) {
 
     m.def("edge_trajectories_from_edge_lists", &edge_trajectories_from_edge_lists, "For each edge, get all time pairs where the edge existed, given an instance of `edge_lists`.",
             py::arg("edge_lists"),
+            py::arg("return_edge_similarities") = false,
             py::arg("verbose") = false
          );
 
     m.def("edge_trajectories_from_edge_changes", &edge_trajectories_from_edge_changes, "For each edge, get all time pairs where the edge existed, given an instance of `edge_changes`.",
             py::arg("edge_changes"),
+            py::arg("return_edge_similarities") = false,
             py::arg("verbose") = false
          );
 
@@ -236,6 +239,15 @@ PYBIND11_PLUGIN(_tacoma) {
             py::arg("node"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
+            py::arg("verbose") = false
+         );
+
+    m.def("get_flockwork_P_args", &get_flockwork_P_args, "Calculate the rewiring_rate gamma(t) and probability to stay alone P(t) as well as the other important parameters to simulate a flockwork_P model with varying rates.",
+            py::arg("edge_changes"),
+            py::arg("dt") = 0.0,
+            py::arg("N_time_steps") = 0,
+            py::arg("aggregated_network") = map < pair < size_t, size_t >, double >(),
+            py::arg("ensure_empty_network") = false,
             py::arg("verbose") = false
          );
 
@@ -391,6 +403,25 @@ PYBIND11_PLUGIN(_tacoma) {
         .def_readwrite("edge", &edge_trajectory_entry::edge)
         .def_readwrite("time_pairs", &edge_trajectory_entry::time_pairs);
 
+    py::class_<flockwork_args>(m,"flockwork_args",py::dynamic_attr())
+        .def(py::init<>())
+        .def_readwrite("E", &flockwork_args::E)
+        .def_readwrite("N", &flockwork_args::N)
+        .def_readwrite("P", &flockwork_args::P)
+        .def_readwrite("rewiring_rate", &flockwork_args::rewiring_rate)
+        .def_readwrite("neighbor_affinity", &flockwork_args::neighbor_affinity)
+        .def_readwrite("tmax", &flockwork_args::tmax)
+        .def_readwrite("m", &flockwork_args::m)
+        .def_readwrite("m_in", &flockwork_args::m_in)
+        .def_readwrite("m_out", &flockwork_args::m_out)
+        .def_readwrite("new_time", &flockwork_args::new_time)
+        ;
+
+    py::class_<edge_trajectories>(m,"edge_trajectories")
+        .def(py::init<>())
+        .def_readwrite("trajectories", &edge_trajectories::trajectories)
+        .def_readwrite("edge_similarities", &edge_trajectories::edge_similarities);
+
     py::class_<dtu_week>(m,"dtu_week")
         .def(py::init<>())
         .def_readwrite("N", &dtu_week::N)
@@ -462,7 +493,5 @@ PYBIND11_PLUGIN(_tacoma) {
         .def_readwrite("SI", &SIRS::SI)
         .def_readwrite("I", &SIRS::I)
         .def_readwrite("R", &SIRS::R);
-    
-    return m.ptr();
 
 }
