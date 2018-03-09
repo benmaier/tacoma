@@ -20,7 +20,7 @@ L.edges = [
            ]
 
 
-new = tc.convert_edge_lists(L)
+new = tc.convert(L)
 
 print "N =", new.N
 print "t0 =", new.t0
@@ -30,7 +30,7 @@ print "edges_in =", new.edges_in
 print "edges_out =", new.edges_out
 print "edges_initial =", new.edges_initial
 
-new = tc.convert_edge_changes(new)
+new = tc.convert(new)
 
 print 
 print "N =", new.N
@@ -63,7 +63,7 @@ C.edges_out = [
                 ],
               ]
 
-new = tc.convert_edge_changes(C)
+new = tc.convert(C)
 print 
 print "N =", new.N
 print "t =", new.t
@@ -71,7 +71,7 @@ print "tmax =", new.tmax
 print "edges =", new.edges
 
 print "=========== edge changes =============="
-new = tc.convert_edge_lists(new)
+new = tc.convert(new)
 
 print
 print "N =", new.N

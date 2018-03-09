@@ -1,8 +1,5 @@
 import tacoma as tc
 
-sample_aggregates = False
-N_time_steps = 2
-
 print "===== edge_lists => edge_lists ====="
 
 L = tc.edge_lists()
@@ -22,8 +19,7 @@ L.edges = [
             ],
            ]
 
-
-new = tc.concatenate_edge_lists([L,L,L])
+new = tc.concatenate([L,L,L])
 
 print new.N
 print new.t
@@ -50,7 +46,7 @@ C.edges_out = [
                 ],
               ]
 
-new = tc.concatenate_edge_changes([C,C,C])
+new = tc.concatenate([C,C,C])
 
 print new.N
 print new.t0
@@ -59,4 +55,3 @@ print new.tmax
 print new.edges_initial
 print new.edges_in
 print new.edges_out
-

@@ -307,3 +307,49 @@ def verify(temporal_network,*args,**kwargs):
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
+
+def convert(temporal_network,*args,**kwargs):
+    """
+        Converts either an instance of `edge_changes` to an instance of
+        `edge_lists` or vice versa.
+
+        py::arg("temporal_network"),
+        py::arg("verbose") = false
+
+        Returns an instance of the other format.
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == ec:
+        result = convert_edge_changes(temporal_network,*args,**kwargs)
+    elif type(temporal_network) == el:
+        result = convert_edge_lists(temporal_network,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+
+    return result
+
+def concatenate(list_of_temporal_networks,*args,**kwargs):
+    """
+        Concatenates a list of either `edge_changes` or `edge_lists`
+        to a single instance of `edge_changes` or`edge_lists`, respectively.
+
+        py::arg("list_of_temporal_networks"),
+        py::arg("verbose") = false
+
+        Returns a single instance of the format provided in the lists.
+    """
+
+    list_of_temporal_networks = [ _get_raw_temporal_network(_t) for _t in list_of_temporal_networks ]
+
+    _t = list_of_temporal_networks[0]
+
+    if type(_t) == ec:
+        result = concatenate_edge_changes(list_of_temporal_networks,*args,**kwargs)
+    elif type(_t) == el:
+        result = concatenate_edge_lists(list_of_temporal_networks,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+
+    return result
