@@ -122,7 +122,7 @@ edge_changes
             vector < pair < size_t, size_t > > this_edge_list;
             edgelist_from_graph(this_edge_list,G);
 
-            vector < pair < size_t, size_t > > next_edge_list = ec_it->edges_initial;
+            vector < pair < size_t, size_t > > next_edge_list = (ec_it+1)->edges_initial;
 
             // get a sorted edge list
             set < size_t > last_edge_integers = get_edge_integer_set(this_edge_list, N);

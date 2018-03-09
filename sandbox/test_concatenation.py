@@ -19,7 +19,21 @@ L.edges = [
             ],
            ]
 
-new = tc.concatenate([L,L,L])
+L2 = tc.edge_lists()
+
+L2.N = 4
+L2.t = [0.0,1.0,2.0]
+L2.tmax = 3.0
+L2.edges = [ 
+            [
+              (3,1)
+            ],
+            [
+              (3,2), (0,2)
+            ],
+           ]
+
+new = tc.concatenate([L,L2,L])
 
 print new.N
 print new.t
@@ -46,7 +60,25 @@ C.edges_out = [
                 ],
               ]
 
-new = tc.concatenate([C,C,C])
+C2 = tc.edge_changes()
+
+C2.N = 4
+C2.edges_initial = [ (3,1) ]
+C2.t0 = 1.0
+C2.tmax = 3.0
+C2.t = [ 2.0, ]
+C2.edges_in = [
+                [
+                    (3,2), (0,2)
+                ],
+             ]
+C2.edges_out = [
+                [
+                    (3,1)
+                ],
+              ]
+
+new = tc.concatenate([C,C2,C])
 
 print new.N
 print new.t0
