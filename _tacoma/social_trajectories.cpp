@@ -26,6 +26,7 @@
 #include "Utilities.h"
 #include "ResultClasses.h"
 #include "social_trajectories.h"
+#include "conversion.h"
 
 using namespace std;
 
@@ -431,7 +432,6 @@ vector < social_trajectory_entry >
 
     vector < social_trajectory_entry > social_trajectory;
 
-
     // iterate through all changes
     while (it_edges_in != all_edges_in.end() and it_time != time.end() and it_edges_out != all_edges_out.end() )
     {
@@ -693,12 +693,19 @@ vector < social_trajectory_entry >
     
 }
 
-vector < edge_trajectory_entry >
+edge_trajectories
         edge_trajectories_from_edge_changes(
             edge_changes &list_of_edge_changes,
+            const bool return_edge_similarities,
             const bool verbose
         )
 {
+    if (return_edge_similarities)
+    {
+        edge_lists el = convert_edge_changes(list_of_edge_changes);
+        return edge_trajectories_from_edge_lists(el);
+    }
+
     // get references to edge_list and time
     vector < vector < pair < size_t, size_t > > > & all_edges_in = list_of_edge_changes.edges_in;
     vector < vector < pair < size_t, size_t > > > & all_edges_out = list_of_edge_changes.edges_out;
@@ -729,7 +736,7 @@ vector < edge_trajectory_entry >
     // vectors and sets dealing with the change of edges
     map < size_t, size_t > hash_to_int;
 
-    vector < edge_trajectory_entry > edge_trajectories;
+    vector < edge_trajectory_entry > trajectories;
 
     for(auto &edge: list_of_edge_changes.edges_initial)
     {
@@ -737,7 +744,7 @@ vector < edge_trajectory_entry >
             swap(edge.first,edge.second);
         size_t edge_int = get_edge_integer(N,edge,hash_to_int);
         edge_trajectory_entry this_entry;
-        if (edge_int == edge_trajectories.size())
+        if (edge_int == trajectories.size())
         {
             this_entry.edge = edge;
             this_entry.last_time_active = t0;
@@ -745,7 +752,7 @@ vector < edge_trajectory_entry >
         else
             throw domain_error("Doubling of edges in edge_changes.edges_initial");
 
-        edge_trajectories.push_back(this_entry);
+        trajectories.push_back(this_entry);
     }
 
 
@@ -766,10 +773,10 @@ vector < edge_trajectory_entry >
 
             size_t edge_int = get_edge_integer(N,edge,hash_to_int);
 
-            if (edge_int == edge_trajectories.size())
+            if (edge_int == trajectories.size())
                 throw length_error("an edge was in edges_out, but did not exist before");
 
-            edge_trajectory_entry &this_entry = edge_trajectories[edge_int];
+            edge_trajectory_entry &this_entry = trajectories[edge_int];
             this_entry.time_pairs.push_back(make_pair(this_entry.last_time_active, t));
             this_entry.last_time_active = t0 - 1000.0;
         }
@@ -781,16 +788,16 @@ vector < edge_trajectory_entry >
 
             size_t edge_int = get_edge_integer(N,edge,hash_to_int);
 
-            if (edge_int == edge_trajectories.size())
+            if (edge_int == trajectories.size())
             {
                 edge_trajectory_entry this_entry;
                 this_entry.edge = edge;
                 this_entry.last_time_active = t;
-                edge_trajectories.push_back(this_entry);
+                trajectories.push_back(this_entry);
             }
             else
             {
-                edge_trajectories[edge_int].last_time_active = t;
+                trajectories[edge_int].last_time_active = t;
             }
 
         }
@@ -800,19 +807,27 @@ vector < edge_trajectory_entry >
         it_time++;
     }
 
-    for(auto &this_entry: edge_trajectories)
+    for(auto &this_entry: trajectories)
     {
         if (this_entry.last_time_active >= t0)
             this_entry.time_pairs.push_back(make_pair(this_entry.last_time_active,tmax));
     }
 
-    return edge_trajectories;
+    edge_trajectories traj;
+
+    vector < tuple < size_t, size_t, double > > sim;
+
+    traj.trajectories = trajectories;
+    traj.edge_similarities = sim;
+
+    return traj;
     
 }
 
-vector < edge_trajectory_entry >
+edge_trajectories
         edge_trajectories_from_edge_lists(
             edge_lists &list_of_edge_lists,
+            const bool return_edge_similarities,
             const bool verbose
         )
 {
@@ -842,7 +857,9 @@ vector < edge_trajectory_entry >
     // vectors and sets dealing with the change of edges
     map < size_t, size_t > hash_to_int;
 
-    vector < edge_trajectory_entry > edge_trajectories;
+    vector < edge_trajectory_entry > these_edge_trajectories;
+
+    map < pair < size_t, size_t >, edge_weight > similarities;
 
     // iterate through all changes
     while (it_edges != all_edges.end() and it_time != time.end() )
@@ -856,35 +873,117 @@ vector < edge_trajectory_entry >
         else
             next_time = *(it_time+1);
 
-        for(auto &edge: *it_edges)
+        for(auto it_edge = it_edges->begin();
+                 it_edge != it_edges->end();
+                 ++it_edge)
         {
+            if(verbose)
+                cout << "evaluating new edge" << endl;
+
+            pair < size_t, size_t > &edge = *it_edge;
+
             if (edge.first > edge.second)
                 swap(edge.first,edge.second);
 
             size_t edge_int = get_edge_integer(N,edge,hash_to_int);
 
-            if (edge_int == edge_trajectories.size())
+            if (edge_int == these_edge_trajectories.size())
             {
                 edge_trajectory_entry this_entry;
                 this_entry.edge = edge;
                 this_entry.time_pairs.push_back(make_pair(t,next_time));
-                edge_trajectories.push_back(this_entry);
+                these_edge_trajectories.push_back(this_entry);
             }
             else
             {
-                edge_trajectory_entry &this_entry = edge_trajectories[edge_int];
+                edge_trajectory_entry &this_entry = these_edge_trajectories[edge_int];
                 if (this_entry.time_pairs.back().second == t)
                     this_entry.time_pairs.back().second = next_time;
                 else
                     this_entry.time_pairs.push_back(make_pair(t,next_time));
             }
 
+            if(verbose)
+                cout << "this edge = ( " << edge.first << ", " << edge.second << " )" << endl;
+
+        }
+
+        if (return_edge_similarities)
+        {
+            for(auto it_edge = it_edges->begin();
+                     it_edge != it_edges->end();
+                     ++it_edge)
+            {
+                if(verbose)
+                    cout << "evaluating new edge" << endl;
+
+                pair < size_t, size_t > &edge = *it_edge;
+
+                if (edge.first > edge.second)
+                    swap(edge.first,edge.second);
+
+                size_t edge_int = get_edge_integer(N,edge,hash_to_int);
+
+                auto it_next_edge = it_edge+1;
+                for(; it_next_edge != it_edges->end(); ++it_next_edge) 
+                {
+
+                    pair < size_t, size_t > & next_edge = *it_next_edge;
+
+                    if(verbose)
+                        cout << "    next edge = ( " << next_edge.first << ", " << next_edge.second << " )" << endl;
+
+                    if (next_edge.first > next_edge.second)
+                        swap(next_edge.first, next_edge.second);
+
+                    size_t &i = edge.first;
+                    size_t &j = edge.second;
+                    size_t &u = next_edge.first;
+                    size_t &v = next_edge.second;
+
+                    if ( (i==u) or (i==v) or (j==u) or (j==v) )
+                    {
+
+                        if (verbose)
+                            cout << "    now integrating edge pair" << endl;
+
+                        size_t edge_int_2 = get_edge_integer(N,next_edge,hash_to_int);
+
+                        if (verbose)
+                            cout << "    eint1 = " << edge_int << ", eint2 = " << edge_int_2 << endl;
+
+                        similarities[ 
+                                        get_sorted_pair( edge_int, edge_int_2 ) 
+                                    ].value += (next_time - t);
+
+                        if (verbose)
+                            cout << "    new_similarity = " << 
+                                similarities[ 
+                                                get_sorted_pair( edge_int, edge_int_2 ) 
+                                            ].value << endl;
+
+                    }
+                }
+            }
         }
 
         it_edges++;
         it_time++;
     }
 
-    return edge_trajectories;
+    edge_trajectories traj;
+
+    vector < tuple < size_t, size_t, double > > sim;
+
+    for(auto const &entry: similarities)
+    {
+        sim.push_back( make_tuple( entry.first.first, entry.first.second, entry.second.value ));
+    }
+    
+    traj.trajectories = these_edge_trajectories;
+    traj.edge_similarities = sim;
+
+    return traj;
     
 }
+

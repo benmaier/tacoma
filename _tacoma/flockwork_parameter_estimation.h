@@ -23,12 +23,11 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef __CONVERSION_H__
-#define __CONVERSION_H__
+#ifndef __FW_PARAM_EST_H__
+#define __FW_PARAM_EST_H__
 
 #include "Utilities.h"
 #include "ResultClasses.h"
-#include "social_trajectories.h"
 
 #include <iostream>
 #include <algorithm>
@@ -42,25 +41,17 @@
 #include <random>
 #include <ctime>
 #include <tuple>
-#include <functional>
 
 using namespace std;
 
-set < size_t > 
-    get_edge_integer_set(
-            vector < pair < size_t, size_t > > const & edges,
-            size_t const & N
-            );
+flockwork_args
+     get_flockwork_P_args(
+             edge_changes &list_of_edge_changes,
+             double dt,
+             size_t N_time_steps,
+             map < pair < size_t, size_t >, double > aggregated_network,
+             const bool ensure_empty_network,
+             const bool verbose
+         );
 
-edge_lists
-     convert_edge_changes(
-            edge_changes &list_of_edge_changes,
-            const bool verbose = false
-            );
-
-edge_changes
-     convert_edge_lists(
-            edge_lists &list_of_edge_lists,
-            const bool verbose = false
-        );
 #endif

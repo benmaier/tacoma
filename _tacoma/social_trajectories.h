@@ -92,15 +92,17 @@ size_t get_edge_integer(
             map < size_t, size_t > &hash_to_int
         );
 
-vector < edge_trajectory_entry >
+edge_trajectories
         edge_trajectories_from_edge_lists(
             edge_lists &list_of_edge_lists,
-            const bool verbose
+            const bool return_edge_similarities = false,
+            const bool verbose = false
         );
 
-vector < edge_trajectory_entry >
+edge_trajectories
         edge_trajectories_from_edge_changes(
             edge_changes &list_of_edge_changes,
-            const bool verbose
+            const bool return_edge_similarities = false,
+            const bool verbose = false
         );
 #endif

@@ -79,7 +79,6 @@ def bin(temporal_network,*args,**kwargs):
         if `N_time_steps` was provided).
 
         py::arg("temporal_network"), -- the temporal network
-        py::arg("node"),             -- the node for which to compute the trajectory
         py::arg("dt") = 0.0,         -- dt of the time bin
         py::arg("N_time_steps") = 0, -- number of time bins (use either this or dt).
         py::arg("sample_aggregates") = false, -- if this is True, behavior is equal to `bin_temporal_network()`
@@ -106,7 +105,6 @@ def sample(temporal_network,*args,**kwargs):
         if `N_time_steps` was provided).
 
         py::arg("temporal_network"), -- the temporal network
-        py::arg("node"),             -- the node for which to compute the trajectory
         py::arg("dt") = 0.0,         -- dt of the time bin
         py::arg("N_time_steps") = 0, -- number of time bins (use either this or dt).
         py::arg("sample_aggregates") = false, -- if this is True, behavior is equal to `bin_temporal_network()`
@@ -265,16 +263,24 @@ def gillespie_SIRS(temporal_network,*args,**kwargs):
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
 
-def edge_trajectories(temporal_network,*args,**kwargs):
+def get_edge_trajectories(temporal_network,*args,**kwargs):
     """
         Computes the times in which each edge existed.
 
         py::arg("temporal_network"),
+        py::arg("return_edge_similarities"),
         py::arg("verbose") = false
 
-        Returns a list of `edge_trajectory_entry` objects, which contain
-        the `.time_pairs` attributes, a list of time pairs (t0, t1)
-        for time t0 <= t <= t1 in which the edge existed.
+        Returns an instance of `edge_trajectories`
+            edge_trajectories.trajectories -- a list of `edge_trajectory_entry` objects, which contain
+                                              the `.time_pairs` attributes, a list of time pairs (t0, t1)
+                                              for time t0 <= t <= t1 in which the edge existed and `.edge`
+                                              a pair of node integers.
+            edge_trajectories.edge_similarities -- a list of triples ( u, v, similarity ) where
+                                                   `u` and `v` refer to the edge indices in
+                                                   `edge_trajectories.trajectories` and similarity
+                                                   is the integrated time both edges were switched on
+                                                   while being connected to the same node.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -353,3 +359,68 @@ def concatenate(list_of_temporal_networks,*args,**kwargs):
         raise ValueError('Unknown temporal network format: ' + str(type(_t)))
 
     return result
+
+def flockwork_P_args(temporal_network,*args,**kwargs):
+    """
+        Bins an `edge_changes` instance for each `dt` (after each step, respectively,
+        if `N_time_steps` was provided) and computes the rewiring rate and P 
+        from the binned `edges_in` and `edges_out`. For DTU data use dt = 3600,
+        for sociopatterns use dt = 600.
+
+        py::arg("temporal_network"),             -- the temporal network
+        py::arg("t_run_total") = None,           -- this is just plainly copied to the returned 
+                                                    kwargs. If it is set to `None`, t_run_total
+                                                    will be set to `temporal_network.tmax`
+        py::arg("dt") = 0.0,                     -- dt of the time bin
+        py::arg("N_time_steps") = 0,             -- number of time bins (use either this or dt).
+        py::arg("aggregated_network") = {}       -- dict[edge] -> similarity, if this is given,
+                                                    the kwargs are supposed to be for the function
+                                                    `flockwork_P_varying_rates_neighbor_affinity`,
+                                                    you can get this network from the `aggregated_network`
+                                                    property from the results returned from
+                                                    `measure_group_sizes_and_durations`
+        py::arg("ensure_empty_network") = false, -- if this is True, bins where the original network
+                                                    is empty (n_edges = 0) will be an artificially 
+                                                    set high gamma with P = 0, such that nodes will
+                                                    lose all edges.
+        py::arg("use_preferential_node_selection") = false -- this is just plainly copied to 
+                                                              the returned kwargs if `aggregated_network`
+                                                              is not empty
+        py::arg("verbose") = false
+
+        Returns a dictionary of kwargs for the functions `flockwork_P_varying_rates` or 
+        `flockwork_P_varying_rates_neighbor_affinity`.
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    new_kwargs = {}
+    with_affinity = 'aggregated_network' in kwargs and len(kwargs['aggregated_network']) > 0
+    if with_affinity and\
+       'use_preferential_node_selection' in kwargs:
+            new_kwargs['use_preferential_node_selection'] = kwargs.pop('use_preferential_node_selection')
+
+    if 't_run_total' in kwargs and kwargs['t_run_total'] is not None:
+        new_kwargs['t_run_total'] = kwargs.pop('t_run_total')
+    elif 't_run_total' in kwargs and kwargs['t_run_total'] is None:
+        new_kwargs['t_run_total'] = temporal_network.tmax
+        kwargs.pop('t_run_total')
+    else:
+        new_kwargs['t_run_total'] = temporal_network.tmax
+
+    if type(temporal_network) == el:
+        temporal_network = convert(temporal_network)
+
+    if type(temporal_network) == ec:
+        kw = get_flockwork_P_args(temporal_network,*args,**kwargs)
+        new_kwargs['E'] = kw.E
+        new_kwargs['N'] = kw.N
+        new_kwargs['P'] = kw.P
+        new_kwargs['rewiring_rate'] = kw.rewiring_rate
+        new_kwargs['tmax'] = kw.tmax
+        if with_affinity:
+            new_kwargs['neighbor_affinity'] = kw.neighbor_affinity
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+
+    return new_kwargs

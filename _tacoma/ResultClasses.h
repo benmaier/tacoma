@@ -157,4 +157,24 @@ struct edge_trajectory_entry {
     double last_time_active;
     bool is_active;
 };
+
+struct edge_trajectories {
+    vector < edge_trajectory_entry > trajectories;
+    vector < tuple < size_t, size_t, double > > edge_similarities;
+};
+
+struct flockwork_args {
+    size_t N;
+    vector < pair < size_t, size_t > > E;
+    vector < double > P;
+    vector < pair < double, double > > rewiring_rate;
+    vector < pair < vector < size_t >, vector < double > > > neighbor_affinity;
+    double tmax;
+    vector < double > new_time;
+    vector < size_t > m_in;
+    vector < size_t > m_out;
+    vector < size_t > m;
+
+};
+
 #endif
