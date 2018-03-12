@@ -44,6 +44,7 @@
 #include <ctime>
 #include <tuple>
 #include <functional>
+#include <string>
 
 using namespace std;
 

@@ -142,6 +142,9 @@ edge_lists
     result.N = N;
     result.edges = new_list_of_edge_lists;
     result.t = new_time;
+    result.time_unit = list_of_edge_lists.time_unit;
+    result.notes = list_of_edge_lists.notes + "\n This data was sampled for dt = " + to_string(dt);
+    result.int_to_node = list_of_edge_lists.int_to_node;
 
     return result;
 }
@@ -281,6 +284,9 @@ edge_lists
     result.N = N;
     result.edges = new_list_of_edge_lists;
     result.t = new_time;
+    result.time_unit = list_of_edge_changes.time_unit;
+    result.notes = list_of_edge_changes.notes + "\n This data was binned for dt = " + to_string(dt);
+    result.int_to_node = list_of_edge_changes.int_to_node;
 
     return result;
 }
@@ -411,6 +417,9 @@ edge_lists
     result.N = N;
     result.edges = new_list_of_edge_lists;
     result.t = new_time;
+    result.time_unit = list_of_edge_lists.time_unit;
+    result.notes = list_of_edge_lists.notes + "\n This data was binned for dt = " + to_string(dt);
+    result.int_to_node = list_of_edge_lists.int_to_node;
 
     return result;
 }
@@ -538,6 +547,9 @@ edge_lists
     result.N = N;
     result.edges = new_list_of_edge_lists;
     result.t = new_time;
+    result.time_unit = list_of_edge_changes.time_unit;
+    result.notes = list_of_edge_changes.notes + "\n This data was binned for dt = " + to_string(dt);
+    result.int_to_node = list_of_edge_changes.int_to_node;
 
     return result;
 }

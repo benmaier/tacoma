@@ -66,9 +66,25 @@ edge_changes
 
     double last_tmax = t0;
 
+    set < string > time_units;
+    string all_notes = "";
+
+    // TODO: write a procedure that efficiently checks the 
+    // node integer maps and remaps integers which 
+    // point to different node names
+    // map < size_t, string > new_int_to_node;
+
     // iterate through all edge_changes
     while ( ec_it != ec_lists.end() )
     {
+
+        time_units.insert( ec_it->time_unit );
+
+        if (time_units.size() > 1)
+            throw domain_error("instances of `edge_changes` have varying time_units");
+
+        all_notes += "<< NEXT NOTES >> " + ec_it->notes + " ";
+                
         vector < set < size_t > > G(N);
         graph_from_edgelist(G,ec_it->edges_initial);
 
@@ -177,6 +193,8 @@ edge_changes
     new_ec.edges_in = new_edges_in;
     new_ec.edges_out = new_edges_out;
     new_ec.t = new_time;
+    new_ec.notes = all_notes;
+    new_ec.time_unit = *time_units.begin();
 
     return new_ec;
 }
@@ -207,9 +225,23 @@ edge_lists
     
     double last_tmax = ec_it->t.front();
 
+    set < string > time_units;
+    string all_notes = "";
+
+    // TODO: write a procedure that efficiently checks the 
+    // node integer maps and remaps integers which 
+    // point to different node names
+
     // iterate through all edge_changes
     while ( ec_it != el_lists.end() )
     {
+        time_units.insert( ec_it->time_unit );
+
+        if (time_units.size() > 1)
+            throw domain_error("instances of `edge_lists` have varying time_units");
+
+        all_notes += "<< NEXT NOTES >> " + ec_it->notes + " ";
+                
         // create iterators
         auto it_edges = (ec_it->edges).begin();
         auto it_time = (ec_it->t).begin();
@@ -239,6 +271,9 @@ edge_lists
     new_ec.tmax = tmax;
     new_ec.edges = new_edges;
     new_ec.t = new_time;
+    new_ec.notes = all_notes;
+    new_ec.time_unit = *time_units.begin();
+
 
     return new_ec;
 }

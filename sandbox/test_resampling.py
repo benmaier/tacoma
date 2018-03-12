@@ -21,16 +21,17 @@ L.edges = [
               (0,1)
             ],
            ]
+L.time_unit = 's'
 
-
-new = tc.concatenate_edge_lists([L,L])
+new = tc.bin_from_edge_lists(L,N_time_steps=N_time_steps,verbose=True)
 
 print new.N
 print new.t
 print new.tmax
 print new.edges
+print new.notes
+print new.time_unit
 
-"""
 print "=====binning from edge lists======="
 
 new = tc.bin_from_edge_lists(L,N_time_steps=N_time_steps,verbose=True)
@@ -79,4 +80,3 @@ print new.N
 print new.t
 print new.tmax
 print new.edges
-"""

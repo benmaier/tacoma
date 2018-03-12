@@ -81,4 +81,5 @@ print "tmax =", new.tmax
 print "edges_in =", new.edges_in
 print "edges_out =", new.edges_out
 print "edges_initial =", new.edges_initial
+print new.notes
 

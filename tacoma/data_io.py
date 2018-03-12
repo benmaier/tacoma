@@ -117,8 +117,6 @@ def read_json_taco(fp):
 
     return load_json_taco(fp)
 
-
-
 def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatterns.org/files/datasets/003/ht09_contact_list.dat.gz",
                                                       filename="~/.tacoma/ht09.taco",
                                                       ):

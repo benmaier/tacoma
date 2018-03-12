@@ -121,6 +121,9 @@ edge_lists
     new_edge_lists.tmax = tmax;
     new_edge_lists.t = new_time;
     new_edge_lists.edges = new_edges;
+    new_edge_lists.time_unit = list_of_edge_changes.time_unit;
+    new_edge_lists.notes = list_of_edge_changes.notes + "\n This data was converted from an `edge_changes` instance.";
+    new_edge_lists.int_to_node = list_of_edge_changes.int_to_node;
 
     return new_edge_lists;
     
@@ -216,6 +219,9 @@ edge_changes
     new_edge_changes.edges_in = edges_in;
     new_edge_changes.edges_out = edges_out;
     new_edge_changes.edges_initial = initial_edges;
+    new_edge_changes.time_unit = list_of_edge_lists.time_unit;
+    new_edge_changes.notes = list_of_edge_lists.notes + "\n This data was converted from an `edge_lists` instance.";
+    new_edge_changes.int_to_node = list_of_edge_lists.int_to_node;
     
     return new_edge_changes;
 }
