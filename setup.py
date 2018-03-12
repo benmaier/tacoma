@@ -106,7 +106,12 @@ setup(
     long_description = '',
     packages = setuptools.find_packages(),
     ext_modules = ext_modules,
-    install_requires = ['pybind11'],
+    install_requires = [
+            'pybind11>=2.0.0',
+            'wget',
+            'numpy',
+            'scipy',
+            ],
     cmdclass = {'build_ext': BuildExt},
     zip_safe = False,
 )
