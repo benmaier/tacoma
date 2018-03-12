@@ -424,3 +424,6 @@ def flockwork_P_args(temporal_network,*args,**kwargs):
         raise ValueError('Unknown temporal network format: ' + str(type(_t)))
 
     return new_kwargs
+
+
+from .data_io import *
