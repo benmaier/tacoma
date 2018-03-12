@@ -6,6 +6,8 @@ TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal 
 
 If you get compiling errors, make sure that [https://github.com/pybind/pybind11](pybind11) is installed.
 
+    $ git clone https://github.com/benmaier/tacoma
+    $ pip install pybind11
     $ pip install ./tacoma
 
 ## Some Explanations
@@ -60,7 +62,7 @@ class edge_changes():
 
         # this list contains the edges of the initial Graph
         # it has to be a list of tuples containing two unsigned integers
-        self.E 
+        self.edges_initial 
 
         # this list contains the event times
         # it has to be a list of floats
@@ -79,7 +81,7 @@ class edge_changes():
 Even though this package started as a collection of simulation functions for the Flockwork model, 
 it grew to incorporate other models of temporal networks, as well. Specifically, I implemented a version of
 the dynamic random geometric graph model (dynamic RGGs), as well as the model by Zhao, Stehle, Bianconi, and Barrat (ZSBB model).
-In the following I want to explain the work flow for generating models and measuring observables.
+In the following I explain the work flow for generating models and measuring observables.
 
 Both the Flockwork models as well as the ZSBB model are based on node-centric events, i.e. nodes leaving
 groups or nodes joining groups. Hence, for an event time `t`, it does not make much sense to save a whole edge list.
