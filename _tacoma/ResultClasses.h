@@ -79,6 +79,8 @@ struct edge_changes
     double t0;
     double tmax;
     map < size_t, string > int_to_node;
+    string time_unit;
+    string notes;
 
     edge_changes(){};
     edge_changes(const edge_changes_with_histograms & other){
@@ -115,6 +117,8 @@ struct edge_lists
     size_t N;
     double tmax;
     map < size_t, string > int_to_node;
+    string time_unit;
+    string notes;
 
     edge_lists(){};
     edge_lists(const edge_lists_with_histograms & other){

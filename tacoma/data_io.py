@@ -35,6 +35,8 @@ def write_json_taco(temporal_network,fp):
         this_data['edges_in'] = temporal_network.edges_in
         this_data['edges_out'] = temporal_network.edges_out
         this_data['int_to_node'] = temporal_network.int_to_node
+        this_data['notes'] = temporal_network.notes
+        this_data['time_unit'] = temporal_network.time_unit
 
     elif type(temporal_network) == tc.edge_lists:
         this_data['type'] = 'edge_lists'
@@ -43,6 +45,8 @@ def write_json_taco(temporal_network,fp):
         this_data['N'] = temporal_network.N
         this_data['edges'] = temporal_network.edges
         this_data['int_to_node'] = temporal_network.int_to_node
+        this_data['notes'] = temporal_network.notes
+        this_data['time_unit'] = temporal_network.time_unit
 
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
@@ -84,6 +88,8 @@ def load_json_taco(fp):
         temporal_network.edges_in = this_data['edges_in']
         temporal_network.edges_out = this_data['edges_out']
         temporal_network.int_to_node = this_data['int_to_node']
+        temporal_network.notes = this_data['notes']
+        temporal_network.time_unit = this_data['time_unit']
 
     elif this_data['type'] == 'edge_lists':
         temporal_network = tc.edge_lists()
@@ -92,6 +98,8 @@ def load_json_taco(fp):
         temporal_network.N = this_data['N']
         temporal_network.edges = this_data['edges']
         temporal_network.int_to_node = this_data['int_to_node']
+        temporal_network.notes = this_data['notes']
+        temporal_network.time_unit = this_data['time_unit']
 
     else:
         raise ValueError('file is corrupted, unknown temporal network format: ' + this_data['type'])
@@ -196,6 +204,19 @@ def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatte
     el.tmax = tmax
     el.edges = edges
     el.t = time
+    el.time_unit = 's'
+    el.notes = """
+        This data is binned.
+
+        In this data, t0 = 0.0 corresponds to 8am on Jun 29th 2009 (UNIX time 1246255200).
+
+        For more info, please visit http://www.sociopatterns.org/datasets/hypertext-2009-dynamic-contact-network/ .
+
+        If you use this data, please cite
+
+        L. Isella et al.,  What's in a crowd? Analysis of face-to-face behavioral networks, 
+        Journal of Theoretical Biology 271, 166 (2011).
+        """
 
     # verifying that this is a valid temporal network
     tc.verify(el)
@@ -236,6 +257,8 @@ if __name__ == "__main__":
     print el.tmax
     print el.t[:10]
     print el.edges[:10]
+    print el.notes
+    print el.time_unit
 
 
 
