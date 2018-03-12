@@ -40,6 +40,7 @@
 #include <random>
 #include <ctime>
 #include <tuple>
+#include <string>
 
 namespace EPI {
     enum {
@@ -77,6 +78,7 @@ struct edge_changes
     vector < pair < size_t, size_t > > edges_initial; 
     double t0;
     double tmax;
+    map < size_t, string > int_to_node;
 
     edge_changes(){};
     edge_changes(const edge_changes_with_histograms & other){
@@ -112,6 +114,7 @@ struct edge_lists
     vector < vector < pair < size_t, size_t > > > edges;
     size_t N;
     double tmax;
+    map < size_t, string > int_to_node;
 
     edge_lists(){};
     edge_lists(const edge_lists_with_histograms & other){
