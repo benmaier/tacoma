@@ -26,6 +26,7 @@ print L.N
 print L.t
 print L.tmax
 print L.edges
+print L.int_to_node
 
 write_json_taco(L,"test_write.taco")
 new = load_json_taco("test_write.taco")
