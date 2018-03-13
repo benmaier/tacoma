@@ -87,7 +87,7 @@ def load_json_taco(fp):
         temporal_network.edges_initial = this_data['edges_initial']
         temporal_network.edges_in = this_data['edges_in']
         temporal_network.edges_out = this_data['edges_out']
-        temporal_network.int_to_node = this_data['int_to_node']
+        temporal_network.int_to_node = { int(i): s for i, s in this_data['int_to_node'].items() }
         temporal_network.notes = this_data['notes']
         temporal_network.time_unit = this_data['time_unit']
 
@@ -97,7 +97,7 @@ def load_json_taco(fp):
         temporal_network.tmax = this_data['tmax']
         temporal_network.N = this_data['N']
         temporal_network.edges = this_data['edges']
-        temporal_network.int_to_node = this_data['int_to_node']
+        temporal_network.int_to_node = { int(i): s for i, s in this_data['int_to_node'].items() }
         temporal_network.notes = this_data['notes']
         temporal_network.time_unit = this_data['time_unit']
 
@@ -177,12 +177,12 @@ def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatte
             if i not in node_to_int:
                 this_int = len(node_to_int)
                 node_to_int[i] = len(node_to_int)
-                int_to_node[this_int] = i
+                int_to_node[this_int] = str(i)
 
             if j not in node_to_int:
                 this_int = len(node_to_int)
                 node_to_int[j] = len(node_to_int)
-                int_to_node[this_int] = j
+                int_to_node[this_int] = str(j)
 
             # save the edge
             edges[-1].append(tuple(sorted([
@@ -215,6 +215,7 @@ def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatte
         L. Isella et al.,  What's in a crowd? Analysis of face-to-face behavioral networks, 
         Journal of Theoretical Biology 271, 166 (2011).
         """
+    el.int_to_node = int_to_node
 
     # verifying that this is a valid temporal network
     tc.verify(el)

@@ -614,3 +614,57 @@ group_sizes_and_durations
     
 }
 
+vector < pair < double, double > >
+    mean_degree_from_edge_lists(
+                edge_lists &el 
+               )
+{
+    vector < pair < double, double > > result;
+    double N = (double) el.N;
+    auto it_time = el.t.begin();
+
+    for(auto const &this_el: el.edges)
+    {
+        double t = *it_time;
+        double m = (double) this_el.size();
+        result.push_back( make_pair( t, 2.0*m / N ) );
+
+        it_time++;
+    }
+
+    double last_k = result.back().second;
+    result.push_back( make_pair( el.tmax, last_k ) );
+
+    return result;
+}
+
+vector < pair < double, double > >
+    mean_degree_from_edge_changes(
+                edge_changes &ec
+               )
+{
+    vector < pair < double, double > > result;
+    double N = (double) ec.N;
+    double t = ec.t0;
+    long m = (long) ec.edges_initial.size();
+    result.push_back( make_pair( t, 2.0 * ((double) m) / N ) );
+
+    auto it_edges_in = ec.edges_in.begin();
+    auto it_edges_out = ec.edges_out.begin();
+
+    for(auto const &t: ec.t)
+    {
+        m += it_edges_in->size();
+        m -= it_edges_out->size();
+
+        result.push_back( make_pair( t, 2.0 * ((double) m) / N ) );
+
+        it_edges_in++;
+        it_edges_out++;
+    }
+
+    double last_k = result.back().second;
+    result.push_back( make_pair( ec.tmax, last_k ) );
+
+    return result;
+}

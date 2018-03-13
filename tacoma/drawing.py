@@ -35,10 +35,15 @@ def draw_edge_lists(L):
 def draw_edges(traj,
                time_normalization_factor = 1.,
                time_unit = None,
+               ax = None,
                fit = False,
                ):
 
-    fig, ax = pl.subplots(1,1)
+    if ax is None:
+        fig, ax = pl.subplots(1,1)
+    else:
+        fig = None
+        
     lines = []
     max_i = len(traj)
     all_t_max = []

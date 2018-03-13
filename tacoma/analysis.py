@@ -7,31 +7,12 @@ import matplotlib.pyplot as pl
 
 from tacoma import marker_sequence
 from tacoma import color_sequence
+from tacoma import get_logarithmic_histogram
 
-
-def get_logarithmic_histogram(data,
-                              bins, #number of bins
-                              return_bin_means = True,
-                              density = True):
-    data = np.array(data)
-    data = data[data>0]
-    MIN = min(data)
-    MAX = max(data)
-    y, x = np.histogram(data,
-                        bins = np.logspace(log10(MIN), log10(MAX), bins+1,base=10.),
-                        density = density,
-                       )
-    
-    new_x = np.sqrt(x[1:]*x[:-1])
-
-    if return_bin_means:
-        return new_x, y
-    else:
-        return x, y
 
 
 def temporal_network_group_analysis(result,
-                                    max_group = 8,
+                                    max_group = 5,
                                     time_normalization_factor = 1.,
                                     time_unit = None,
                                     plot_step = False,
@@ -61,6 +42,7 @@ def temporal_network_group_analysis(result,
     res_dur = plot_group_durations(result,
                                    ax[2],
                                    time_normalization_factor = time_normalization_factor,
+                                   max_group = max_group,
                                    time_unit = time_unit,
                                    plot_step = plot_step,
                                    fit_power_law = fit_power_law,
@@ -172,23 +154,24 @@ def plot_group_durations(result,
     res = {}
     
     for size in range(2,max_group+1):
-        data = time_normalization_factor * np.array(result.group_durations[size],dtype=float)
-        if not plot_step:
-            x, y = get_logarithmic_histogram(data,bins)
-            ax.plot(x,y,
-                    ls='',
-                    marker=marker_sequence[size % len(marker_sequence)],
-                    label='$m=%d$'%size,
-                    ms=4,
-                    mew=1,
-                    mfc='None'
+        if len(result.group_durations[size])>6:
+            data = time_normalization_factor * np.array(result.group_durations[size],dtype=float)
+            if not plot_step:
+                x, y = get_logarithmic_histogram(data,bins)
+                ax.plot(x,y,
+                        ls='',
+                        marker=marker_sequence[size % len(marker_sequence)],
+                        label='$m=%d$'%size,
+                        ms=4,
+                        mew=1,
+                        mfc='None'
+                        )
+            else:
+                x, y = get_logarithmic_histogram(data,bins,return_bin_means=False)
+                ax.step(x,np.append(y,y[-1]),
+                        where='post',
                     )
-        else:
-            x, y = get_logarithmic_histogram(data,bins,return_bin_means=False)
-            ax.step(x,np.append(y,y[-1]),
-                    where='post',
-                    )
-        res[size] = (x,y)
+            res[size] = (x,y)
         
     ax.set_xscale('log')
     ax.set_yscale('log')

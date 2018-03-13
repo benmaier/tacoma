@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import numpy.polynomial.polynomial as poly
+from numpy.polynomial import Polynomial
 
 from scipy.optimize import fsolve
 from scipy.optimize import minimize
@@ -12,6 +14,12 @@ from tacoma import edge_changes_with_histograms as ec_h
 from tacoma.analysis import get_logarithmic_histogram
 from tacoma.power_law_fitting import fit_power_law_clauset
 from tacoma import _get_raw_temporal_network
+from tacoma import mean_coordination_number
+from tacoma import convert
+from tacoma import get_flockwork_P_args
+import tacoma as tc
+
+# ========================================================= ZSBB ==================================================
 
 def ZSBB_mean_coordination_number(b0,lam,N,b1):
 
@@ -23,33 +31,16 @@ def ZSBB_mean_coordination_number(b0,lam,N,b1):
 
     return pi_10 / (2.0*lam) * s
 
-def b0_func(b0,lam):
+def ZSBB_b0_func(b0,lam):
     return b0 * (2.0+(1.0-lam/(2*lam-1))) + 1
 
 
-def get_mean_coordination_number(group_sizes_and_durations):
 
-
-    group_size_histogram = np.array([
-                            (size, val)\
-                            for size, val in enumerate(group_sizes_and_durations.aggregated_size_histogram)\
-                            if size > 0
-                        ],dtype=float)
-
-    N = group_size_histogram.shape[0]
-    m = group_size_histogram[:,0]   # group sizes
-    N_m = group_size_histogram[:,1] # mean number of groups existing
-
-    P_k = m * N_m / N # degree distribution
-    
-    return m.dot(P_k) - 1.0
-
-
-def estimate_ZSBB_parameters(temporal_network,
-                             group_sizes_and_durations = None,
-                             fit_discrete = False,
-                             dt = None,
-                            ):
+def estimate_ZSBB_args(temporal_network,
+                       group_sizes_and_durations = None,
+                       fit_discrete = False,
+                       dt = None,
+                       ):
 
     if fit_discrete and dt is None:
         raise ValueError('If the data is supposed to be treated as discrete, a value for `dt` must be provided in order to norm the group size durations.')
@@ -93,18 +84,18 @@ def estimate_ZSBB_parameters(temporal_network,
     else:
         alpha_0, err, xmin = fit_power_law_clauset(result.group_durations[1])
 
-    mean_n = get_mean_coordination_number(result)
+    mean_n = mean_coordination_number(result)
 
     def equations(p):
         b0, lam = p
         n = ZSBB_mean_coordination_number(b0,lam,N,b1)
-        al0 = b0_func(b0,lam)
+        al0 = ZSBB_b0_func(b0,lam)
         return (n - mean_n, al0 - alpha_0)
 
     def cost(p):
         b0, lam = p
         n = ZSBB_mean_coordination_number(b0,lam,N,b1)
-        al0 = b0_func(b0,lam)
+        al0 = ZSBB_b0_func(b0,lam)
         return np.abs((n - mean_n)/mean_n) + np.abs((al0 - alpha_0)/alpha_0)
 
     #b0, lam = fsolve(equations,(0.7,0.7))
@@ -114,12 +105,12 @@ def estimate_ZSBB_parameters(temporal_network,
     if lam < 0.5:
         lam = 0.51
     elif lam > 1:
-        lam = 1
+        lam = 1.0
 
     if b0 < 0.5:
         b0 = 0.51
     elif b0 > 1:
-        b0 = 1
+        b0 = 1.0
 
     if b0 <= (2*lam-1) / (3*lam-1.0):
         b0 = (2*lam-1) / (3*lam-1.0) + 0.01
@@ -135,9 +126,135 @@ def estimate_ZSBB_parameters(temporal_network,
     kwargs['E'] = []
     kwargs['N'] = N
     kwargs['return_after_equilibration_only'] = True
-    kwargs['t_equilibration'] = 10000*N
+    kwargs['t_equilibration'] = float(10000*N)
 
     return kwargs
+
+# ==================================================== FLOCKWORK P-MODEL ===============================================
+
+def estimate_flockwork_P_args(temporal_network,*args,**kwargs):
+    """
+        Bins an `edge_changes` instance for each `dt` (after each step, respectively,
+        if `N_time_steps` was provided) and computes the rewiring rate gamma and probability
+        to stay alone P  from the binned `edges_in` and `edges_out`. For DTU data use 
+        dt = 3600, for sociopatterns use dt = 600.
+
+        py::arg("temporal_network"),             -- the temporal network
+        py::arg("t_run_total") = None,           -- this is just plainly copied to the returned 
+                                                    kwargs. If it is set to `None`, t_run_total
+                                                    will be set to `temporal_network.tmax`
+        py::arg("dt") = 0.0,                     -- dt of the time bin
+        py::arg("N_time_steps") = 0,             -- number of time bins (use either this or dt).
+        py::arg("aggregated_network") = {}       -- dict(edge -> similarity), if this is given,
+                                                    the kwargs are supposed to be for the function
+                                                    `flockwork_P_varying_rates_neighbor_affinity`,
+                                                    you can get this network from the `aggregated_network`
+                                                    property from the results returned by
+                                                    `measure_group_sizes_and_durations`
+        py::arg("ensure_empty_network") = false, -- if this is True, bins where the original network
+                                                    is empty (n_edges = 0) will be an artificially 
+                                                    set high gamma with P = 0, such that nodes will
+                                                    lose all edges.
+        py::arg("use_preferential_node_selection") = false -- this is just plainly copied to 
+                                                              the returned kwargs if `aggregated_network`
+                                                              is not empty
+        py::arg("verbose") = false
+
+        Returns a dictionary of kwargs for the functions `flockwork_P_varying_rates` or 
+        `flockwork_P_varying_rates_neighbor_affinity`.
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    new_kwargs = {}
+    with_affinity = 'aggregated_network' in kwargs and len(kwargs['aggregated_network']) > 0
+    if with_affinity and\
+       'use_preferential_node_selection' in kwargs:
+            new_kwargs['use_preferential_node_selection'] = kwargs.pop('use_preferential_node_selection')
+
+    if 't_run_total' in kwargs and kwargs['t_run_total'] is not None:
+        new_kwargs['t_run_total'] = kwargs.pop('t_run_total')
+    elif 't_run_total' in kwargs and kwargs['t_run_total'] is None:
+        new_kwargs['t_run_total'] = temporal_network.tmax
+        kwargs.pop('t_run_total')
+    else:
+        new_kwargs['t_run_total'] = temporal_network.tmax
+
+    if type(temporal_network) == el:
+        temporal_network = convert(temporal_network)
+
+    if type(temporal_network) == ec:
+        kw = get_flockwork_P_args(temporal_network,*args,**kwargs)
+        new_kwargs['E'] = kw.E
+        new_kwargs['N'] = kw.N
+        new_kwargs['P'] = kw.P
+        new_kwargs['rewiring_rate'] = kw.rewiring_rate
+        new_kwargs['tmax'] = kw.tmax
+        if with_affinity:
+            new_kwargs['neighbor_affinity'] = kw.neighbor_affinity
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+
+    return new_kwargs 
+
+    
+
+# =============================================== DYNAMIC RGG ===============================================
+
+def estimate_dynamic_RGG_args(sampled_or_binned_temporal_network,periodic_boundary_conditions_for_link_building=True,group_sizes_and_durations=None):
+
+    if not periodic_boundary_conditions_for_link_building:
+        raise ValueError('So far, only parameter estimation for periodic_boundary_conditions_for_link_building = True has been implemented')
+
+    if group_sizes_and_durations is not None:
+        result = group_sizes_and_durations
+    else:
+        result = tc.measure_group_sizes_and_durations(sampled_or_binned_temporal_network)
+
+    mean_m = tc.mean_group_size(result)
+    log_y = np.log(mean_m)
+
+    params = [0.7895411,  1.28318048, 0.0]
+    params[-1] -= log_y
+
+    def get_root(p):
+        a, b, c = params
+        r = b**2 - 4*a*c
+
+        if r >= 0:
+            r1 = (-b + np.sqrt(r)) / (2.0*a)     
+            r2 = (-b - np.sqrt(r)) / (2.0*a)
+            return max(r1,r2)
+        else:
+            return None
+        """
+        elif r == 0:
+            r = -b/2.0*a
+            return r
+        """
+
+    density = get_root(params)
+
+    """
+    print params
+    this_poly = Polynomial(params)
+    print this_poly
+    roots = poly.polyroots(this_poly)
+    print roots
+    density = roots.max()
+    """
+
+    dt = sampled_or_binned_temporal_network.t[1] - sampled_or_binned_temporal_network.t[0]
+    mean_link_duration = np.array(result.contact_durations).mean() / dt
+
+    kwargs = {}
+    kwargs['N'] = sampled_or_binned_temporal_network.N
+    kwargs['t_run_total'] = len(sampled_or_binned_temporal_network.t)
+    kwargs['mean_link_duration'] = mean_link_duration
+    kwargs['critical_density'] = density
+
+    return kwargs
+
 
 if __name__ == "__main__":
     import tacoma as tc
@@ -150,16 +267,16 @@ if __name__ == "__main__":
     P = test.P
 
     fw = tc.flockwork_P_varying_rates([],100,P,24*3600,rewiring_rate,tmax=24*3600*7)
-    fw_binned = tc.sample_temporal_network(fw,dt=300)
+    fw_binned = tc.sample(fw,dt=300)
     fw_binned_result = tc.measure_group_sizes_and_durations(fw_binned)
 
-    kwargs = estimate_ZSBB_parameters(fw_binned,fw_binned_result,fit_discrete=True,dt=300.)
+    kwargs = get_ZSBB_parameters(fw_binned,fw_binned_result,fit_discrete=True,dt=300.)
     print "lambda =", kwargs['lambda']
     print "b0 =", kwargs['b0']
     print "b1 =", kwargs['b1']
     kwargs['t_run_total'] = (len(fw_binned.t) + 1)*kwargs['N']
     zsbb = tc.ZSBB_model(**kwargs)
-    zsbb_binned = tc.sample_temporal_network(zsbb,dt=kwargs['N'])
+    zsbb_binned = tc.sample(zsbb,dt=kwargs['N'])
     zsbb_binned_result = tc.measure_group_sizes_and_durations(zsbb_binned)
 
 
@@ -167,4 +284,5 @@ if __name__ == "__main__":
     temporal_network_group_analysis(zsbb_binned_result,
                                     time_normalization_factor = 300./kwargs['N'],
                                     ax=ax)
+
     pl.show()

@@ -57,4 +57,14 @@ group_sizes_and_durations
              const bool ignore_size_histograms_differences = false,
              const bool verbose = false
         );
+
+vector < pair < double, double > >
+    mean_degree_from_edge_changes(
+                edge_changes &ec
+               );
+
+vector < pair < double, double > >
+    mean_degree_from_edge_lists(
+                edge_lists &el 
+               );
 #endif

@@ -142,6 +142,14 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
+    m.def("mean_degree_from_edge_lists", &mean_degree_from_edge_lists, "Get a list of pairs, where the first entry is a time point and the second entry is the mean degree of the current state, given an `edge_lists` instance.",
+            py::arg("edge_lists")
+         );
+
+    m.def("mean_degree_from_edge_changes", &mean_degree_from_edge_changes, "Get a list of pairs, where the first entry is a time point and the second entry is the mean degree of the current state, given an `edge_changes` instance.",
+            py::arg("edge_changes")
+         );
+
     m.def("sample_from_edge_lists", &sample_from_edge_lists, "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
             py::arg("edge_lists"),
             py::arg("dt") = 0.0,
