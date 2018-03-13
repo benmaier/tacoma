@@ -11,7 +11,7 @@ from tacoma import edge_changes as ec
 from tacoma import edge_lists as el
 from tacoma import edge_lists_with_histograms as el_h
 from tacoma import edge_changes_with_histograms as ec_h
-from tacoma.analysis import get_logarithmic_histogram
+from tacoma import get_logarithmic_histogram
 from tacoma.power_law_fitting import fit_power_law_clauset
 from tacoma import _get_raw_temporal_network
 from tacoma import mean_coordination_number
