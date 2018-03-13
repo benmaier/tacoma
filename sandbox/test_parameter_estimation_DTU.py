@@ -40,7 +40,8 @@ traj = tc.get_edge_trajectories(zsbb_binned)
 draw_edges(traj.trajectories,ax=ax[3])
 
 # ============== generate surrogate network from flockwork_P model ==============
-fwP_params = estimate_flockwork_P_args(socio_binned,dt=3600.,aggregated_network=socio_result.aggregated_network)
+fwP_params = estimate_flockwork_P_args(socio_binned,dt=1800.,aggregated_network=socio_result.aggregated_network)
+tc.write_fwP_args(fwP_params,"./fwP_args_dtu_1_weeks.json")
 fwP = tc.flockwork_P_varying_rates_neighbor_affinity(**fwP_params)
 fwP_binned = tc.bin(fwP,dt=300)
 

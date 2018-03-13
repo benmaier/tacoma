@@ -28,10 +28,10 @@ fwP_binned = tc.bin(fwP,dt=300)
 
 N = fwP.N
 
-R0 = 1.0
-rho = 3.0 / (24*3600.)
+R0 = 2.0
+rho = 1.0 / (3*24*3600.)
 dt = 3600.
-t_simulation = 2*fwP.tmax
+t_simulation = 4*fwP.tmax
 t_sample = np.arange(int(t_simulation / dt)+1,dtype=float) * dt
 
 N_meas = 30
@@ -54,6 +54,8 @@ for tn in [socio, fwP, fwP_binned]:
     
     i_sample = np.zeros_like(t_sample)
 
+    successful = 0
+
     for meas in range(N_meas):
 
         sis = tc.SIS(N, t_simulation, eta, rho, number_of_initially_infected = 10)
@@ -65,11 +67,13 @@ for tn in [socio, fwP, fwP_binned]:
 
         this_sample = tc.sample_a_function(t,i,t_sample)
 
-        i_sample += this_sample / N_meas
+        if this_sample[-1] > 0.0:
+            successful += 1
+            i_sample += this_sample
         
         ax[2].plot(t_sample,this_sample,c=line.get_color(),alpha=0.1)
 
-    ax[1].plot(t_sample,i_sample)
+    ax[1].plot(t_sample,i_sample/successful)
 
 
 

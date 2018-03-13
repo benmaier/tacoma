@@ -229,6 +229,23 @@ def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatte
 
     return el
 
+def write_fwP_args(args,filename):
+
+    filename = os.path.abspath(os.path.expanduser(filename))
+
+    with open(filename,'w') as f:
+        json.dump(args,f)
+
+def load_fwP_args(filename):
+
+    filename = os.path.abspath(os.path.expanduser(filename))
+
+    with open(filename,'r') as f:
+        args = json.load(f)
+
+    return args
+    
+
 def load_sociopatterns_hypertext_2009(filename="~/.tacoma/ht09.taco"):
     """
         Once `download_sociopatterns_hypertext_2009` was called,
