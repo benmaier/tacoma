@@ -159,7 +159,7 @@ class SIRS
 
         bool simulation_ended() 
         {
-            return (infected.size() == 0) or (recovered.size() == N);
+            return ( (recovered.size() == 0) and (infected.size() == 0) );
         };
 
         void get_rates_and_Lambda(vector < double > &rates,

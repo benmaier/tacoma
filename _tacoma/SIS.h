@@ -155,7 +155,7 @@ class SIS
 
         bool simulation_ended() 
         {
-            return (infected.size() == 0) or (infected.size() == N);
+            return (infected.size() == 0);
         };
 
         void get_rates_and_Lambda(vector < double > &rates,
