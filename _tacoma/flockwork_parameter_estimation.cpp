@@ -27,6 +27,7 @@
 #include "ResultClasses.h"
 #include "measurements.h"
 #include "resampling.h"
+#include "conversion.h"
 
 using namespace std;
 
@@ -158,28 +159,38 @@ flockwork_args
         new_time.push_back( this_new_time );
     }
 
-    // add the last time frame for looping
+    // ============== add the last time frame for looping ================
     new_time.push_back( dt * N_time_steps + t0 );
 
-    long dm = m.front() - m.back();
-    if (dm > 0)
-    {
-        m_in.push_back(dm);
-        m_out.push_back(0);
-    } 
-    else if (dm < 0)
-    {
-        m_in.push_back(0);
-        m_out.push_back(-dm);
-    }
-    else
-    {
-        m_in.push_back(0);
-        m_out.push_back(0);
-    }
+    // get a sorted edge list
+    vector < pair < size_t, size_t > > last_edge_list;
+    edgelist_from_graph(last_edge_list,G);
+
+    set < size_t > last_edge_integers = get_edge_integer_set(last_edge_list, N);
+    set < size_t > edge_integers = get_edge_integer_set(list_of_edge_changes.edges_initial, N);
+
+    vector < size_t > incoming_edge_integers;
+    vector < size_t > outgoing_edge_integers;
+
+    // incoming edges are from the set (edges - last_edges) 
+    set_difference(
+                   edge_integers.begin(), edge_integers.end(),
+                   last_edge_integers.begin(), last_edge_integers.end(),
+                   back_inserter(incoming_edge_integers)
+                  );
+
+    // outgoing edges are from the set (last_edges - edges) 
+    set_difference(
+                   last_edge_integers.begin(), last_edge_integers.end(),
+                   edge_integers.begin(), edge_integers.end(),
+                   back_inserter(outgoing_edge_integers)
+                  );
+
+    m_in.push_back(incoming_edge_integers.size());
+    m_out.push_back(outgoing_edge_integers.size());
     m.push_back( m.front() );
 
-    // now go through the observables and compute the parameters
+    // ========= now go through the observables and compute the parameters =============
     auto it_m = m.begin();
     auto it_m_in = m_in.begin();
     auto it_m_out = m_out.begin();
