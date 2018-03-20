@@ -250,7 +250,7 @@ flockwork_args
         else if ( (this_m_out == 0) and (this_m_in > 0) )
         {
             // secondary case if there's no outgoing edges
-            double next_m = (double) *(it_m+1);
+            double next_m = ((double) *(it_m+1)) / k_over_k_real_scaling;
             _P = 2.0 * next_m / (N+2.0*next_m);
             _g = _m_in / ( _P * (N+2.0*_m) * dt);
         }
