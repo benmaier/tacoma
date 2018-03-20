@@ -39,6 +39,7 @@ flockwork_args
              size_t N_time_steps,
              map < pair < size_t, size_t >, double > aggregated_network,
              const bool ensure_empty_network,
+             const bool change_tmax_if_dt_does_not_fit,
              const bool verbose
              )
 {
@@ -69,7 +70,13 @@ flockwork_args
         // check if this yielded a nice round number
         // by checking the rest after the period
         if (modf(_N_t,&intpart) != 0.0)
-            throw domain_error("dt does not nicely divide time interval (tmax - t0) in integer parts");
+            if (change_tmax_if_dt_does_not_fit)
+            {
+                N_time_steps = (size_t) ceil(_N_t);
+                tmax = t0 + N_time_steps * dt;
+            }
+            else
+                throw domain_error("dt does not nicely divide time interval (tmax - t0) in integer parts");
         else
             N_time_steps = (size_t) _N_t;
     }

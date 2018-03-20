@@ -120,6 +120,20 @@ def time_average(t,x,tmax=None):
     
     return dt.dot(x[:-1]) / sum_dt
 
+def time_RMSE(t,x1,x2,tmax=None):
+    
+    if len(t) != len(x1):
+        raise ValueError("t and x1 must have the same shape")
+
+    if len(t) != len(x2):
+        raise ValueError("t and x2 must have the same shape")
+
+    if tmax is not None:
+        t = np.append(t,tmax)
+        x1 = np.append(x1,x1[-1])
+        x2 = np.append(x2,x2[-1])
+
+    return np.sqrt(time_average(t,(x1-x2)**2))
 
 def bin_a_function(x,y,bins,mode='mean'):
     if mode=='mean':
