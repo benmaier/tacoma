@@ -49,6 +49,7 @@ flockwork_args
              edge_changes &list_of_edge_changes,
              double dt,
              size_t N_time_steps,
+             double k_over_k_real_scaling,
              map < pair < size_t, size_t >, double > aggregated_network,
              const bool ensure_empty_network,
              const bool change_tmax_if_dt_does_not_fit,

@@ -37,6 +37,7 @@ flockwork_args
              edge_changes &list_of_edge_changes,
              double dt,
              size_t N_time_steps,
+             double k_over_k_real_scaling,
              map < pair < size_t, size_t >, double > aggregated_network,
              const bool ensure_empty_network,
              const bool change_tmax_if_dt_does_not_fit,
@@ -272,8 +273,8 @@ flockwork_args
             _g = 20.0 / dt / ((double) N);
         }
 
-        gamma.push_back( make_pair( *it_time, _g) );
-        P.push_back( _P );
+        gamma.push_back( make_pair( *it_time, _g * k_over_k_real_scaling) );
+        P.push_back( _P / k_over_k_real_scaling );
 
         it_m++; 
         it_m_in++;
