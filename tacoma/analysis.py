@@ -77,7 +77,7 @@ def plot_group_size_histogram(result,
                 where = 'mid',
                 )
     else:
-        ax.plot(x_group,y_group,'.',
+        ax.plot(x_group,y_group,'o',
                     ms=4,
                     mew=1,
                     mfc='None'

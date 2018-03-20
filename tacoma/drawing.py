@@ -85,6 +85,9 @@ def draw_edges(traj,
 
         ax.plot(fit_x, fit(fit_x,*popt),'r')
 
+        log_y = np.log(fit_y) - 1.
+        log_x = np.log(fit_x) - 1.
+
 
     return fig, ax
 
