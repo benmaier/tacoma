@@ -236,7 +236,7 @@ flockwork_args
 
         double _m_out = (double) this_m_out;
         double _m_in = (double) this_m_in;
-        double _m = (double) this_m;
+        double _m = (double) this_m / k_over_k_real_scaling;
 
         if (this_m_out > 0)
         {
@@ -273,8 +273,8 @@ flockwork_args
             _g = 20.0 / dt / ((double) N);
         }
 
-        gamma.push_back( make_pair( *it_time, _g * k_over_k_real_scaling) );
-        P.push_back( _P / k_over_k_real_scaling );
+        gamma.push_back( make_pair( *it_time, _g ) );
+        P.push_back( _P );
 
         it_m++; 
         it_m_in++;
