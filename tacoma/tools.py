@@ -1,4 +1,5 @@
 from math import log10
+import json
 
 import numpy as np
 
@@ -199,3 +200,9 @@ def rescale_time(temporal_network, new_t0, new_tmax):
     temporal_network.tmax = new_tmax
 
     return temporal_network
+
+def load_json_dict(fn):
+    with open(fn,'r') as f:
+         this_dict = json.load(f)
+
+    return this_dict

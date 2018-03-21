@@ -407,3 +407,4 @@ def edge_counts(temporal_network):
 
 from .data_io import *
 from .tools import *
+from .load_model_parameters import *
