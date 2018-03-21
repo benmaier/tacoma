@@ -182,3 +182,20 @@ def sample_a_function(x,y,time_points,sample_width=0):
             new_y.append(y[this_index])
 
     return np.array(new_y)
+
+
+def rescale_time(temporal_network, new_t0, new_tmax):
+
+    if hasattr(temporal_network,'t0'):
+        this_t0 = temporal_network.t0
+        temporal_network.t0 = new_t0
+    else:
+        this_t0 = temporal_network.t[0]
+
+    this_T = temporal_network.tmax - this_t0
+    new_T = new_tmax - new_t0
+    
+    temporal_network.t = [ (t - this_t0) / this_T * new_T + new_t0 for t in temporal_network.t ]
+    temporal_network.tmax = new_tmax
+
+    return temporal_network
