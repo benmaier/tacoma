@@ -204,7 +204,11 @@ def estimate_flockwork_P_args(temporal_network,*args,**kwargs):
 
 # =============================================== DYNAMIC RGG ===============================================
 
-def estimate_dynamic_RGG_args(sampled_or_binned_temporal_network,periodic_boundary_conditions_for_link_building=True,group_sizes_and_durations=None):
+def estimate_dynamic_RGG_args(sampled_or_binned_temporal_network,
+                              dt = None,
+                              periodic_boundary_conditions_for_link_building = True,
+                              group_sizes_and_durations = None,
+                              ):
 
     if not periodic_boundary_conditions_for_link_building:
         raise ValueError('So far, only parameter estimation for periodic_boundary_conditions_for_link_building = True has been implemented')
@@ -247,7 +251,9 @@ def estimate_dynamic_RGG_args(sampled_or_binned_temporal_network,periodic_bounda
     density = roots.max()
     """
 
-    dt = sampled_or_binned_temporal_network.t[1] - sampled_or_binned_temporal_network.t[0]
+    if dt is None:
+        dt = sampled_or_binned_temporal_network.t[1] - sampled_or_binned_temporal_network.t[0]
+
     mean_link_duration = np.array(result.contact_durations).mean() / dt
 
     kwargs = {}
