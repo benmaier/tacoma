@@ -12,8 +12,16 @@ def get_logarithmic_histogram(data,
     data = data[data>0]
     MIN = min(data)
     MAX = max(data)
+
+    # check if bins is an array, if not, make an array
+    try:
+        bins[0]
+    except:
+        # if this fails, we assume `bins` is an integer
+        bins = np.logspace(log10(MIN), log10(MAX), bins+1,base=10.)
+
     y, x = np.histogram(data,
-                        bins = np.logspace(log10(MIN), log10(MAX), bins+1,base=10.),
+                        bins = bins
                         density = density,
                        )
     
