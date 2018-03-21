@@ -31,7 +31,7 @@
 using namespace std;
 
 //vector < edge_trajectory_entry >
-void
+size_t
     verify_edge_changes(
         edge_changes &list_of_edge_changes,
         const bool verbose
@@ -49,6 +49,8 @@ void
     double t0 = list_of_edge_changes.t0;
     double tmax = list_of_edge_changes.tmax;
 
+    size_t error_count = 0;
+
     if (verbose)
     {
         cout << "last time in array = " << time.back() << endl;
@@ -56,13 +58,19 @@ void
     }
 
     if (tmax <= time.back())
+    {
         //throw domain_error(
         cout << "The value tmax is smaller or equal than the last time in the time list."
             //);
             << endl;
+        error_count++;
+    }
 
     if (all_edges_in.size() != time.size() or all_edges_out.size() != time.size() or all_edges_in.size() != all_edges_out.size())
+    {
         cout << "size of `edges_in` = " + to_string(all_edges_in.size()) + " != size of `t` = " + to_string(time.size()) << " != size of `edges_out` = " << to_string(all_edges_out.size()) << endl;
+        error_count++;
+    }
 
     // create iterators
     auto it_edges_in = all_edges_in.begin();
@@ -81,15 +89,19 @@ void
             swap(edge.first,edge.second);
 
         if (edge.first == edge.second)
+        {
             //throw domain_error(
-                    cout << 
-                               "The edge ("+to_string(edge.first)+", "
-                               +to_string(edge.second)+") in the initial edge list "
-                               +"is a self-loop."
-                               //);
-                        << endl;
+            cout << 
+                       "The edge ("+to_string(edge.first)+", "
+                       +to_string(edge.second)+") in the initial edge list "
+                       +"is a self-loop."
+                       //);
+                << endl;
+            error_count++;
+        }
 
         if ((edge.first >= N) or (edge.second >= N))
+        {
             //throw domain_error(
                     cout <<
                                "The edge ("+to_string(edge.first)+", "
@@ -97,6 +109,8 @@ void
                                +"contains a node larger or equal to the number of nodes N = "+to_string(N)
                                //);
                         << endl;
+            error_count++;
+        }
 
         size_t edge_int = get_edge_integer(N,edge,hash_to_int);
         edge_trajectory_entry this_entry;
@@ -107,10 +121,13 @@ void
             this_entry.is_active = true;
         }
         else
+        {
             //throw domain_error(
-                    cout << "Doubling of edges in edge_changes.edges_initial"
-                    //);
-                        << endl;
+            cout << "Doubling of edges in edge_changes.edges_initial"
+            //);
+                << endl;
+            error_count++;
+        }
 
         edge_trajectories.push_back(this_entry);
     }
@@ -124,6 +141,7 @@ void
         // get time of current state
         double t = *it_time;
         if (t <= last_time)
+        {
             //throw domain_error(
              cout <<
                                 "this time value t = " + to_string(t) + " at it = " + to_string(t_count)
@@ -131,6 +149,8 @@ void
                                +" the last time value t_last = " + to_string(last_time)
                                //);
                         << endl;
+             error_count++;
+        }
 
         // get a sorted edge list
         vector < pair < size_t, size_t > > & these_edges_in = (*it_edges_in);
@@ -145,22 +165,36 @@ void
                 swap(edge.first,edge.second);
 
             if (edge.first == edge.second)
+            {
                 //throw domain_error(
-                        cout << "The edge ("+to_string(edge.first)+", "
-                                   +to_string(edge.second)+") in the edges_out list at time it = "+to_string(t_count)
-                                   +" is a self-loop."
-                                   //);
-                        << endl;
+                cout << "The edge ("+to_string(edge.first)+", "
+                           +to_string(edge.second)+") in the edges_out list at time it = "+to_string(t_count)
+                           +" is a self-loop."
+                           //);
+                << endl;
+                error_count++;
+            }
 
             if ((edge.first >= N) or (edge.second >= N))
+            {
                 //throw domain_error(
-                        cout << 
-                                  "The edge ("+to_string(edge.first)+", "
-                                   +to_string(edge.second)+") in the edges_out list at time it = "+to_string(t_count)
-                                   +" contains a node larger or equal to the number of nodes N = "+to_string(N)
-                                   //);
-                            << endl;
+                cout << 
+                          "The edge ("+to_string(edge.first)+", "
+                           +to_string(edge.second)+") in the edges_out list at time it = "+to_string(t_count)
+                           +" contains a node larger or equal to the number of nodes N = "+to_string(N)
+                           //);
+                    << endl;
+                error_count++;
+            }
             edge_int_out.insert( hash_edge(edge, N) );
+        }
+
+        if (not is_unique_vector(these_edges_out))
+        {
+            cout << "There's duplicate edges in the edges_out list at time index it = "
+                     + to_string(t_count)
+                 << endl;
+            error_count++;
         }
 
         for(auto &edge: these_edges_in)
@@ -169,6 +203,7 @@ void
                 swap(edge.first,edge.second);
 
             if (edge.first == edge.second)
+            {
                 //throw domain_error(
                         cout <<
                                     "The edge ("+to_string(edge.first)+", "
@@ -176,8 +211,11 @@ void
                                    +" is a self-loop."
                                    //);
                             << endl;
+                error_count++;
+            }
 
             if ((edge.first >= N) or (edge.second >= N))
+            {
                 //throw domain_error(
                 cout<<
                         "The edge ("+to_string(edge.first)+", "
@@ -185,8 +223,18 @@ void
                                    +" contains a node larger or equal to the number of nodes N = "+to_string(N)
                                    //);
                             << endl;
+                error_count++;
+            }
 
             edge_int_in.insert( hash_edge(edge, N) );
+        }
+
+        if (not is_unique_vector(these_edges_in))
+        {
+            cout << "There's duplicate edges in the edges_in list at time index it = "
+                     + to_string(t_count)
+                 << endl;
+            error_count++;
         }
 
         vector < size_t > intersection;
@@ -202,6 +250,7 @@ void
                 size_t i = e / N;
                 cout << "The edge ("<< i << ", " << j << ") is in both lists edges_in "
                      << "and edges_out at time it = " << t_count << endl;
+                error_count++;
             }
             //throw domain_error("Equal edges in both lists edges_in and edges_out. See output for details.");
         }
@@ -212,6 +261,7 @@ void
             size_t edge_int = get_edge_integer(N,edge,hash_to_int);
 
             if (edge_int == edge_trajectories.size())
+            {
                 //throw domain_error(
                 cout << 
                                    "The edge ("+to_string(edge.first)+", "
@@ -220,8 +270,11 @@ void
                                    +" did not exist before"
                                    //);
                             << endl;
+                error_count++;
+            }
 
             if ((edge.first >= N) or (edge.second >= N))
+            {
                 //throw domain_error(
                 cout<<
                         "The edge ("+to_string(edge.first)+", "
@@ -229,10 +282,13 @@ void
                                    +" contains a node larger or equal to the number of nodes N = "+to_string(N)
                                    //);
                             << endl;
+                error_count++;
+            }
 
             edge_trajectory_entry &this_entry = edge_trajectories[edge_int];
 
             if (not this_entry.is_active)
+            {
                 //throw domain_error(
                         cout << 
                                    "The edge ("+to_string(this_entry.edge.first)+", "
@@ -241,6 +297,8 @@ void
                                    +" but was not active before."
                                    //);
                             << endl;
+                error_count++;
+            }
 
             this_entry.time_pairs.push_back(make_pair(this_entry.last_time_active, t));
             this_entry.last_time_active = t0 - 1000.0;
@@ -267,6 +325,7 @@ void
                 edge_trajectory_entry & this_entry = edge_trajectories[edge_int];
 
                 if (this_entry.is_active)
+                {
                     //throw domain_error(
                             cout << 
                                       "The edge ("+to_string(this_entry.edge.first)+", "
@@ -276,6 +335,8 @@ void
                                        +to_string(this_entry.last_time_active)
                                        //);
                             << endl;
+                    error_count++;
+                }
 
                 this_entry.last_time_active = t;
                 this_entry.is_active = true;
@@ -290,19 +351,15 @@ void
         last_time = t;
     }
 
-    for(auto &this_entry: edge_trajectories)
-    {
-        if (this_entry.is_active)
-            this_entry.time_pairs.push_back(make_pair(this_entry.last_time_active,tmax));
-    }
+    return error_count;
 }
 
 //vector < edge_trajectory_entry >
-void
-        verify_edge_lists(
-            edge_lists &list_of_edge_lists,
-            const bool verbose
-        )
+size_t
+    verify_edge_lists(
+        edge_lists &list_of_edge_lists,
+        const bool verbose
+    )
 {
     // get references to edge_list and time
     vector < vector < pair < size_t, size_t > > > & all_edges = list_of_edge_lists.edges;
@@ -314,10 +371,13 @@ void
     // set initial and final time
     double tmax = list_of_edge_lists.tmax;
 
+    size_t error_count = 0;
+
     if (verbose)
     {
         cout << "last time in array = " << time.back() << endl;
         cout << "              tmax = " << tmax << endl;
+        error_count++;
     }
 
     if (tmax < time.back())
@@ -327,7 +387,10 @@ void
                 << endl;
 
     if (all_edges.size() != time.size())
+    {
         cout << "size of `edges` = " + to_string(all_edges.size()) + " != size of `t` = " + to_string(time.size()) << endl;
+        error_count++;
+    }
 
     // create iterators
     auto it_edges = all_edges.begin();
@@ -349,6 +412,7 @@ void
         if (next_time <= t)
         {
             cout << "the upcoming time t_{i+1} = " + to_string(next_time) + " is smaller or equal to the current time t_{i} = " + to_string(t) + " with i = " + to_string(t_count) << endl;
+            error_count++;
         }
 
         for(auto &edge: *it_edges)
@@ -357,14 +421,18 @@ void
                 swap(edge.first,edge.second);
 
             if (edge.first == edge.second)
+            {
                 //throw domain_error(
-                        cout << 
-                                   "The edge ("+to_string(edge.first)+", "
-                                   +to_string(edge.second)+") in the edge list at it = " + to_string(t_count)
-                                   +" is a self-loop."
-                                   //);
-                             << endl;
+                cout << 
+                           "The edge ("+to_string(edge.first)+", "
+                           +to_string(edge.second)+") in the edge list at it = " + to_string(t_count)
+                           +" is a self-loop."
+                           //);
+                     << endl;
+                error_count++;
+            }
             if ((edge.first >= N) or (edge.second >= N))
+            {
                 //throw domain_error(
                 cout<<
                         "The edge ("+to_string(edge.first)+", "
@@ -372,10 +440,21 @@ void
                                    +" contains a node larger or equal to the number of nodes N = "+to_string(N)
                                    //);
                             << endl;
+                error_count++;
+            }
         }
+
+        if (not is_unique_vector( *it_edges ))
+        {
+            cout << "There's duplicate entries of edges in the edge list at time index it = "+to_string(t_count)<< endl;
+            error_count++;
+        }
+
 
         it_edges++;
         it_time++;
         t_count++;
     }
+
+    return error_count;
 }

@@ -303,6 +303,8 @@ def verify(temporal_network,*args,**kwargs):
 
         py::arg("temporal_network"),
         py::arg("verbose") = false
+
+        Returns number of errors.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)

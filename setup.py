@@ -22,12 +22,12 @@ ext_modules = [
         [ 
             '_tacoma/Utilities.cpp', 
             '_tacoma/Events.cpp', 
+            '_tacoma/verify_formats.cpp', 
             '_tacoma/social_trajectories.cpp', 
             '_tacoma/flockwork_parameter_estimation.cpp', 
             '_tacoma/conversion.cpp', 
             '_tacoma/concatenation.cpp', 
             '_tacoma/measurements.cpp', 
-            '_tacoma/verify_formats.cpp', 
             '_tacoma/SIS.cpp', 
             '_tacoma/SIR.cpp',             
             '_tacoma/SIRS.cpp',

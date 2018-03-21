@@ -45,13 +45,22 @@
 
 using namespace std;
 
-void
+template < typename T >
+bool is_unique_vector(
+        vector < T > &v
+        )
+{
+    set < T > s(v.begin(), v.end());
+    return s.size() == v.size();
+}
+
+size_t
     verify_edge_lists(
         edge_lists &list_of_edge_lists,
         const bool verbose
     );
 
-void
+size_t
     verify_edge_changes(
         edge_changes &list_of_edge_changes,
         const bool verbose
