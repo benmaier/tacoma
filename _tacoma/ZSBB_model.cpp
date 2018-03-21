@@ -55,6 +55,7 @@ edge_changes_with_histograms
              const double b0,
              const double b1,
              const double t_run_simulation,
+             const size_t max_edge_events_to_end_simulation,
              const double t_equilibration,
              const size_t seed,
              const bool record_sizes_and_durations,
@@ -62,6 +63,17 @@ edge_changes_with_histograms
              const bool verbose
         )
 {
+    bool end_at_max_time;
+
+    // check the ending conditions
+    if (( t_run_simulation == 0) and (max_edge_events_to_end_simulation == 0) )
+        throw domain_error("Please provide either a total simulation time or a number of maximum edge events.");
+    else if (( t_run_simulation > 0) and (max_edge_events_to_end_simulation > 0) )
+        throw domain_error("Please provide either a total simulation time or a number of maximum edge events, not both.");
+    else if (( t_run_simulation > 0) and (max_edge_events_to_end_simulation == 0) )
+        end_at_max_time = true;
+    else if (( t_run_simulation == 0) and (max_edge_events_to_end_simulation > 0) )
+        end_at_max_time = false;
 
     size_t t = 0;
 
@@ -132,15 +144,23 @@ edge_changes_with_histograms
         cout << "initiated" << endl;
 
 
+    // initialize the edge container which will be returned
     vector < vector < pair <size_t,size_t> > > edges_out;
     vector < vector < pair <size_t,size_t> > > edges_in;
     vector < double > time;
     vector < pair <size_t,size_t> > edges_equilibrium;
 
+    // initialize edge event counter
+    size_t num_edge_events = 0;
+    
+    // initialize time
+    t = 1;
 
-
-    for(t = 1; t<t_equilibration+t_run_simulation; t++)
-    {
+    while (
+            ( ( end_at_max_time ) and (t < t_equilibration + t_run_simulation) ) or
+            ( (not end_at_max_time ) and (num_edge_events < max_edge_events_to_end_simulation) )
+          )
+    {         
         if (verbose)
         {
             cout << " ============== " << endl;
@@ -388,6 +408,12 @@ edge_changes_with_histograms
             edges_in.push_back(in);
             edges_out.push_back(out);
 
+            if (t > t_equilibration)
+            {
+                num_edge_events += in.size();
+                num_edge_events += out.size();
+            }
+
 
             if((record_sizes_and_durations) and (t > t_equilibration))
             {
@@ -430,6 +456,7 @@ edge_changes_with_histograms
             last_time_active[i] = t;
         }
 
+        t++;
     }
 
     // get final size histogram
@@ -437,7 +464,7 @@ edge_changes_with_histograms
 
     edge_changes_with_histograms result;
 
-    result.tmax = t_equilibration+t_run_simulation;
+    result.tmax = t;
     result.N = N;
     if (return_after_equilibration_only)
     {

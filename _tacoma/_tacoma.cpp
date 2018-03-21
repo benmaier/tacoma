@@ -150,6 +150,10 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("edge_changes")
          );
 
+    m.def("get_edge_counts", &get_edge_counts, "Given an instance of `edge_changes`, returns the lists `m_in`, `m_out` and `m`, which count the edge events as well as the edges at the given times. Note that `m` contains one entry more than `m_in` and `m_out` due to the initial edge list.",
+            py::arg("edge_changes")
+         );
+
     m.def("sample_from_edge_lists", &sample_from_edge_lists, "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
             py::arg("edge_lists"),
             py::arg("dt") = 0.0,
@@ -267,7 +271,8 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("lambda"),
             py::arg("b0"),
             py::arg("b1"),
-            py::arg("t_run_total"),
+            py::arg("t_run_total") = 0,
+            py::arg("max_edge_events_to_end_simulation") = 0,
             py::arg("t_equilibration") = 0,
             py::arg("seed") = 0,
             py::arg("record_sizes_and_durations") = false,
