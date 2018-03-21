@@ -3,7 +3,7 @@
 TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks, produce surrogate networks using qualitative models and simulate Gillespie processes on them.
 """
 
-__version__ = "0.0.17"
+__version__ = "0.0.20"
 
 import numpy as np
 
@@ -384,6 +384,26 @@ def mean_degree(temporal_network,*args,**kwargs):
     t, k = result[:,0], result[:,1]
 
     return t, k
+
+def edge_counts(temporal_network):
+    """
+        Returns the number of edge events and total edge count (In this order: `m_in`, `m_out`, and `m`).
+
+        py::arg("temporal_network"), -- the temporal network
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+
+    if type(temporal_network) == el:
+        temporal_network = convert(temporal_network)
+
+    if type(temporal_network) == ec:
+        m_in, m_out, m = get_edge_counts(temporal_network)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+
+    return m_in, m_out, m
 
 from .data_io import *
 from .tools import *

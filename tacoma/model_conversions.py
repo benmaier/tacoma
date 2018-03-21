@@ -34,8 +34,6 @@ def ZSBB_mean_coordination_number(b0,lam,N,b1):
 def ZSBB_b0_func(b0,lam):
     return b0 * (2.0+(1.0-lam/(2*lam-1))) + 1
 
-
-
 def estimate_ZSBB_args(temporal_network,
                        group_sizes_and_durations = None,
                        fit_discrete = False,
@@ -50,6 +48,10 @@ def estimate_ZSBB_args(temporal_network,
     result = group_sizes_and_durations
     if result is None:
         result = tc.measure_group_sizes_and_durations(temporal_network)
+
+    m_in, m_out, m = tc.edge_counts(temporal_network)
+
+    max_edge_events = sum(m_in) + sum(m_out)
 
     N = temporal_network.N
 
@@ -127,6 +129,7 @@ def estimate_ZSBB_args(temporal_network,
     kwargs['N'] = N
     kwargs['return_after_equilibration_only'] = True
     kwargs['t_equilibration'] = float(10000*N)
+    kwargs['max_edge_events_to_end_simulation'] = max_edge_events
 
     return kwargs
 

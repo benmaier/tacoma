@@ -21,7 +21,7 @@ def get_logarithmic_histogram(data,
         bins = np.logspace(log10(MIN), log10(MAX), bins+1,base=10.)
 
     y, x = np.histogram(data,
-                        bins = bins
+                        bins = bins,
                         density = density,
                        )
     
