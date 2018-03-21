@@ -20,6 +20,13 @@ def load_ht09_flockwork_params(scaled=False):
 
     return tc.load_json_dict(fn)
 
+def load_dtu_flockwork_unscaled_params():
+    return load_ht09_flockwork_params(False)
+
+def load_dtu_flockwork_scaled_params():
+    return load_ht09_flockwork_params(True)
+
+
 def load_dtu_dyn_RGG_params():
     fn = os.path.join(path,'dtu_dyn_RGG_params.json')
     return tc.load_json_dict(fn)
@@ -36,6 +43,12 @@ def load_dtu_flockwork_params(scaled=False):
         fn = os.path.join(path,'dtu_fwP_params_unscaled.json')
 
     return tc.load_json_dict(fn)
+
+def load_dtu_flockwork_unscaled_params():
+    return load_dtu_flockwork_params(False)
+
+def load_dtu_flockwork_scaled_params():
+    return load_dtu_flockwork_params(True)
 
 
 if __name__ == "__main__":
