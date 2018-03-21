@@ -67,4 +67,9 @@ vector < pair < double, double > >
     mean_degree_from_edge_lists(
                 edge_lists &el 
                );
+
+tuple < vector < size_t >, vector < size_t >, vector < size_t > >
+    get_edge_counts (
+                edge_changes &ec
+            );
 #endif

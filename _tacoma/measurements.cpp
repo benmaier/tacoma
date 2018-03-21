@@ -668,3 +668,34 @@ vector < pair < double, double > >
 
     return result;
 }
+
+tuple < vector < size_t >, vector < size_t >, vector < size_t > >
+    get_edge_counts (
+                edge_changes &ec
+            )
+{
+    vector < size_t > m_in;
+    vector < size_t > m_out;
+    vector < size_t > m;
+
+    size_t _m = ec.edges_initial.size();
+    m.push_back(_m);
+
+    auto it_edges_in = ec.edges_in.begin();
+    auto it_edges_out = ec.edges_out.begin();
+
+    while (it_edges_in != ec.edges_in.end())
+    {
+        _m += it_edges_in->size();
+        _m -= it_edges_out->size();
+
+        m.push_back(_m);
+        m_in.push_back(it_edges_in->size());
+        m_out.push_back(it_edges_out->size());
+
+        it_edges_in++;
+        it_edges_out++;
+    }
+
+    return make_tuple( m_in, m_out, m );
+}
