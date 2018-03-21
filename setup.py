@@ -26,12 +26,12 @@ ext_modules = [
             '_tacoma/flockwork_parameter_estimation.cpp', 
             '_tacoma/conversion.cpp', 
             '_tacoma/concatenation.cpp', 
+            '_tacoma/measurements.cpp', 
             '_tacoma/verify_formats.cpp', 
             '_tacoma/SIS.cpp', 
             '_tacoma/SIR.cpp',             
             '_tacoma/SIRS.cpp',
             '_tacoma/SI.cpp', 
-            '_tacoma/measurements.cpp', 
             '_tacoma/resampling.cpp', 
             '_tacoma/ZSBB_model.cpp', 
             '_tacoma/dyn_RGG.cpp', 
@@ -97,7 +97,7 @@ class BuildExt(build_ext):
 
 setup(
     name = 'tacoma',
-    version = '0.0.19',
+    version = '0.0.20',
     author = 'Benjamin F. Maier',
     author_email = 'bfmaier@physik.hu-berlin.de',
     url = 'https://github.com/benmaier/tacoma',
