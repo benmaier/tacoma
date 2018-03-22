@@ -236,7 +236,7 @@ flockwork_args
 
         double _m_out = (double) this_m_out;
         double _m_in = (double) this_m_in;
-        double _m = (double) this_m / k_over_k_real_scaling;
+        double _m = ((double) this_m) / k_over_k_real_scaling;
 
         if (this_m_out > 0)
         {
