@@ -261,7 +261,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("k_over_k_real_scaling") = 1.0,
             py::arg("aggregated_network") = map < pair < size_t, size_t >, double >(),
             py::arg("ensure_empty_network") = false,
-            py::arg("change_tmax_if_dt_does_not_fit") = false,
+            py::arg("adjust_last_bin_if_dt_does_not_fit") = false,
             py::arg("verbose") = false
          );
 

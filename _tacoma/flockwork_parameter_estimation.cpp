@@ -40,7 +40,7 @@ flockwork_args
              double k_over_k_real_scaling,
              map < pair < size_t, size_t >, double > aggregated_network,
              const bool ensure_empty_network,
-             const bool change_tmax_if_dt_does_not_fit,
+             const bool adjust_last_bin_if_dt_does_not_fit,
              const bool verbose
              )
 {
@@ -71,8 +71,12 @@ flockwork_args
         // check if this yielded a nice round number
         // by checking the rest after the period
         if (modf(_N_t,&intpart) != 0.0)
-            if (change_tmax_if_dt_does_not_fit)
+            if (adjust_last_bin_if_dt_does_not_fit)
             {
+                // if it did not, change the time of the network
+                // to be larger than originally.
+                // This will be changed back later when 
+                // computing gamma and P
                 N_time_steps = (size_t) ceil(_N_t);
                 tmax = t0 + N_time_steps * dt;
             }
@@ -214,6 +218,16 @@ flockwork_args
         size_t & this_m_in = *it_m_in;
         size_t & this_m_out = *it_m_out;
 
+        // if tmax was shifted because dt did not fit, rescale the last
+        // time dt to the appropriate dt
+        if (it_m_in + 1 == m_in.end())
+        {
+            double this_time = *it_time;
+            double next_time = list_of_edge_changes.tmax;
+            dt = next_time - this_time;
+        }
+
+
         if ( (this_m == 0) and ( this_m_out > 0) )
         {
             /* this happens, e.g. in the beginning for cumulated bins. originally,
@@ -262,7 +276,7 @@ flockwork_args
         }
 
         // if in the beginning of this bin and at the end of this bin
-        // there's no 
+        // there's no nodes and we want this to be ensured
         if ( ( ensure_empty_network ) and 
              ( this_m == 0 ) and 
              ( *(it_m+1) == 0 ) and
@@ -288,7 +302,7 @@ flockwork_args
     fw_args.E = list_of_edge_changes.edges_initial;
     fw_args.P = P;
     fw_args.rewiring_rate = gamma;
-    fw_args.tmax = tmax;
+    fw_args.tmax = list_of_edge_changes.tmax;
     fw_args.new_time = new_time;
     fw_args.m_in = m_in;
     fw_args.m_out = m_out;

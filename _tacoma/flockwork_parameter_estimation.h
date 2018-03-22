@@ -52,7 +52,7 @@ flockwork_args
              double k_over_k_real_scaling,
              map < pair < size_t, size_t >, double > aggregated_network,
              const bool ensure_empty_network,
-             const bool change_tmax_if_dt_does_not_fit,
+             const bool adjust_last_bin_if_dt_does_not_fit,
              const bool verbose
          );
 
