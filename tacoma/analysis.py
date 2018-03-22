@@ -92,7 +92,7 @@ def plot_group_size_histogram(result,
 
 def plot_contact_durations(result,
                            ax,
-                           markers = ['.','d'],
+                           markers = ['o','d'],
                            xlabel = 'duration',
                            bins = 100, #number of bins
                            time_normalization_factor = 1., 
