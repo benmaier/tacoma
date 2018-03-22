@@ -1,4 +1,4 @@
-![logo](logo/logo.png)
+![logo](logo/logo_trimmed.png)
 # TACOMA
 
 TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks, produce surrogate networks using qualitative models and simulate Gillespie processes on them.
