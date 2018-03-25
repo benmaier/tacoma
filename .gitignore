@@ -19,3 +19,5 @@ a.out
 /dist/
 
 /jupyter_notebooks/.ipynb_checkpoints/
+
+/docs/
