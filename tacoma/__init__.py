@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks, produce surrogate networks using qualitative models and simulate Gillespie processes on them.
+Tacoma stands for TemporAl COntact Modeling and Analysis. 
+It provides fast tools to analyze temporal contact networks, 
+produce surrogate networks using qualitative models 
+and simulate Gillespie processes on them. Additionally 
+provides some visualization tools.
 """
 
 __version__ = "0.0.20"
@@ -18,12 +22,17 @@ color_sequence = [ u'#1f77b4', u'#ff7f0e', u'#2ca02c', u'#d62728', u'#9467bd', u
 marker_sequence = ['s','d','o','X','v','<','^','.','>','h','p','P','*','8','H']
 
 def complete_graph(N):
-    """
-        Get a single frame of a complete network.
+    """Get a single frame of a complete network.
 
-        N -- number of nodes
-
-        Returns an instance of `tacoma.edge_lists` with t = [0.0], tmax = 1.0
+    Parameters
+    ----------
+    N : int
+        Number of nodes.
+        
+    Returns 
+    -------
+    :mod:`edge_lists`
+        An instance of `tacoma.edge_lists` with t = [0.0], tmax = 1.0.
     """
 
     edge_list = []
@@ -50,15 +59,21 @@ def _get_raw_temporal_network(temporal_network):
 
 
 def measure_group_sizes_and_durations(temporal_network,*args,**kwargs):
-    """
-        Measures aggregated group size distribution, group size histogram for each time point,
-        contact durations, inter-contact durations, durations of each group size.
+    """Measures aggregated group size distribution, group size histogram for each time point, contact durations, inter-contact durations, durations of each group size, and the aggregated social network.
 
-        py::arg("temporal_network"),
-        py::arg("ignore_size_histograms") = false, -- don't compute the single time point group size histograms (save time and memory)
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    ignore_size_histogram : bool, optional
+        Don't compute the single time point group size histograms (save time and memory). default : False
+    verbose: bool, optional
+        Be chatty.
 
-        Returns an instance of `group_sizes_and_durations`.
+    Returns 
+    -------
+    :mod:`group_sizes_and_durations`
+        The result of the measurements.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -76,17 +91,23 @@ def measure_group_sizes_and_durations(temporal_network,*args,**kwargs):
     return result
     
 def bin(temporal_network,*args,**kwargs):
-    """
-        Bins a temporal network for each `dt` (after each step, respectively,
-        if `N_time_steps` was provided).
+    """Bins a temporal network for each `dt` (after each step, respectively, if `N_time_steps` was provided).
 
-        py::arg("temporal_network"), -- the temporal network
-        py::arg("dt") = 0.0,         -- dt of the time bin
-        py::arg("N_time_steps") = 0, -- number of time bins (use either this or dt).
-        py::arg("sample_aggregates") = false, -- if this is True, behavior is equal to `bin_temporal_network()`
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    dt : float
+        The demanded bin size. default : 0.0
+    N_time_steps : int
+        Number of time bins (use either this or dt). default : 0
+    verbose: bool, optional
+        Be chatty.
 
-        Returns and instance of `edge_lists` with one edge list describing the network as a list of all edges
+    Returns
+    -------
+    :mod:`edge_lists` 
+        An edge_lists instance with one edge list describing the network as a list of all edges
         that were present in the last time bin.
     """
 
@@ -102,17 +123,28 @@ def bin(temporal_network,*args,**kwargs):
     return result
     
 def sample(temporal_network,*args,**kwargs):
-    """
-        Samples a temporal network after each `dt` (after each step, respectively,
-        if `N_time_steps` was provided).
+    """Samples a temporal network after each `dt` (after each step, respectively, if `N_time_steps` was provided).
 
-        py::arg("temporal_network"), -- the temporal network
-        py::arg("dt") = 0.0,         -- dt of the time bin
-        py::arg("N_time_steps") = 0, -- number of time bins (use either this or dt).
-        py::arg("sample_aggregates") = false, -- if this is True, behavior is equal to `bin_temporal_network()`
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    dt : float
+        The demanded bin size. default : 0.0
+    N_time_steps : int
+        Number of time bins (use either this or dt). default : 0
+    sample_aggregates : bool, optional
+        If this is True, the following happens. If an edge is active during a time bin,
+        it will appear in the final graph at the end of this time bin. It will then exist
+        until the ende of the coming time bin. (This is different from the binning procedure). 
+        default : False
+    verbose: bool, optional
+        Be chatty.
 
-        Returns and instance of `edge_lists` with one edge list describing the network states after every time bin.
+    Returns
+    -------
+    :mod:`edge_lists` 
+        An edge_lists instance with one edge list describing the network states after every time bin.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -127,18 +159,25 @@ def sample(temporal_network,*args,**kwargs):
     return result
     
 def binned_social_trajectory(temporal_network,*args,**kwargs):
-    """
-        Computes the binned social trajectory of node `node` in `temporal_network`, i.e.
-        the groups it was part of and pairs of times (t0, t1) when it was part of
-        a certain group.
+    """Computes the binned social trajectory of node `node` in `temporal_network`, i.e. the groups it was part of and pairs of times (t0, t1) when it was part of a certain group. In this case, binning makes it easier to, e.g. see the days where a group was active.
 
-        py::arg("temporal_network"), -- the temporal network
-        py::arg("node"),             -- the node for which to compute the trajectory
-        py::arg("dt") = 0.0,         -- dt of the time bin
-        py::arg("N_time_steps") = 0, -- number of time bins (use either this or dt).
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    node : int
+        The node for which to compute the social trajectory
+    dt : float
+        The demanded bin size. default : 0.0
+    N_time_steps : int
+        Number of time bins (use either this or dt). default : 0
+    verbose: bool, optional
+        Be chatty.
 
-        Returns a list, one entry for each dt. Each entry is a list of group ids.
+    Returns
+    -------
+        :obj:`list` of :obj:`list` of int
+            A list, one entry for each dt. Each entry is a list of group ids.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -153,16 +192,20 @@ def binned_social_trajectory(temporal_network,*args,**kwargs):
     return result
     
 def social_trajectory(temporal_network,*args,**kwargs):
-    """
-        Computes the social trajectory of node `node` in `temporal_network`, i.e.
-        the groups it was part of and pairs of times (t0, t1) when it was part of
-        a certain group.
+    """Computes the social trajectory of node `node` in `temporal_network`, i.e. the groups it was part of and pairs of times (t0, t1) when it was part of a certain group.
 
-        py::arg("temporal_network"), -- the temporal network
-        py::arg("node"),             -- the node for which to compute the trajectory
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    node : int
+        The node for which to compute the social trajectory
+    verbose: bool, optional
+        Be chatty.
 
-        Returns a list of `social_trajectory_entry`.
+    Returns
+    -------
+    :obj:`list` of :mod:`social_trajectory_entry`
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -178,14 +221,21 @@ def social_trajectory(temporal_network,*args,**kwargs):
     
 
 def gillespie_SIS(temporal_network,*args,**kwargs):
-    """
-        Simulates an SIS process on the provided temporal network
+    """Simulates an SIS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
-        py::arg("temporal_network"),
-        py::arg("SIS"),
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    SIS : :mod:`SIS`
+        An initialized SIS object.
+    verbose: bool, optional
+        Be chatty.
 
-        Returns `None`, but the observables are saved in the `SIS` object.
+    Returns
+    -------
+    None
+        But the observables are saved in the :mod:`SIS` object.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -200,14 +250,21 @@ def gillespie_SIS(temporal_network,*args,**kwargs):
     return result
     
 def gillespie_SI(temporal_network,*args,**kwargs):
-    """
-        Simulates an SI process on the provided temporal network
+    """Simulates an SI process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
-        py::arg("temporal_network"),
-        py::arg("SI"),
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    SI : :mod:`SI`
+        An initialized SI object.
+    verbose: bool, optional
+        Be chatty.
 
-        Returns `None`, but the observables are saved in the `SI` object.
+    Returns
+    -------
+    None
+        But the observables are saved in the :mod:`SI` object.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -223,14 +280,21 @@ def gillespie_SI(temporal_network,*args,**kwargs):
     
 
 def gillespie_SIR(temporal_network,*args,**kwargs):
-    """
-        Simulates an SIR process on the provided temporal network
+    """Simulates an SIR process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
-        py::arg("temporal_network"),
-        py::arg("SIR"),
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    SIR : :mod:`SIR`
+        An initialized SIR object.
+    verbose: bool, optional
+        Be chatty.
 
-        Returns `None`, but the observables are saved in the `SIR` object.
+    Returns
+    -------
+    None
+        But the observables are saved in the :mod:`SIR` object.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -245,14 +309,21 @@ def gillespie_SIR(temporal_network,*args,**kwargs):
     return result
     
 def gillespie_SIRS(temporal_network,*args,**kwargs):
-    """
-        Simulates an SIRS process on the provided temporal network
+    """Simulates an SIRS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
-        py::arg("temporal_network"),
-        py::arg("SIRS"),
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    SIRS : :mod:`SIRS`
+        An initialized SIRS object.
+    verbose: bool, optional
+        Be chatty.
 
-        Returns `None`, but the observables are saved in the `SIRS` object.
+    Returns
+    -------
+    None
+        But the observables are saved in the :mod:`SIRS` object.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -266,23 +337,29 @@ def gillespie_SIRS(temporal_network,*args,**kwargs):
 
 
 def get_edge_trajectories(temporal_network,*args,**kwargs):
-    """
-        Computes the times in which each edge existed.
+    """Computes the time intervals in which each edge existed.
 
-        py::arg("temporal_network"),
-        py::arg("return_edge_similarities"),
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    return_edge_similarities : bool, optional
+        If this is `True`, return the similarity between edges. default : False
+    verbose: bool, optional
+        Be chatty.
 
-        Returns an instance of `edge_trajectories`
-            edge_trajectories.trajectories -- a list of `edge_trajectory_entry` objects, which contain
-                                              the `.time_pairs` attributes, a list of time pairs (t0, t1)
-                                              for time t0 <= t <= t1 in which the edge existed and `.edge`
-                                              a pair of node integers.
-            edge_trajectories.edge_similarities -- a list of triples ( u, v, similarity ) where
-                                                   `u` and `v` refer to the edge indices in
-                                                   `edge_trajectories.trajectories` and similarity
-                                                   is the integrated time both edges were switched on
-                                                   while being connected to the same node.
+    Returns
+    -------
+    :mod:`edge_trajectories`
+        edge_trajectories.trajectories -- a list of `edge_trajectory_entry` objects, which contain
+                                          the `.time_pairs` attributes, a list of time pairs (t0, t1)
+                                          for time t0 <= t <= t1 in which the edge existed and `.edge`
+                                          a pair of node integers.
+        edge_trajectories.edge_similarities -- a list of triples ( u, v, similarity ) where
+                                               `u` and `v` refer to the edge indices in
+                                               `edge_trajectories.trajectories` and similarity
+                                               is the integrated time both edges were switched on
+                                               while being connected to the same node.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -297,14 +374,19 @@ def get_edge_trajectories(temporal_network,*args,**kwargs):
     return result
 
 def verify(temporal_network,*args,**kwargs):
-    """
-        Checks wether the temporal network is compliant with the demanded
-        formats for analyses. Writes remarks on violations in the console.
+    """Checks wether the temporal network is compliant with the demanded formats for analyses. Writes remarks on violations to stdout.
 
-        py::arg("temporal_network"),
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    verbose: bool, optional
+        Be chatty.
 
-        Returns number of errors.
+    Returns
+    -------
+    int
+        Number of found errors.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -319,14 +401,18 @@ def verify(temporal_network,*args,**kwargs):
     return result
 
 def convert(temporal_network,*args,**kwargs):
-    """
-        Converts either an instance of `edge_changes` to an instance of
-        `edge_lists` or vice versa.
+    """Converts either an instance of :mod:`edge_changes` to an instance of :mod:`edge_lists` or vice versa.
 
-        py::arg("temporal_network"),
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    verbose: bool, optional
+        Be chatty.
 
-        Returns an instance of the other format.
+    Returns
+    -------
+    An instance of the other format.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -341,14 +427,18 @@ def convert(temporal_network,*args,**kwargs):
     return result
 
 def concatenate(list_of_temporal_networks,*args,**kwargs):
-    """
-        Concatenates a list of either `edge_changes` or `edge_lists`
-        to a single instance of `edge_changes` or`edge_lists`, respectively.
+    """Concatenates a list of either :mod:`edge_changes` or :mod:`edge_lists` to a single instance of :mod:`edge_changes` or :mod:`edge_lists`, respectively.
 
-        py::arg("list_of_temporal_networks"),
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :obj:`list` of :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        A list of a temporal networks.
+    verbose: bool, optional
+        Be chatty.
 
-        Returns a single instance of the format provided in the lists.
+    Returns
+    -------
+    A single instance of the format provided in the lists. 
     """
 
     list_of_temporal_networks = [ _get_raw_temporal_network(_t) for _t in list_of_temporal_networks ]
@@ -365,12 +455,19 @@ def concatenate(list_of_temporal_networks,*args,**kwargs):
     return result
 
 def mean_degree(temporal_network,*args,**kwargs):
-    """
-        Computes the time dependent mean degree of the temporal network.
+    """Computes the time dependent mean degree of the temporal network.
 
-        py::arg("temporal_network"), -- the temporal network
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        A list of a temporal networks.
 
-        Returns, two numpy arrays, `t` containing the time points and `k` containing the mean degree.
+    Returns
+    -------
+    numpy array
+        `t` containing the time points.
+    numpy array
+        `k` containing the mean degree at the corresponding times.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -388,10 +485,21 @@ def mean_degree(temporal_network,*args,**kwargs):
     return t, k
 
 def edge_counts(temporal_network):
-    """
-        Returns the number of edge events and total edge count (In this order: `m_in`, `m_out`, and `m`).
+    """Returns the number of edge events and total edge count (In this order: `m_in`, `m_out`, and `m`).
 
-        py::arg("temporal_network"), -- the temporal network
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        A list of a temporal networks.
+
+    Returns
+    -------
+    :obj:`list` of `int`
+        Number of edges coming into the network at the corresponding times.
+    :obj:`list` of `int`
+        Number of edges leaving the network at the corresponding times.
+    :obj:`list` of `int`
+        Number of edges existent in the network at the corresponding times.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
