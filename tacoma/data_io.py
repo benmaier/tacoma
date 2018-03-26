@@ -1,3 +1,7 @@
+"""
+This module provides routines to load and write temporal networks to the taco fileformat
+"""
+
 import os 
 import json
 import gzip # for sociopatterns data
@@ -9,17 +13,22 @@ from tacoma import _get_raw_temporal_network
 import wget
 
 def mkdirp_customdir(directory='~/.tacoma/'):
+    """simulate `mkdir -p` functionality"""
+
     directory = os.path.abspath( os.path.expanduser(directory) )
     if not os.path.exists(directory):
         os.makedirs(directory)
 
 def write_json_taco(temporal_network,fp):
-    """
-        Writes the provided temporal network to a .taco-file 
-        (which is actually json)
+    """Writes a temporal network to a .taco-file (which is actually in json format).
 
-        py::arg("temporal_network") -- an instance of `edge_changes` or `edge_lists`
-        py::arg("fp")               -- a string containing a path or a file-like object
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    fp : file-like or :obj:`str`
+        write to this file
+
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -60,12 +69,20 @@ def write_json_taco(temporal_network,fp):
     fp.close()
 
 def load_json_taco(fp):
-    """
-        Loads a temporal network from a .taco-file 
-        (which is actually json)
+    """Loads a temporal network from a .taco-file (which is actually in json format). 
 
-        py::arg("fp") -- a string containing a path or a file-like object
+    Parameters
+    ----------
+    fp : file-like or :obj:`str`
+        read from this file
+
+    Returns
+    -------
+    temporal network
+        type as given in the .taco-file
     """
+
+    return load_json_taco(fp)
 
     file_is_string = isinstance(fp,basestring)
 
@@ -107,12 +124,19 @@ def load_json_taco(fp):
     return temporal_network
 
 def read_json_taco(fp):
-    """
-        Loads a temporal network from a .taco-file 
-        (which is actually json) by simply calling `load_json_taco` because
-        I'm too stupid to remember if it's actually 'read' or 'load' smh.
+    """Loads a temporal network from a .taco-file (which is actually in json format) 
+    by simply calling :mod:`load_json_taco` because I'm too stupid to remember 
+    if it's actually 'read' or 'load' smh.
 
-        py::arg("fp") -- a string containing a path or a file-like object
+    Parameters
+    ----------
+    fp : file-like or :obj:`str`
+        read from this file
+
+    Returns
+    -------
+    temporal network
+        type as given in the .taco-file
     """
 
     return load_json_taco(fp)
@@ -120,18 +144,26 @@ def read_json_taco(fp):
 def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatterns.org/files/datasets/003/ht09_contact_list.dat.gz",
                                                       filename="~/.tacoma/ht09.taco",
                                                       ):
-    """
-        Download the SocioPatterns 'Hypertext 2009 dynamic contact network' data,
-        extract it and save it as taco. This data is actually binned in intervals
-        of [t-20s, t].
+    """Download the SocioPatterns 'Hypertext 2009 dynamic contact network' data,
+    extract it and save it as taco. This data is actually binned in intervals
+    of `[t-20s, t]`.
 
-        py::arg(url)      -- this is the url to the gzipped data
-        py::arg(filename) -- this is the path where the taco should be saved to.
-        
-        If you use this data, please cite
+    Parameters
+    ----------
+    url : :obj:`str`, optional
+        The url from which the tsv-data should be retrieved
+    filename : :obj:`str`, optional
+        this is the path where the taco will be saved to. default : "~/.tacoma/ht09.taco"
+    
+    Returns
+    -------
+    :mod:`edge_lists`
+        The temporal network of the 'Hypertext 2009 dynamic contact network'.
+    
+    If you use this data, please cite
 
-        L. Isella et al.,  What's in a crowd? Analysis of face-to-face behavioral networks, 
-        Journal of Theoretical Biology 271, 166 (2011).
+    L. Isella et al.,  What's in a crowd? Analysis of face-to-face behavioral networks, 
+    Journal of Theoretical Biology 271, 166 (2011).
     """
 
     # get directory name for download
@@ -230,6 +262,7 @@ def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatte
     return el
 
 def write_fwP_args(args,filename):
+    """Dump Flockwork-P arguments to a json-file"""
 
     filename = os.path.abspath(os.path.expanduser(filename))
 
@@ -237,6 +270,7 @@ def write_fwP_args(args,filename):
         json.dump(args,f)
 
 def load_fwP_args(filename):
+    """Load Flockwork-P arguments from a json-file"""
 
     filename = os.path.abspath(os.path.expanduser(filename))
 
@@ -247,22 +281,31 @@ def load_fwP_args(filename):
     
 
 def load_sociopatterns_hypertext_2009(filename="~/.tacoma/ht09.taco"):
-    """
-        Once `download_sociopatterns_hypertext_2009` was called,
-        use this function to retrieve an `edge_lists` instance
-        of the conference data set 'Hypertext 2009 dynamic contact network'
-        (from the SocioPatterns project).
+    """Once :mod:`download_sociopatterns_hypertext_2009` was called,
+    use this function to retrieve an :mod:`edge_lists` instance
+    of the conference data set 'Hypertext 2009 dynamic contact network'
+    (from the SocioPatterns project).
+    
+    Parameters
+    ----------
+    filename : :obj:`str`, optional
+        this is the path where the taco was saved to. default : "~/.tacoma/ht09.taco"
 
-        py::arg(filename) -- this is the path where the taco was saved too
-                             (default: ~/.tacoma/ht09.taco)
-        
-        If you use this data, please cite
+    Returns
+    -------
+    :mod:`edge_lists`
+        The temporal network of the 'Hypertext 2009 dynamic contact network'.
+    
+    If you use this data, please cite
 
-        L. Isella et al.,  What's in a crowd? Analysis of face-to-face behavioral networks, 
-        Journal of Theoretical Biology 271, 166 (2011).
+    L. Isella et al.,  What's in a crowd? Analysis of face-to-face behavioral networks, 
+    Journal of Theoretical Biology 271, 166 (2011).
     """
 
     filename = os.path.abspath(os.path.expanduser(filename))
+
+    if not os.path.exists(filename):
+        raise ValueError("File "+filename+" does not exist. Have you called tacoma.`download_and_convert_sociopatterns_hypertext_2009` before?")
 
     return load_json_taco(filename)
 
