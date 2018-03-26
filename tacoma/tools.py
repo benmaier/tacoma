@@ -5,6 +5,33 @@ import numpy as np
 
 import tacoma as tc
 
+def complete_graph(N):
+    """Get a single frame of a complete network.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes.
+        
+    Returns 
+    -------
+    :mod:`edge_lists`
+        An instance of `tacoma.edge_lists` with t = [0.0], tmax = 1.0.
+    """
+
+    edge_list = []
+    for i in range(N-1):
+        for j in range(i+1,N):
+            edge_list.append((i,j))
+
+    this = tc.edge_lists()
+    this.t = [0.]
+    this.tmax = 1.
+    this.edges = [edge_list]
+    this.N = N
+
+    return this
+
 def get_logarithmic_histogram(data,
                               bins, #number of bins
                               return_bin_means = True,
