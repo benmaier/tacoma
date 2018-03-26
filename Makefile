@@ -18,5 +18,11 @@ pyclean:
 python:
 	python setup.py develop
 
-groot:
+grootinstall:
 	/usr/local/bin/python2.7 setup.py install --user
+
+groot:
+	git fetch
+	git pull
+	make clean
+	make grootinstall
