@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+"""
+This module provides functions to analyze and plot
+the results from temporal network analyses, especially
+from the :mod:`tacoma.measure_group_sizes_and_durations`
+routine. These functions are not imported by default
+as they require `matplotlib` which cannot be easily installed
+on some systems like compute clusters due to a missing
+X server. If you want to use the routines of this
+submodule, please make sure `matplotlib` is installed.
+"""
 
 from math import log10
 
@@ -9,8 +19,6 @@ from tacoma import marker_sequence
 from tacoma import color_sequence
 from tacoma import get_logarithmic_histogram
 
-
-
 def temporal_network_group_analysis(result,
                                     max_group = 5,
                                     time_normalization_factor = 1.,
@@ -19,6 +27,40 @@ def temporal_network_group_analysis(result,
                                     fit_power_law = False,
                                     ax = None,
                                    ):
+    """Analyze the result of :mod:`tacoma.measure_group_sizes_and_durations`
+    and plot it.
+
+    Parameters
+    ----------
+    result : :mod:`tacoma.group_sizes_and_durations`
+        The result of the temporal network analysis provided by
+        :mod:`tacoma.measure_group_sizes_and_durations`
+    max_group : int, optional
+        The maximum group size for which to plot the duration distribution.
+        default: 5
+    time_normalization_factor : float, optional
+        Factor with which the time in the duration lists are rescaled
+        default: 1.0
+    time_unit : :obj:`str`, optional
+        Time unit to put on the axes. default : None
+    plot_step : bool, optional
+        If True, plot step functions instead of markers. default : False
+    fit_power_law : bool, optional
+        If True, fit and plot a power law to the distributions. default: False
+    ax : :obj:`list` of matplotlib axes objects
+        The axes to plot to (have to be a list of length 3 at least). If 
+        set to None, a figure and axes will be created and returned. 
+        default : None
+
+    Returns
+    -------
+    matplotlib figure
+        A matplotlib figure object.
+    array_like of matplotlib axes
+        As the name says.
+    :obj:`dict`
+        The results of the analysis (the distributions).
+    """
 
     if ax is None:
         fig, ax = pl.subplots(2,2)
