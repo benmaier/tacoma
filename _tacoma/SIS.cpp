@@ -130,6 +130,9 @@ void SIS::infection_event()
 
 void SIS::recovery_event()
 {
+    if ((prevent_disease_extinction) and (infected.size() == 1))
+        return ;
+
     // initialize uniform integer random distribution
     uniform_int_distribution < size_t > random_infected(0,infected.size()-1);
 

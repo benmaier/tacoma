@@ -451,13 +451,14 @@ PYBIND11_MODULE(_tacoma, m) {
         .def_readwrite("P", &dtu_week::P);
 
     py::class_<SIS>(m,"SIS")
-        .def(py::init<size_t,double,double,double,size_t,size_t,size_t,bool>(),
+        .def(py::init<size_t,double,double,double,size_t,size_t,bool,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
                 py::arg("infection_rate"),
                 py::arg("recovery_rate"),
                 py::arg("number_of_initially_infected") = 1, 
                 py::arg("number_of_initially_vaccinated") = 0, 
+                py::arg("prevent_disease_extinction") = false,
                 py::arg("seed") = 0,
                 py::arg("verbose") = false
             )

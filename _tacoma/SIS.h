@@ -55,6 +55,7 @@ class SIS
         size_t number_of_initially_vaccinated;
         size_t seed;
         bool verbose;
+        bool prevent_disease_extinction;
 
         mt19937_64 generator;
         uniform_real_distribution<double> randuni;
@@ -71,6 +72,7 @@ class SIS
             double _recovery_rate,
             size_t _number_of_initially_infected = 1,
             size_t _number_of_initially_vaccinated = 0,
+            bool _prevent_disease_extinction = false,
             size_t _seed = 0,
             bool _verbose = false
         )
@@ -81,6 +83,7 @@ class SIS
             recovery_rate = _recovery_rate;
             number_of_initially_vaccinated = _number_of_initially_vaccinated;
             number_of_initially_infected = _number_of_initially_infected;
+            prevent_disease_extinction = _prevent_disease_extinction;
             verbose = _verbose;
             seed = _seed;
 
@@ -92,7 +95,6 @@ class SIS
         void reset() 
         {
             // reset observables
-            //
             time.clear();
             R0.clear();
             SI.clear();
