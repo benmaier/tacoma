@@ -82,8 +82,6 @@ def load_json_taco(fp):
         type as given in the .taco-file
     """
 
-    return load_json_taco(fp)
-
     file_is_string = isinstance(fp,basestring)
 
     if file_is_string:

@@ -141,8 +141,6 @@ def load_dtu_flockwork_params(scaled=False):
     """
 
     if scaled:
-
-    if scaled:
         fn = os.path.join(path,'dtu_fwP_params_scaled.json')
     else:
         fn = os.path.join(path,'dtu_fwP_params_unscaled.json')

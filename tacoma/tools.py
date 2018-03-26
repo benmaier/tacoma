@@ -6,7 +6,7 @@ import numpy as np
 import tacoma as tc
 
 def complete_graph(N):
-    """Get a single frame of a complete network.
+    """Get a single fram which consists of a complete network.
 
     Parameters
     ----------
