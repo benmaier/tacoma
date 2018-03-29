@@ -831,6 +831,9 @@ edge_trajectories
             const bool verbose
         )
 {
+    //cout << "return_edge_similarities = " << return_edge_similarities << endl;
+    //cout << "verbose = " << verbose << endl;
+
     // get references to edge_list and time
     vector < vector < pair < size_t, size_t > > > & all_edges = list_of_edge_lists.edges;
     vector < double > & time = list_of_edge_lists.t;

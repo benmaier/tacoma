@@ -10,6 +10,8 @@ import tacoma as tc
 from rocsNWL.drawing import draw
 from rocsNWL.drawing import get_pos
 
+import community
+
 _layout_function = 'graphviz'
 
 def draw_edge_lists(L):
@@ -37,6 +39,7 @@ def draw_edges(traj,
                time_unit = None,
                ax = None,
                fit = False,
+               edge_order = None,
                ):
 
     if ax is None:
@@ -55,7 +58,13 @@ def draw_edges(traj,
         max_node.extend(entry.edge)
         for t_ in entry.time_pairs:
             t_ = np.array(t_) * time_normalization_factor
-            lines.append([ t_, [i,i]])
+
+            if edge_order is not None:
+                y = edge_order[i]
+            else:
+                y = i
+
+            lines.append([ t_, [y,y]])
 
     fit_x = np.array(all_t_min)
     fit_y = np.arange(len(traj),dtype=float)
@@ -90,6 +99,37 @@ def draw_edges(traj,
 
 
     return fig, ax
+
+def get_edge_order(edge_traj,threshold=0.):
+
+    G = get_edge_graph(edge_traj,threshold = 0.)
+
+    partition = community.best_partition(G)
+    N_comm = max([v for v in partition.values()]) + 1
+
+    comm = [ [] for i in range(N_comm) ]
+
+    for k, v in partition.items():
+        comm[v].append(k)
+
+    order = []
+    for module in comm:
+        order.extend(module)
+
+    order = np.argsort(order)
+
+    return order
+
+
+def get_edge_graph(edge_traj,threshold = 0.):
+
+    N_edges = len(edge_traj.trajectories)
+    G = nx.Graph()
+    G.add_nodes_from(range(N_edges))
+    G.add_edges_from([ (u,v) for u,v,val in edge_traj.edge_similarities if val > threshold])
+
+    return G
+
 
 if __name__ == "__main__":
     import time
