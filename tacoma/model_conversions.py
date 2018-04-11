@@ -136,35 +136,46 @@ def estimate_ZSBB_args(temporal_network,
 # ==================================================== FLOCKWORK P-MODEL ===============================================
 
 def estimate_flockwork_P_args(temporal_network,*args,**kwargs):
-    """
-        Bins an `edge_changes` instance for each `dt` (after each step, respectively,
-        if `N_time_steps` was provided) and computes the rewiring rate gamma and probability
-        to stay alone P  from the binned `edges_in` and `edges_out`. For DTU data use 
-        dt = 3600, for sociopatterns use dt = 600.
+    """Bins an `edge_changes` instance for each `dt` (after each step, respectively,
+    if `N_time_steps` was provided) and computes the rewiring rate gamma and probability
+    to stay alone P  from the binned `edges_in` and `edges_out`. For DTU data use 
+    dt = 3600, for sociopatterns use dt = 600.
 
-        py::arg("temporal_network"),             -- the temporal network
-        py::arg("t_run_total") = None,           -- this is just plainly copied to the returned 
-                                                    kwargs. If it is set to `None`, t_run_total
-                                                    will be set to `temporal_network.tmax`
-        py::arg("dt") = 0.0,                     -- dt of the time bin
-        py::arg("N_time_steps") = 0,             -- number of time bins (use either this or dt).
-        py::arg("aggregated_network") = {}       -- dict(edge -> similarity), if this is given,
-                                                    the kwargs are supposed to be for the function
-                                                    `flockwork_P_varying_rates_neighbor_affinity`,
-                                                    you can get this network from the `aggregated_network`
-                                                    property from the results returned by
-                                                    `measure_group_sizes_and_durations`
-        py::arg("ensure_empty_network") = false, -- if this is True, bins where the original network
-                                                    is empty (n_edges = 0) will be an artificially 
-                                                    set high gamma with P = 0, such that nodes will
-                                                    lose all edges.
-        py::arg("use_preferential_node_selection") = false -- this is just plainly copied to 
-                                                              the returned kwargs if `aggregated_network`
-                                                              is not empty
-        py::arg("verbose") = false
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    t_run_total : float
+        this is just plainly copied to the returned kwargs. If it is set to `None`, t_run_total will be set to `temporal_network.tmax`
+    dt : float
+        The demanded bin size. default : 0.0
+    N_time_steps : int
+        Number of time bins (use either this or dt). default : 0
+    aggregated_network : :obj:`dict` of :obj:`tuple` of int -> float, optional
+        dict(edge -> similarity), if this is given,
+        the kwargs are supposed to be for the function
+        :mod:`flockwork_P_varying_rates_neighbor_affinity`,
+        you can get this network from the `aggregated_network`
+        property from the results returned by
+        :mod:`measure_group_sizes_and_durations`. default : `{}`
+    ensure_empty_network : bool, optional
+        if this is True, bins where the original network
+        is empty (n_edges = 0) will be an artificially 
+        set high gamma with P = 0, such that nodes will
+        lose all edges. default : False
+    use_preferential_node_selection : bool, optional
+        this is just plainly copied to 
+        the returned kwargs if `aggregated_network`
+        is not empty. default : False
+    verbose: bool, optional
+        Be chatty.
 
-        Returns a dictionary of kwargs for the functions `flockwork_P_varying_rates` or 
-        `flockwork_P_varying_rates_neighbor_affinity`.
+
+    Returns
+    -------
+    :obj:`dict`
+        kwargs for the functions :mod:`flockwork_P_varying_rates` or 
+        :mod:`flockwork_P_varying_rates_neighbor_affinity`, if `aggregated_network` was provided
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
