@@ -1,3 +1,4 @@
+from __future__ import print_function
 import matplotlib.pyplot as pl
 from matplotlib.collections import LineCollection
 import networkx as nx
@@ -161,16 +162,16 @@ if __name__ == "__main__":
     result = tc.get_edge_trajectories(FBIN)
     end = time.time()
     traj = result.trajectories
-    print result.edge_similarities
+    print(result.edge_similarities)
 
-    print "needed ", end-start, "seconds"
+    print("needed ", end-start, "seconds")
     draw_edges(traj,fit=True)
 
     start = time.time()
     result = tc.get_edge_trajectories(F)
     end = time.time()
     traj = result.trajectories
-    print "needed ", end-start, "seconds"
+    print("needed ", end-start, "seconds")
     draw_edges(traj)
 
 

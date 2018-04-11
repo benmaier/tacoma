@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import numpy as np
 import numpy.polynomial.polynomial as poly
 from numpy.polynomial import Polynomial
@@ -291,9 +292,9 @@ if __name__ == "__main__":
     fw_binned_result = tc.measure_group_sizes_and_durations(fw_binned)
 
     kwargs = get_ZSBB_parameters(fw_binned,fw_binned_result,fit_discrete=True,dt=300.)
-    print "lambda =", kwargs['lambda']
-    print "b0 =", kwargs['b0']
-    print "b1 =", kwargs['b1']
+    print("lambda =", kwargs['lambda'])
+    print("b0 =", kwargs['b0'])
+    print("b1 =", kwargs['b1'])
     kwargs['t_run_total'] = (len(fw_binned.t) + 1)*kwargs['N']
     zsbb = tc.ZSBB_model(**kwargs)
     zsbb_binned = tc.sample(zsbb,dt=kwargs['N'])

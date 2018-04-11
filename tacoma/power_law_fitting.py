@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+
+from __future__ import print_function
 import numpy as np
 
 from scipy.special import zeta
@@ -64,11 +66,11 @@ if __name__ == "__main__":
     G = nx.barabasi_albert_graph(100000,2)
     k = [ G.degree(n) for n in G.nodes() ] 
     c = Counter(k)
-    dat = np.array([(a,b) for a,b in c.iteritems()])
+    dat = np.array([(a,b) for a,b in c.items()])
     x = dat[:,0]
     y = dat[:,1]/float(dat[:,1].sum())
     alpha, err, x_min = fit_power_law_clauset(k,discrete=True)
-    print alpha, err
+    print(alpha, err)
     pl.figure()
     pl.plot(x,y,'.')
     pl.xscale('log')

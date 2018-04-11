@@ -110,7 +110,7 @@ def flockwork_P_equilibrium_configuration(N,P,shuffle_nodes = True):
         # loop through group sizes in descending order.
         # start with the smallest group size that
         # may contain all of the nodes left
-        for m in xrange(nodes_left,0,-1):
+        for m in range(nodes_left,0,-1):
 
             # if the expected number of groups of this size is not zero
             if dist[m-1] > 0. and nodes_left >= m:
@@ -132,7 +132,7 @@ def flockwork_P_equilibrium_configuration(N,P,shuffle_nodes = True):
                     delta_C_m = 0
 
                 # add the additional number of groups of this size
-                for group_instance in xrange(delta_C_m):
+                for group_instance in range(delta_C_m):
                     #for u in xrange(nodes_left-1,nodes_left-m,-1):
                     #    for v in xrange(u-1,nodes_left-m-1,-1):
                     #        edges.append((node_ints[u],node_ints[v]))
@@ -140,8 +140,8 @@ def flockwork_P_equilibrium_configuration(N,P,shuffle_nodes = True):
                     # add fully connected clusters to the edge set
                     if m > 1:
                         edges.extend([ (node_ints[u],node_ints[v])\
-                                        for u in xrange(nodes_left-1,nodes_left-m,-1) \
-                                            for v in xrange(u-1,nodes_left-m-1,-1) ])
+                                        for u in range(nodes_left-1,nodes_left-m,-1) \
+                                            for v in range(u-1,nodes_left-m-1,-1) ])
 
                     # remove the grouped nodes from the pool of remaining nodes
                     nodes_left -= m
@@ -166,4 +166,4 @@ if __name__ == "__main__":
 
     dist = flockwork_P_equilibrium_group_size_distribution(N,P)
 
-    print dist, sum([ m * h for m,h in enumerate(dist)])
+    print(dist, sum([ m * h for m,h in enumerate(dist)]))
