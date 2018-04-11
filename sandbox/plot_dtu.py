@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as pl
-import cPickle as pickle
+import pickle as pickle
 from scipy.special import kl_div
 from rocsNWL import marker_sequence
 

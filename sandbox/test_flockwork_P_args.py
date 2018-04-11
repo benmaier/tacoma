@@ -29,6 +29,6 @@ C.edges_out = [
 
 fw_args = tc.get_flockwork_P_args(C,dt=1.)
 
-print fw_args.rewiring_rate
-print fw_args.P
-print fw_args.__dict__
+print(fw_args.rewiring_rate)
+print(fw_args.P)
+print(fw_args.__dict__)

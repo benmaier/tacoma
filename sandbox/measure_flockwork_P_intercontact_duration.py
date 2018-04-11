@@ -15,12 +15,12 @@ seed = 45
 
 edge_changes = tc.flockwork_P_varying_rates(E,N,P,t_run_total,gamma,tmax,seed=seed)
 
-print "measuring groups and durations, ignore histograms differences =", True
+print("measuring groups and durations, ignore histograms differences =", True)
 start = time.time()
 result = tc.measure_group_sizes_and_durations_for_edge_changes(edge_changes,
                                                                ignore_size_histogram_differences = True)
 end = time.time()
-print "took", end - start, "seconds"
+print("took", end - start, "seconds")
 
 
 new_fig, axes = pl.subplots(2,2)
@@ -44,7 +44,7 @@ axes[1].set_yscale('log')
 social_network = result.aggregated_network
 
 i, j , data = [], [], []
-[ ( i.append(k[0]), j.append(k[1]), data.append(np.log(v))) for k, v in social_network.iteritems() ]
+[ ( i.append(k[0]), j.append(k[1]), data.append(np.log(v))) for k, v in social_network.items() ]
 
 A = sprs.csr_matrix((data,(i,j)),shape=(N,N))
 A += A.T

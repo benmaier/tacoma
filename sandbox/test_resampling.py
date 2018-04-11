@@ -3,7 +3,7 @@ import tacoma as tc
 sample_aggregates = False
 N_time_steps = 2
 
-print "===== edge_lists => edge_lists ====="
+print("===== edge_lists => edge_lists =====")
 
 L = tc.edge_lists()
 
@@ -25,23 +25,23 @@ L.time_unit = 's'
 
 new = tc.bin_from_edge_lists(L,N_time_steps=N_time_steps,verbose=True)
 
-print new.N
-print new.t
-print new.tmax
-print new.edges
-print new.notes
-print new.time_unit
+print(new.N)
+print(new.t)
+print(new.tmax)
+print(new.edges)
+print(new.notes)
+print(new.time_unit)
 
-print "=====binning from edge lists======="
+print("=====binning from edge lists=======")
 
 new = tc.bin_from_edge_lists(L,N_time_steps=N_time_steps,verbose=True)
 
-print new.N
-print new.t
-print new.tmax
-print new.edges
+print(new.N)
+print(new.t)
+print(new.tmax)
+print(new.edges)
 
-print "===== edge_changes => edge_lists ====="
+print("===== edge_changes => edge_lists =====")
 
 C = tc.edge_changes()
 
@@ -69,14 +69,14 @@ C.edges_out = [
 
 new = tc.sample_from_edge_changes(C,N_time_steps=N_time_steps,sample_aggregates=sample_aggregates,verbose=True)
 
-print new.N
-print new.t
-print new.tmax
-print new.edges
+print(new.N)
+print(new.t)
+print(new.tmax)
+print(new.edges)
 
 new = tc.bin_from_edge_changes(C,N_time_steps=N_time_steps,verbose=True)
 
-print new.N
-print new.t
-print new.tmax
-print new.edges
+print(new.N)
+print(new.t)
+print(new.tmax)
+print(new.edges)

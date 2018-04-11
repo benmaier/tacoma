@@ -36,7 +36,7 @@ for ieta,eta in enumerate(etas):
         
 
         seed += 1
-        print meas
+        print(meas)
 
 
 tc_means = tc_vals.mean(axis=1)

@@ -12,13 +12,13 @@ tn = tc.convert(tn)
 
 edge_traj = tc.get_edge_trajectories(tn,return_edge_similarities=True)
 
-print edge_traj.edge_similarities[:10]
+print(edge_traj.edge_similarities[:10])
 
 edge_order = get_edge_order(edge_traj,threshold=3600.)
 
 
-print edge_order
-print np.all(edge_order == np.sort(edge_order))
+print(edge_order)
+print(np.all(edge_order == np.sort(edge_order)))
 
 draw_edges(edge_traj.trajectories,edge_order=edge_order)
 draw_edges(edge_traj.trajectories)

@@ -15,7 +15,7 @@ N_meas = 10
 #Rs = np.zeros((len(R0s),N_meas))
 R0 = 1.5
 eta = R0*rho/k
-print eta, rho
+print(eta, rho)
 
 sir = tc.Dyn_SIR(N,200,eta,rho,I0,verbose=True)
 

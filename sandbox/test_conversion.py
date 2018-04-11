@@ -1,6 +1,6 @@
 import tacoma as tc
 
-print "===== edge_lists => edge_lists ====="
+print("===== edge_lists => edge_lists =====")
 
 L = tc.edge_lists()
 
@@ -22,23 +22,23 @@ L.edges = [
 
 new = tc.convert(L)
 
-print "N =", new.N
-print "t0 =", new.t0
-print "t =", new.t
-print "tmax =", new.tmax
-print "edges_in =", new.edges_in
-print "edges_out =", new.edges_out
-print "edges_initial =", new.edges_initial
+print("N =", new.N)
+print("t0 =", new.t0)
+print("t =", new.t)
+print("tmax =", new.tmax)
+print("edges_in =", new.edges_in)
+print("edges_out =", new.edges_out)
+print("edges_initial =", new.edges_initial)
 
 new = tc.convert(new)
 
-print 
-print "N =", new.N
-print "t =", new.t
-print "tmax =", new.tmax
-print "edges =", new.edges
+print() 
+print("N =", new.N)
+print("t =", new.t)
+print("tmax =", new.tmax)
+print("edges =", new.edges)
 
-print "=========== edge changes =============="
+print("=========== edge changes ==============")
 C = tc.edge_changes()
 
 C.N = 3
@@ -64,22 +64,22 @@ C.edges_out = [
               ]
 
 new = tc.convert(C)
-print 
-print "N =", new.N
-print "t =", new.t
-print "tmax =", new.tmax
-print "edges =", new.edges
+print() 
+print("N =", new.N)
+print("t =", new.t)
+print("tmax =", new.tmax)
+print("edges =", new.edges)
 
-print "=========== edge changes =============="
+print("=========== edge changes ==============")
 new = tc.convert(new)
 
-print
-print "N =", new.N
-print "t0 =", new.t0
-print "t =", new.t
-print "tmax =", new.tmax
-print "edges_in =", new.edges_in
-print "edges_out =", new.edges_out
-print "edges_initial =", new.edges_initial
-print new.notes
+print()
+print("N =", new.N)
+print("t0 =", new.t0)
+print("t =", new.t)
+print("tmax =", new.tmax)
+print("edges_in =", new.edges_in)
+print("edges_out =", new.edges_out)
+print("edges_initial =", new.edges_initial)
+print(new.notes)
 

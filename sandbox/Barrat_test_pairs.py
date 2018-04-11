@@ -1,12 +1,12 @@
 import tacoma as tc
 import matplotlib.pyplot as pl
 from collections import Counter
-from itertools import izip
+
 import numpy as np
 
 def get_hist_from_counter(c):
 
-    data = np.array(c.items(),dtype=float)
+    data = np.array(list(c.items()),dtype=float)
 
     x = data[:,0]
     y = data[:,1] / data[:,1].sum()
@@ -30,9 +30,9 @@ b1 = 0.8
 
 plot_size = False
 
-print "simulating"
+print("simulating")
 result = tc.ZSBB_model([],N,lambda_,b0,b1,t_sim,t_equilibration=t_eq,seed=1346,record_sizes_and_durations=True)
-print "done"
+print("done")
 
 fig, ax = pl.subplots(1,3,figsize=(12,4))
 
@@ -64,12 +64,12 @@ if plot_size:
 
 m_edges = 0
 ks = []
-print len(result.edges_in[0])
-print result.edges_in[0]
+print(len(result.edges_in[0]))
+print(result.edges_in[0])
 edges_in = result.edges_in
 edges_out = result.edges_out
 
-for e_in,e_out in izip(edges_in,edges_out):
+for e_in,e_out in zip(edges_in,edges_out):
     #print ch, e_in, e_out
     m_in = len(e_in)
     m_out = len(e_out)
@@ -82,7 +82,7 @@ for e_in,e_out in izip(edges_in,edges_out):
 t = np.array(result.t,dtype=float)
 t /= N
 
-print len(ks), len(result.t)
+print(len(ks), len(result.t))
 
 
 ax[2].plot(t,ks,'-')

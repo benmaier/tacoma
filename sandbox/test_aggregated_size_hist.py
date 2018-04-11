@@ -1,7 +1,7 @@
 import tacoma as tc
 import numpy as np
 
-print "===== edge_lists => edge_lists ====="
+print("===== edge_lists => edge_lists =====")
 
 L = tc.edge_lists()
 
@@ -22,11 +22,11 @@ L.edges = [
 
 result = tc.measure_group_sizes_and_durations_for_edge_lists(L)
 
-print "N_m =", result.aggregated_size_histogram
-print "sum(m*N_m) =", np.dot(np.arange(0,L.N+1),result.aggregated_size_histogram), "should be N =", L.N
+print("N_m =", result.aggregated_size_histogram)
+print("sum(m*N_m) =", np.dot(np.arange(0,L.N+1),result.aggregated_size_histogram), "should be N =", L.N)
 
 
-print "===== edge_changes => edge_lists ====="
+print("===== edge_changes => edge_lists =====")
 
 C = tc.edge_changes()
 
@@ -54,5 +54,5 @@ C.edges_out = [
 
 result = tc.measure_group_sizes_and_durations_for_edge_changes(C)
 
-print "N_m =", result.aggregated_size_histogram
-print "sum(m*N_m) =", np.dot(np.arange(0,C.N+1),result.aggregated_size_histogram), "should be N =", C.N
+print("N_m =", result.aggregated_size_histogram)
+print("sum(m*N_m) =", np.dot(np.arange(0,C.N+1),result.aggregated_size_histogram), "should be N =", C.N)

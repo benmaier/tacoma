@@ -15,7 +15,7 @@ N_meas = 10
 #Rs = np.zeros((len(R0s),N_meas))
 R0 = 4.0
 eta = R0*rho/k
-print eta, rho
+print(eta, rho)
 
 sirs = tc.SIRS(N,200,eta,rho,1.0,number_of_initially_infected=I0)
 

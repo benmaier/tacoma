@@ -1,3 +1,4 @@
+
 import tacoma as tc
 import numpy as np
 import matplotlib.pyplot as pl
@@ -59,7 +60,7 @@ for iR0,R0 in enumerate(R0s):
         ax[iR0].plot(sir.time,sir.I,'-',c='r',alpha=0.1,lw=1)
         ax[iR0].plot(sir.time,sir.R,'-',c='g',alpha=0.1,lw=1)
 
-        print R0, meas, end1-start1, end2-start2
+        print(R0, meas, end1-start1, end2-start2)
 
 pl.figure()
 pl.plot(R0s,Rs.mean(axis=1)/N)

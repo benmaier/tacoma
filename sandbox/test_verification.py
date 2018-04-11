@@ -12,7 +12,7 @@ L.edges = [
 
 tc.verify(L)
 
-print 
+print() 
 
 C = tc.edge_changes()
 

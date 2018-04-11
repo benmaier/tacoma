@@ -1,6 +1,6 @@
 import tacoma as tc
 
-print "===== edge_lists => edge_lists ====="
+print("===== edge_lists => edge_lists =====")
 
 L = tc.edge_lists()
 
@@ -35,12 +35,12 @@ L2.edges = [
 
 new = tc.concatenate([L,L2,L])
 
-print new.N
-print new.t
-print new.tmax
-print new.edges
+print(new.N)
+print(new.t)
+print(new.tmax)
+print(new.edges)
 
-print "===== edge_changes => edge_changes ====="
+print("===== edge_changes => edge_changes =====")
 
 C = tc.edge_changes()
 
@@ -80,10 +80,10 @@ C2.edges_out = [
 
 new = tc.concatenate([C,C2,C])
 
-print new.N
-print new.t0
-print new.t
-print new.tmax
-print new.edges_initial
-print new.edges_in
-print new.edges_out
+print(new.N)
+print(new.t0)
+print(new.t)
+print(new.tmax)
+print(new.edges_initial)
+print(new.edges_in)
+print(new.edges_out)

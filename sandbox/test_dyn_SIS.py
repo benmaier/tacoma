@@ -6,7 +6,7 @@ import numpy as np
 sample_aggregates = False
 N_time_steps = 5
 
-print "===== edge_lists => edge_lists ====="
+print("===== edge_lists => edge_lists =====")
 
 L = tc.edge_lists()
 
@@ -33,7 +33,7 @@ pl.plot(L_sis.time,L_sis.I)
 pl.plot(L_sis.time,L_sis.SI)
 pl.plot(L_sis.time,L_sis.R0)
 
-print "===== edge_changes => edge_lists ====="
+print("===== edge_changes => edge_lists =====")
 
 C = tc.edge_changes()
 
@@ -67,10 +67,10 @@ pl.plot(C_sis.time,C_sis.I,'--')
 pl.plot(C_sis.time,C_sis.SI,'--')
 pl.plot(C_sis.time,C_sis.R0,'--')
 
-print "================ SIS vestergaard =============="
+print("================ SIS vestergaard ==============")
 result = gill.SIS_Poisson_homogeneous(L.N,L.edges,1.0,0.1,100,seed=12234235,initial_number_of_infected=3,verbose=True)
 
-print result
+print(result)
 
 #It = np.array(result[0].I_of_t)
 #t = It[:,0]

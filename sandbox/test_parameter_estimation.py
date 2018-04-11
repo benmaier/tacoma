@@ -36,7 +36,7 @@ zsbb.tmax = socio.tmax - socio.t[0]
 #zsbb_binned = tc.bin(zsbb,N_time_steps=int((zsbb.tmax-zsbb.t0) / (socio_binned.N / 5.0)))
 zsbb_binned = tc.bin(zsbb,dt=20.)
 
-print ZSBB_params
+print(ZSBB_params)
 
 # plot properties
 result = tc.measure_group_sizes_and_durations(zsbb_binned)

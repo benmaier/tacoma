@@ -43,12 +43,12 @@ for tn in [socio, fwP, fwP_binned]:
     t, k = np.array(tc.mean_degree(tn))
     end = time.time()
 
-    print "took", end-start, "seconds"
+    print("took", end-start, "seconds")
 
     line, = ax[0].step(t,k,where='post',lw=1)
 
     mean_k = tc.time_average(t, k)
-    print mean_k
+    print(mean_k)
     eta = R0 * rho / mean_k
 
     
