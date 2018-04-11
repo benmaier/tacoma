@@ -1,6 +1,7 @@
 """
 This module provides routines to load and write temporal networks to the taco fileformat
 """
+from __future__ import print_function
 
 import os 
 import json
@@ -60,7 +61,7 @@ def write_json_taco(temporal_network,fp):
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
-    if isinstance(fp,basestring):
+    if isinstance(fp,str):
         fp = os.path.abspath( os.path.expanduser(fp) )
         fp = open(fp,'w')
 
@@ -82,7 +83,7 @@ def load_json_taco(fp):
         type as given in the .taco-file
     """
 
-    file_is_string = isinstance(fp,basestring)
+    file_is_string = isinstance(fp,str)
 
     if file_is_string:
         fp = os.path.abspath( os.path.expanduser(fp) )
@@ -133,7 +134,7 @@ def read_json_taco(fp):
 
     Returns
     -------
-    temporal network
+    temporal_network : `edge_lists` or `edge_changes`
         type as given in the .taco-file
     """
 
@@ -155,7 +156,7 @@ def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatte
     
     Returns
     -------
-    :mod:`edge_lists`
+    edge_lists : :mod:`edge_lists`
         The temporal network of the 'Hypertext 2009 dynamic contact network'.
     
     If you use this data, please cite
@@ -174,7 +175,7 @@ def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatte
 
     # open gzipped file
     gzip_file = os.path.join(directory, 'ht09_contact_list.dat.gz')
-    with gzip.open(gzip_file,'rb') as f:
+    with gzip.open(gzip_file,mode='rt') as f:
         reader = csv.reader(f,delimiter='\t')
 
         # mappings of nodes to integers
@@ -291,7 +292,7 @@ def load_sociopatterns_hypertext_2009(filename="~/.tacoma/ht09.taco"):
 
     Returns
     -------
-    :mod:`edge_lists`
+    edge_lists : :mod:`edge_lists`
         The temporal network of the 'Hypertext 2009 dynamic contact network'.
     
     If you use this data, please cite
@@ -303,19 +304,19 @@ def load_sociopatterns_hypertext_2009(filename="~/.tacoma/ht09.taco"):
     filename = os.path.abspath(os.path.expanduser(filename))
 
     if not os.path.exists(filename):
-        raise ValueError("File "+filename+" does not exist. Have you called tacoma.`download_and_convert_sociopatterns_hypertext_2009` before?")
+        raise ValueError("File "+filename+" does not exist. Have you called tacoma.download_and_convert_sociopatterns_hypertext_2009() before?")
 
     return load_json_taco(filename)
 
 if __name__ == "__main__":
     el = download_and_convert_sociopatterns_hypertext_2009()
 
-    print el.N
-    print el.tmax
-    print el.t[:10]
-    print el.edges[:10]
-    print el.notes
-    print el.time_unit
+    print(el.N)
+    print(el.tmax)
+    print(el.t[:10])
+    print(el.edges[:10])
+    print(el.notes)
+    print(el.time_unit)
 
 
 
