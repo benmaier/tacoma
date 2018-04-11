@@ -16,6 +16,7 @@ import community
 _layout_function = 'graphviz'
 
 def draw_edge_lists(L):
+    """this draws a force-directed layout for each snapshot of a temporal network and hence should be used with caution"""
 
     G = nx.Graph()
     G.add_nodes_from(range(L.N))
@@ -71,7 +72,7 @@ def draw_edges(traj,
     fit_y = np.arange(len(traj),dtype=float)
     
 
-    lines = [zip(x, y) for x, y in lines]
+    lines = [list(zip(x, y)) for x, y in lines]
 
     ax.add_collection(LineCollection(lines))
 
