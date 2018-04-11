@@ -61,6 +61,7 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(_tacoma, m) {
     m.doc() = "TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks and simulate Gillespie processes on them.";
+    //m.attr("__name__") = "tacoma.core";
     
     m.def("flockwork_P_varying_rates", &flockwork_P_varying_rates, "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rate and varying P. Returns time points and concurrent edge changes.",
             py::arg("E"),
