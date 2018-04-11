@@ -8,15 +8,14 @@ from scipy.optimize import curve_fit
 
 import tacoma as tc
 
-from rocsNWL.drawing import draw
-from rocsNWL.drawing import get_pos
-
 import community
 
 _layout_function = 'graphviz'
 
 def draw_edge_lists(L):
     """this draws a force-directed layout for each snapshot of a temporal network and hence should be used with caution"""
+    from rocsNWL.drawing import draw
+    from rocsNWL.drawing import get_pos
 
     G = nx.Graph()
     G.add_nodes_from(range(L.N))
