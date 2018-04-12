@@ -112,6 +112,7 @@ setup(
             'numpy',
             'scipy',
             ],
+    include_package_data = True,
     cmdclass = {'build_ext': BuildExt},
     zip_safe = False,
 )
