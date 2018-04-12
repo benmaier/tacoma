@@ -7,6 +7,9 @@ import numpy as np
 from numpy import random
 
 from scipy.integrate import ode
+from scipy.integrate import simps
+
+from tacoma.power_law_fitting import fit_power_law_clauset
 
 def flockwork_P_equilibrium_group_size_distribution(N,P):
     """Get the equilibrium group size distribution of a Flockwork-P model
@@ -273,7 +276,59 @@ def flockwork_P_mean_group_size_distribution_for_varying_rates(flockwork_P_param
 
     return mean_distro
 
+def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flockwork_P_params, dk, N = None):
+    """Compute the mean group size distribution for a Flockwork-P system with varying rates from the 
+    mean degree distribution which is fitted as <k>^(-alpha), hence this returns
+        <N_m> = \int dk P(k) * N_m( k/(k+1) )
+    
+    Parameters
+    ----------
+    flockwork_P_params : :obj:`dict`
+        Contains all parameters necessary for a Flockwork-P simulation, especially the 
+        time-dependent rewiring rate and time-dependent reconnection probability
+    dk : float
+        resolution of <k>-space for the solution of the integral.
+    N : int, default : None
+        If given, compute everything for `N` nodes, where `N` is different from 
+        `N` in `flockwork_P_params`.
 
+    Returns
+    -------
+    mean_distribution : numpy.array
+        An array of length `N` with its `i`-th entry containing the mean number of
+        groups of size `m = i + 1`.
+    """
+    
+    if N is None:
+        N = flockwork_P_params['N']
+
+    # estimate mean degree from integrating ODE
+    new_t, k = flockwork_P_mean_degree_for_varying_rates(flockwork_P_params,N)
+
+    alpha, err, xmin = fit_power_law_clauset(k)
+    kmin = k.min()
+    kmax = k.max()
+    
+    norm = 1/(1-alpha) * (kmax**(-alpha+1) - kmin**(-alpha+1))
+    dist = lambda k_:  k_**(-alpha) / norm
+
+    k = np.linspace(kmin, kmax, int((kmax-kmin) / dk) + 1)
+
+    # from equilibrium assumption k = P/(1-P) compute adjusted P
+    new_P = k / (k+1)
+
+    distro = []
+
+    # for every time point and adjusted P, compute the equilibrium group size distribution
+    for P_ in new_P:
+        this_distro = flockwork_P_equilibrium_group_size_distribution(N, P_)
+        distro.append(this_distro[1:])
+
+    distro = np.array(distro)
+
+    mean_distro = simps(dist(k)[:,None] * distro, x = k, axis = 0)
+
+    return mean_distro
 
 
 if __name__ == "__main__":
