@@ -113,6 +113,7 @@ setup(
             'scipy',
             'python-louvain',
             ],
+    include_package_data = True,
     cmdclass = {'build_ext': BuildExt},
     zip_safe = False,
 )
