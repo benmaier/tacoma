@@ -21,11 +21,11 @@ edge_lists = tc.dynamic_RGG(N = N,
 
 end = time.time()
 
-print "needed", end-start, "seconds"
+print("needed", end-start, "seconds")
 
 G = nx.Graph()
 G.add_edges_from(edge_lists.edges[-1])
-G.add_nodes_from(range(N))
+G.add_nodes_from(list(range(N)))
 
 #draw(G)
 
@@ -46,7 +46,7 @@ fig, ax = pl.subplots(2,1)
 
 for ia, a in enumerate(ax):
 
-    sizes = np.array(counters[ia].items(),dtype=float)
+    sizes = np.array(list(counters[ia].items()),dtype=float)
     size = sizes[:,0]
     count = sizes[:,1]
 
@@ -58,6 +58,6 @@ for ia, a in enumerate(ax):
 ax[0].set_xlabel('group size')
 ax[1].set_xlabel('contact duration [steps]')
 
-print "mean link duration =", np.mean(edge_lists.group_durations)
+print("mean link duration =", np.mean(edge_lists.group_durations))
 
 pl.show()

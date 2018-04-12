@@ -79,14 +79,14 @@ for ieta,eta in enumerate(etas):
         
 
         seed += 1
-        print meas
+        print(meas)
 
 
 tc_means = tc_vals.mean(axis=1)
 dyn_means = dyn_vals.mean(axis=1)
 
-print R0
-print etas
+print(R0)
+print(etas)
 
 pl.plot(R0,tc_means/N,label='tc')
 pl.plot(R0,dyn_means/N,label='dyn')

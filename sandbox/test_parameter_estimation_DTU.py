@@ -21,7 +21,7 @@ draw_edges(traj.trajectories,ax=ax[3],time_unit='h',time_normalization_factor = 
 
 # ========== generate surrogate from ZSBB model ======
 ZSBB_params = estimate_ZSBB_args(socio,group_sizes_and_durations=socio_result)
-print ZSBB_params
+print(ZSBB_params)
 zsbb = tc.ZSBB_model(**ZSBB_params)
 this_t0 = zsbb.t0
 zsbb.t0 = 0.

@@ -111,6 +111,7 @@ setup(
             'wget',
             'numpy',
             'scipy',
+            'python-louvain',
             ],
     include_package_data = True,
     cmdclass = {'build_ext': BuildExt},

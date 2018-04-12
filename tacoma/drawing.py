@@ -1,3 +1,4 @@
+from __future__ import print_function
 import matplotlib.pyplot as pl
 from matplotlib.collections import LineCollection
 import networkx as nx
@@ -7,12 +8,14 @@ from scipy.optimize import curve_fit
 
 import tacoma as tc
 
-from rocsNWL.drawing import draw
-from rocsNWL.drawing import get_pos
+import community
 
 _layout_function = 'graphviz'
 
 def draw_edge_lists(L):
+    """this draws a force-directed layout for each snapshot of a temporal network and hence should be used with caution"""
+    from rocsNWL.drawing import draw
+    from rocsNWL.drawing import get_pos
 
     G = nx.Graph()
     G.add_nodes_from(range(L.N))
@@ -37,6 +40,7 @@ def draw_edges(traj,
                time_unit = None,
                ax = None,
                fit = False,
+               edge_order = None,
                ):
 
     if ax is None:
@@ -55,13 +59,19 @@ def draw_edges(traj,
         max_node.extend(entry.edge)
         for t_ in entry.time_pairs:
             t_ = np.array(t_) * time_normalization_factor
-            lines.append([ t_, [i,i]])
+
+            if edge_order is not None:
+                y = edge_order[i]
+            else:
+                y = i
+
+            lines.append([ t_, [y,y]])
 
     fit_x = np.array(all_t_min)
     fit_y = np.arange(len(traj),dtype=float)
     
 
-    lines = [zip(x, y) for x, y in lines]
+    lines = [list(zip(x, y)) for x, y in lines]
 
     ax.add_collection(LineCollection(lines))
 
@@ -90,6 +100,37 @@ def draw_edges(traj,
 
 
     return fig, ax
+
+def get_edge_order(edge_traj,threshold=0.):
+
+    G = get_edge_graph(edge_traj,threshold = 0.)
+
+    partition = community.best_partition(G)
+    N_comm = max([v for v in partition.values()]) + 1
+
+    comm = [ [] for i in range(N_comm) ]
+
+    for k, v in partition.items():
+        comm[v].append(k)
+
+    order = []
+    for module in comm:
+        order.extend(module)
+
+    order = np.argsort(order)
+
+    return order
+
+
+def get_edge_graph(edge_traj,threshold = 0.):
+
+    N_edges = len(edge_traj.trajectories)
+    G = nx.Graph()
+    G.add_nodes_from(range(N_edges))
+    G.add_edges_from([ (u,v) for u,v,val in edge_traj.edge_similarities if val > threshold])
+
+    return G
+
 
 if __name__ == "__main__":
     import time
@@ -121,16 +162,16 @@ if __name__ == "__main__":
     result = tc.get_edge_trajectories(FBIN)
     end = time.time()
     traj = result.trajectories
-    print result.edge_similarities
+    print(result.edge_similarities)
 
-    print "needed ", end-start, "seconds"
+    print("needed ", end-start, "seconds")
     draw_edges(traj,fit=True)
 
     start = time.time()
     result = tc.get_edge_trajectories(F)
     end = time.time()
     traj = result.trajectories
-    print "needed ", end-start, "seconds"
+    print("needed ", end-start, "seconds")
     draw_edges(traj)
 
 

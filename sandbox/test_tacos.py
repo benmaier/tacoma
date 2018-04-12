@@ -2,7 +2,7 @@ import tacoma as tc
 from tacoma.data_io import load_json_taco
 from tacoma.data_io import write_json_taco
 
-print "===== edge_lists ====="
+print("===== edge_lists =====")
 
 L = tc.edge_lists()
 
@@ -21,23 +21,23 @@ L.edges = [
             ],
            ]
 
-print "   == old"
-print L.N
-print L.t
-print L.tmax
-print L.edges
-print L.int_to_node
+print("   == old")
+print(L.N)
+print(L.t)
+print(L.tmax)
+print(L.edges)
+print(L.int_to_node)
 
 write_json_taco(L,"test_write.taco")
 new = load_json_taco("test_write.taco")
 
-print "   == new"
-print new.N
-print new.t
-print new.tmax
-print new.edges
+print("   == new")
+print(new.N)
+print(new.t)
+print(new.tmax)
+print(new.edges)
 
-print "===== edge_changes ====="
+print("===== edge_changes =====")
 
 C = tc.edge_changes()
 
@@ -63,24 +63,24 @@ C.edges_out = [
                 ],
               ]
 
-print "   == old"
-print C.N
-print C.t
-print C.t0
-print C.tmax
-print C.edges_initial
-print C.edges_in
-print C.edges_out
+print("   == old")
+print(C.N)
+print(C.t)
+print(C.t0)
+print(C.tmax)
+print(C.edges_initial)
+print(C.edges_in)
+print(C.edges_out)
 
 write_json_taco(C,"test_write.taco")
 new = load_json_taco("test_write.taco")
 
-print "   == new"
-print new.N
-print new.t
-print new.t0
-print new.tmax
-print new.edges_initial
-print new.edges_in
-print new.edges_out
+print("   == new")
+print(new.N)
+print(new.t)
+print(new.t0)
+print(new.tmax)
+print(new.edges_initial)
+print(new.edges_in)
+print(new.edges_out)
 

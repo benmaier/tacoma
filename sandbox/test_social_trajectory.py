@@ -3,9 +3,9 @@ import tacoma as tc
 sample_aggregates = True
 N_time_steps = 2
 
-print "======================== BINNING =============================="
+print("======================== BINNING ==============================")
 
-print "===== edge_lists => edge_lists ====="
+print("===== edge_lists => edge_lists =====")
 
 L = tc.edge_lists()
 
@@ -27,18 +27,18 @@ L.edges = [
 
 traj = tc.binned_social_trajectory_from_edge_lists(L,2,N_time_steps=N_time_steps,verbose=True)
 
-print traj
+print(traj)
 
 traj = tc.social_trajectory_from_edge_lists(L,2,verbose=True)
 for entry in traj:
-    print 
-    print "    hash =", entry.hash
-    print "    size =", entry.size
-    print "    time =", entry.time_pairs
+    print() 
+    print("    hash =", entry.hash)
+    print("    size =", entry.size)
+    print("    time =", entry.time_pairs)
 
 
 
-print "===== edge_changes => edge_lists ====="
+print("===== edge_changes => edge_lists =====")
 
 C = tc.edge_changes()
 
@@ -65,11 +65,11 @@ C.edges_out = [
               ]
 
 traj = tc.binned_social_trajectory_from_edge_changes(C,2,N_time_steps=N_time_steps,verbose=True)
-print traj
+print(traj)
 
 traj = tc.social_trajectory_from_edge_changes(C,2,verbose=True)
 for entry in traj:
-    print 
-    print "    hash =", entry.hash
-    print "    size =", entry.size
-    print "    time =", entry.time_pairs
+    print() 
+    print("    hash =", entry.hash)
+    print("    size =", entry.size)
+    print("    time =", entry.time_pairs)

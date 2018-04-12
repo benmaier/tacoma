@@ -51,7 +51,7 @@ fwP_params = estimate_flockwork_P_args(socio_binned,dt=3600.)
 #tc.write_fwP_args(fwP_params,"./fwP_args_dtu_1_weeks.json")
 #fwP = tc.flockwork_P_varying_rates_neighbor_affinity(**fwP_params)
 seed = np.random.randint(100000)
-print seed
+print(seed)
 seed = 88566
 fwP = tc.flockwork_P_varying_rates(seed=seed,**fwP_params)
 fwP_result = tc.measure_group_sizes_and_durations(fwP)

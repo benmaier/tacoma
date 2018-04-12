@@ -8,7 +8,7 @@ from tacoma.model_conversions import estimate_flockwork_P_args
 sample_aggregates = False
 N_time_steps = 2
 
-print "===== edge_lists => edge_lists ====="
+print("===== edge_lists => edge_lists =====")
 
 L = tc.edge_lists()
 
@@ -34,11 +34,11 @@ t, g = g[:,0], g[:,1]
 
 t = np.append(t, params['tmax'])
 g = np.append(g, g[-1])
-print t, g
+print(t, g)
 
 P = np.array(params['P'])
 P = np.append(P, P[-1])
-print t, P
+print(t, P)
 
 fig, ax = pl.subplots(1,2)
 
@@ -54,11 +54,11 @@ t, g = g[:,0], g[:,1]
 
 t = np.append(t, params['tmax'])
 g = np.append(g, g[-1])
-print t, g
+print(t, g)
 
 P = np.array(params['P'])
 P = np.append(P, P[-1])
-print t, P
+print(t, P)
 ax[0].step(t,g,where='post')
 ax[1].step(t,P,where='post')
 

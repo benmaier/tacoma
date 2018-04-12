@@ -41,13 +41,13 @@ edges_out = list(edge_changes.edges_out)
 fw_dt = fw_t[1:] - fw_t[:-1]
 
 G = nx.Graph()
-G.add_nodes_from(range(N))
+G.add_nodes_from(list(range(N)))
 A_fw = np.zeros((N,N))
 
 fw_k = []
 
-for it in xrange(1,len(fw_t)):
-    print it/float(len(fw_t))
+for it in range(1,len(fw_t)):
+    print(it/float(len(fw_t)))
     dt = fw_t[it]-fw_t[it-1]
     for u in G.nodes():
         for v in G.neighbors(u):
@@ -68,7 +68,7 @@ A_fw = A_fw/max_A_fw
 
 sax[1].imshow(A_fw)
 
-print A
-print A_fw
+print(A)
+print(A_fw)
 
 pl.show()

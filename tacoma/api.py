@@ -333,6 +333,10 @@ def get_edge_trajectories(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
+        if 'return_edge_similarities' in kwargs and\
+           kwargs['return_edge_similarities']:
+            raise ValueError('Please convert to `edge_lists` first as the edge similarity algorithm is only implemented for `edge_lists`')
+
         result = edge_trajectories_from_edge_changes(temporal_network,*args,**kwargs)
     elif type(temporal_network) == el:
         result = edge_trajectories_from_edge_lists(temporal_network,*args,**kwargs)
