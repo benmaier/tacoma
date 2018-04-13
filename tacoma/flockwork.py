@@ -11,6 +11,8 @@ from scipy.integrate import simps
 
 from tacoma.power_law_fitting import fit_power_law_clauset
 
+import tacoma as tc
+
 def flockwork_P_equilibrium_group_size_distribution(N,P):
     """Get the equilibrium group size distribution of a Flockwork-P model
     given node number N and probability to reconnect P.
@@ -275,6 +277,45 @@ def flockwork_P_mean_group_size_distribution_for_varying_rates(flockwork_P_param
     mean_distro = np.trapz(distro,x=new_t,axis=0) / (new_t[-1] - new_t[0])
 
     return mean_distro
+
+def estimated_mean_group_size_distribution(temporal_network):
+    """Compute the mean group size distribution for a temporal network under the assumption
+    that it can be described reasonably by a flockwork-P model.
+    
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes` or :mod:`edge_lists`
+        A temporal network.
+
+    Returns
+    -------
+    mean_distribution : numpy.array
+        The average group size distribution of the temporal network which is closer to
+        to the _true_ group size distribution than measuring over the binned system.
+        The result is an array of length `N` with its `i`-th entry containing the mean number of
+        groups of size `m = i + 1`.
+    """
+    
+    new_t, k = tc.mean_degree(temporal_network)
+    N = temporal_network.N
+
+    # from equilibrium assumption k = P/(1-P) compute adjusted P
+    new_P = k / (k+1)
+
+    distro = []
+
+    # for every time point and adjusted P, compute the equilibrium group size distribution
+    for P_ in new_P:
+        this_distro = flockwork_P_equilibrium_group_size_distribution(N, P_)
+        distro.append(this_distro[1:])
+
+    # compute the mean group size distribution as a time integral over the 
+    # group size distribution
+    distro = np.array(distro)
+    mean_distro = np.trapz(distro,x=new_t,axis=0) / (new_t[-1] - new_t[0])
+
+    return mean_distro
+
 
 def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flockwork_P_params, dk, N = None):
     """Compute the mean group size distribution for a Flockwork-P system with varying rates from the 
