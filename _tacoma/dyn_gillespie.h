@@ -335,6 +335,10 @@ void
             next_edges_in = (edg_chg.edges_in).begin();
             next_edges_out = (edg_chg.edges_out).begin();
             next_time = (edg_chg.t).begin();
+
+            // update all the stuff that might have changed for this Gillespie object
+            // because G changed
+            this_gillespie_object.update_network(G,t);
         }
         else
         {
@@ -377,6 +381,10 @@ void
                 G[j].erase(i);
             }
 
+            // update all the stuff that might have changed for this Gillespie object
+            // because G changed
+            this_gillespie_object.update_network(G,*next_edges_in,*next_edges_out,t);
+
             //advance to the upcoming change
             next_time++;
             next_edges_in++;
@@ -395,10 +403,6 @@ void
         // compute the next dt while keeping in mind that the whole thing
         // might have looped already
         dt_to_next_change = this_next_time + t_network_total * loop_count - t;
-
-        // update all the stuff that might have changed for this Gillespie object
-        // because G changed
-        this_gillespie_object.update_network(G,t);
 
         // get the updated_rates
         this_gillespie_object.get_rates_and_Lambda(rates,Lambda);

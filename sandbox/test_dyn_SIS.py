@@ -25,7 +25,7 @@ L.edges = [
             ],
            ]
 
-L_sis = tc.Dyn_SIS(L.N, 100, 1.0, 0.1,3,0,12234235,True)
+L_sis = tc.SIS(L.N, 100, 1.0, 0.1,3,0,12234235,True)
 
 tc.gillespie_SIS_on_edge_lists(L,L_sis,verbose=True)
 
@@ -59,7 +59,7 @@ C.edges_out = [
                 ],
               ]
 
-C_sis = tc.Dyn_SIS(C.N, 100, 1.0, 0.1,3,0,12234235,True)
+C_sis = tc.SIS(C.N, 100, 1.0, 0.1,3,0,12234235,True)
 
 tc.gillespie_SIS_on_edge_changes(C,C_sis,verbose=True)
 

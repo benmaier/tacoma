@@ -160,6 +160,13 @@ class SI
         void update_network(vector < set < size_t > > &G,
                             double t
                             );
+
+        void update_network(vector < set < size_t > > &G,
+                            vector < pair < size_t, size_t > > &edges_in,
+                            vector < pair < size_t, size_t > > &edges_out,
+                            double t
+                            );
+
         void make_event(size_t const &event,
                         double t
                        );

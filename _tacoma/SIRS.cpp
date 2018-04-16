@@ -58,6 +58,59 @@ void SIRS::update_network(
     update_observables(t);
 }
 
+void SIRS::update_network(
+                    vector < set < size_t > > &_G,
+                    vector < pair < size_t, size_t > > &edges_in,
+                    vector < pair < size_t, size_t > > &edges_out,
+                    double t
+                    )
+{
+    // map this network to the current network
+    G = &_G;
+
+    // compute degree and R0
+    size_t number_of_edges_times_two = 0;
+
+    for(auto const &neighbors: *G)
+        number_of_edges_times_two += neighbors.size();
+
+    mean_degree = number_of_edges_times_two / (double) N;
+    
+    // make searchable list
+    set < pair < size_t, size_t > > set_of_out_edges(edges_out.begin(), edges_out.end());
+
+    // erase all entries from SI which are part of the list of edges leaving
+    SI_edges.erase(
+            remove_if(
+                    SI_edges.begin(), 
+                    SI_edges.end(),
+                [&set_of_out_edges](const pair < size_t, size_t > & edge) { 
+                        size_t u = edge.first;
+                        size_t v = edge.second;
+
+                        if (v<u)
+                            swap(u,v);
+
+                        return set_of_out_edges.find( make_pair(u,v) ) != set_of_out_edges.end();
+                }),
+            SI_edges.end() 
+            );
+
+    for(auto &e: edges_in)
+    {
+        size_t &u = e.first;
+        size_t &v = e.second;
+
+        if ((node_status[u] == EPI::S) and (node_status[v] == EPI::I))
+            SI_edges.push_back(  make_pair( v, u ) );
+        else if ((node_status[v] == EPI::S) and (node_status[u] == EPI::I))
+            SI_edges.push_back(  make_pair( u, v ) );
+    }
+
+    // update the arrays containing the observables
+    update_observables(t);
+}
+
 void SIRS::get_rates_and_Lambda(
                     vector < double > &_rates,
                     double &_Lambda
