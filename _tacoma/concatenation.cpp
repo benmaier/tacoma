@@ -41,12 +41,46 @@ edge_changes
     auto ec_it = ec_lists.begin();
 
     // create graph
-    size_t N = 0;
+    size_t N = ec_it->N;
 
-    // find maximum N
+    bool all_equal_N = true;
+    bool all_have_node_map = true;
+
+    // reject the concatenation if N is different
+    // in the different temporal networks
+    // and there's no node mapping
     for(; ec_it != ec_lists.end(); ++ec_it)
-        if (ec_it->N > N)
-            N = ec_it->N;
+    {
+        all_equal_N = all_equal_N and (ec_it->N == N);
+        all_have_node_map = all_have_node_map and (ec_it->int_to_node.size() == ec_it->N);
+    }
+
+    if ((not all_equal_N) and (not all_have_node_map))
+        throw domain_error("Cannot reliably concatenate temporal networks with different node sizes where no sufficient node remaps are given.");
+
+    bool remap_nodes = all_have_node_map;
+    map < string, size_t > all_nodes_to_int;
+    map < size_t, string > all_int_to_node;
+
+    // construct the new node maps
+    for(ec_it = ec_lists.begin(); ec_it != ec_lists.end(); ++ec_it)
+    {
+        for(auto const & this_i2n: ec_it->int_to_node)
+        {
+            string const &s = this_i2n.second;
+
+            if (all_nodes_to_int.find(s) == all_nodes_to_int.end())
+            {
+                size_t new_int = all_nodes_to_int.size();
+                all_nodes_to_int[s] = all_nodes_to_int.size();
+                all_int_to_node[new_int] = s;
+            }
+        }
+    }
+
+    if (remap_nodes)
+        N = all_nodes_to_int.size();
+
 
     // rewind
     ec_it = ec_lists.begin();
@@ -62,7 +96,7 @@ edge_changes
 
     vector < double > new_time;
     
-    vector < pair < size_t, size_t > > these_edges = ec_it->edges_initial;
+    //vector < pair < size_t, size_t > > these_edges = ec_it->edges_initial;
 
     double last_tmax = t0;
 
@@ -84,9 +118,27 @@ edge_changes
             throw domain_error("instances of `edge_changes` have varying time_units");
 
         all_notes += "<< NEXT NOTES >> " + ec_it->notes + " ";
+
+
                 
         vector < set < size_t > > G(N);
-        graph_from_edgelist(G,ec_it->edges_initial);
+        vector < pair < size_t, size_t > > these_edges_initial((ec_it->edges_initial).begin(), (ec_it->edges_initial).begin()); 
+
+        if (remap_nodes)
+        {
+            for(auto &edge: these_edges_initial)
+            {
+                size_t &i = edge.first;
+                size_t &j = edge.second;
+
+                i = all_nodes_to_int[ ec_it->int_to_node[i] ];
+                j = all_nodes_to_int[ ec_it->int_to_node[j] ];
+
+                if (i>j)
+                    swap(i,j);
+            }
+        }
+        graph_from_edgelist(G,these_edges_initial);
 
         // get time of current state
 
@@ -102,21 +154,41 @@ edge_changes
         {
 
             // get a sorted edge list
-            vector < pair < size_t, size_t > > these_edges_in = (*it_edges_in);
-            vector < pair < size_t, size_t > > these_edges_out = (*it_edges_out);
+            vector < pair < size_t, size_t > > these_edges_in(it_edges_in->begin(), it_edges_in->end());
+            vector < pair < size_t, size_t > > these_edges_out(it_edges_out->begin(), it_edges_out->end());
 
             for(auto &edge: these_edges_out)
             {
-                size_t i = edge.first;
-                size_t j = edge.second;
+                size_t &i = edge.first;
+                size_t &j = edge.second;
+
+                if (remap_nodes)
+                {
+                    i = all_nodes_to_int[ ec_it->int_to_node[i] ];
+                    j = all_nodes_to_int[ ec_it->int_to_node[j] ];
+
+                    if (i>j)
+                        swap(i,j);
+                }
+
                 G[i].erase(j);
                 G[j].erase(i);
             }
 
             for(auto &edge: these_edges_in)
             {
-                size_t i = edge.first;
-                size_t j = edge.second;
+                size_t &i = edge.first;
+                size_t &j = edge.second;
+
+                if (remap_nodes)
+                {
+                    i = all_nodes_to_int[ ec_it->int_to_node[i] ];
+                    j = all_nodes_to_int[ ec_it->int_to_node[j] ];
+
+                    if (i>j)
+                        swap(i,j);
+                }
+
                 G[i].insert(j);
                 G[j].insert(i);
             }
@@ -138,7 +210,25 @@ edge_changes
             vector < pair < size_t, size_t > > this_edge_list;
             edgelist_from_graph(this_edge_list,G);
 
-            vector < pair < size_t, size_t > > next_edge_list = (ec_it+1)->edges_initial;
+            vector < pair < size_t, size_t > > next_edge_list(
+                                                                ((ec_it+1)->edges_initial).begin(),
+                                                                ((ec_it+1)->edges_initial).end()
+                                                             );
+
+            if (remap_nodes)
+            {
+                for(auto &edge: next_edge_list)
+                {
+                    size_t &i = edge.first;
+                    size_t &j = edge.second;
+
+                    i = all_nodes_to_int[ (ec_it+1)->int_to_node[i] ];
+                    j = all_nodes_to_int[ (ec_it+1)->int_to_node[j] ];
+
+                    if (i>j)
+                        swap(i,j);
+                }
+            }
 
             // get a sorted edge list
             set < size_t > last_edge_integers = get_edge_integer_set(this_edge_list, N);
@@ -195,6 +285,7 @@ edge_changes
     new_ec.t = new_time;
     new_ec.notes = all_notes;
     new_ec.time_unit = *time_units.begin();
+    new_ec.int_to_node = all_int_to_node;
 
     return new_ec;
 }
@@ -210,12 +301,45 @@ edge_lists
     auto ec_it = el_lists.begin();
 
     // create graph
-    size_t N = 0;
+    size_t N = ec_it->N;
 
-    // find maximum N
+    bool all_equal_N = true;
+    bool all_have_node_map = true;
+
+    // reject the concatenation if N is different
+    // in the different temporal networks
+    // and there's no node mapping
     for(; ec_it != el_lists.end(); ++ec_it)
-        if (ec_it->N > N)
-            N = ec_it->N;
+    {
+        all_equal_N = all_equal_N and (ec_it->N == N);
+        all_have_node_map = all_have_node_map and (ec_it->int_to_node.size() == ec_it->N);
+    }
+
+    if ((not all_equal_N) and (not all_have_node_map))
+        throw domain_error("Cannot reliably concatenate temporal networks with different node sizes where no sufficient node remaps are given.");
+
+    bool remap_nodes = all_have_node_map;
+    map < string, size_t > all_nodes_to_int;
+    map < size_t, string > all_int_to_node;
+
+    // construct the new node maps
+    for(ec_it = el_lists.begin(); ec_it != el_lists.end(); ++ec_it)
+    {
+        for(auto const & this_i2n: ec_it->int_to_node)
+        {
+            string const &s = this_i2n.second;
+
+            if (all_nodes_to_int.find(s) == all_nodes_to_int.end())
+            {
+                size_t new_int = all_nodes_to_int.size();
+                all_nodes_to_int[s] = all_nodes_to_int.size();
+                all_int_to_node[new_int] = s;
+            }
+        }
+    }
+
+    if (remap_nodes)
+        N = all_nodes_to_int.size();
 
     // rewind
     ec_it = el_lists.begin();
@@ -251,7 +375,22 @@ edge_lists
                 and it_time != (ec_it->t).end() 
               )
         {
-            vector < pair < size_t, size_t > > these_edges = *it_edges;
+            vector < pair < size_t, size_t > > these_edges( it_edges->begin(), it_edges->end() );
+
+            if (remap_nodes)
+            {
+                for(auto &edge: these_edges)
+                {
+                    size_t &i = edge.first;
+                    size_t &j = edge.second;
+
+                    i = all_nodes_to_int[ ec_it->int_to_node[i] ];
+                    j = all_nodes_to_int[ ec_it->int_to_node[j] ];
+
+                    if (i>j)
+                        swap(i,j);
+                }
+            }
 
             new_edges.push_back(these_edges);
             new_time.push_back( *it_time - (ec_it->t.front()) + last_tmax );
@@ -273,6 +412,7 @@ edge_lists
     new_ec.t = new_time;
     new_ec.notes = all_notes;
     new_ec.time_unit = *time_units.begin();
+    new_ec.int_to_node = all_int_to_node;
 
 
     return new_ec;
