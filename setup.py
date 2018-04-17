@@ -24,9 +24,9 @@ ext_modules = [
             '_tacoma/Events.cpp', 
             '_tacoma/verify_formats.cpp', 
             '_tacoma/social_trajectories.cpp', 
+            '_tacoma/concatenation.cpp', 
             '_tacoma/flockwork_parameter_estimation.cpp', 
             '_tacoma/conversion.cpp', 
-            '_tacoma/concatenation.cpp', 
             '_tacoma/measurements.cpp', 
             '_tacoma/SIS.cpp', 
             '_tacoma/SIR.cpp',             
@@ -97,7 +97,7 @@ class BuildExt(build_ext):
 
 setup(
     name = 'tacoma',
-    version = '0.0.20',
+    version = '0.0.21',
     author = 'Benjamin F. Maier',
     author_email = 'bfmaier@physik.hu-berlin.de',
     url = 'https://github.com/benmaier/tacoma',
