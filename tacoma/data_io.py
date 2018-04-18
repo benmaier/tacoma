@@ -197,6 +197,10 @@ def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatte
             # if the time changed, we save the new time and 
             # prepare to save new edges
             if t_old != t:
+                if (t_old is not None) and (t - t_old > 20):
+                    edges.append([])
+                    time.append(t_old+20)
+
                 edges.append([])
                 time.append(t)
 
@@ -260,6 +264,141 @@ def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatte
 
     return el
 
+def download_and_convert_sociopatterns_high_school_2013(url="http://www.sociopatterns.org/wp-content/uploads/2015/07/High-School_data_2013.csv.gz",
+                                                      filename="~/.tacoma/hs13.taco",
+                                                      ):
+    """Download the SocioPatterns 'High school 2013 dynamic contact network' data,
+    extract it and save it as taco. This data is actually binned in intervals
+    of `[t-20s, t]`.
+
+    Parameters
+    ----------
+    url : :obj:`str`, optional
+        The url from which the tsv-data should be retrieved
+    filename : :obj:`str`, optional
+        this is the path where the taco will be saved to. default : "~/.tacoma/hs13.taco"
+    
+    Returns
+    -------
+    edge_lists : :mod:`edge_lists`
+        The temporal network of the 'High school 2013 dynamic contact network'.
+    
+    If you use this data, please cite
+
+    R. Mastrandrea, J. Fournet, A. Barrat,
+    Contact patterns in a high school: a comparison between data collected using wearable sensors, contact diaries and friendship surveys.
+    PLoS ONE 10(9): e0136497 (2015)
+    """
+
+    # get directory name for download
+
+    directory, single = os.path.split(os.path.abspath(os.path.expanduser(filename)))
+    mkdirp_customdir(directory)
+
+    # download
+    wget.download(url,out=directory)
+
+    # open gzipped file
+    gzip_file = os.path.join(directory, 'High-School_data_2013.csv.gz')
+    with gzip.open(gzip_file,mode='rt') as f:
+        reader = csv.reader(f,delimiter=' ')
+
+        # mappings of nodes to integers
+        node_to_int = {}
+        int_to_node = {}
+
+        # get an initial t_old
+        # (this is done to detect changes in the tsv
+        t_old = None
+
+        # list of edge lists
+        edges = []
+
+        # time points
+        time = []
+
+        count = 0
+        for row in reader:
+
+            if count == 0:
+                t0 = int(row[0]) - 20
+
+            t = float( int(row[0]) - 20 - t0 ) #this is to account for the interval choice [t-20s, t]
+
+            # if the time changed, we save the new time and 
+            # prepare to save new edges
+            if t_old != t:
+                if (t_old is not None) and (t - t_old > 20):
+                    edges.append([])
+                    time.append(t_old+20)
+
+                edges.append([])
+                time.append(t)
+                
+
+            # get the edge
+            i = int(row[1])
+            j = int(row[2])
+
+            # map the edge to integers
+            if i not in node_to_int:
+                this_int = len(node_to_int)
+                node_to_int[i] = len(node_to_int)
+                int_to_node[this_int] = str(i)
+
+            if j not in node_to_int:
+                this_int = len(node_to_int)
+                node_to_int[j] = len(node_to_int)
+                int_to_node[this_int] = str(j)
+
+            # save the edge
+            edges[-1].append(tuple(sorted([
+                                    node_to_int[i],
+                                    node_to_int[j]
+                                    ])))
+            t_old = t
+
+            count += 1
+
+        N = len(node_to_int)
+        tmax = time[-1] + 20.0
+
+
+    # get a new `edge_lists` instance
+    el = tc.edge_lists()
+
+    el.N = N
+    el.tmax = tmax
+    el.edges = edges
+    el.t = time
+    el.time_unit = 's'
+    el.notes = """
+        This data is binned.
+
+        In this data, t0 = 0.0 corresponds to UNIX time """ + str(t0) + """.
+
+        For more info, please visit http://www.sociopatterns.org/datasets/high-school-contact-and-friendship-networks/ .
+
+        If you use this data, please cite
+
+        R. Mastrandrea, J. Fournet, A. Barrat,
+        Contact patterns in a high school: a comparison between data collected using wearable sensors, contact diaries and friendship surveys.
+        PLoS ONE 10(9): e0136497 (2015)
+        """
+    el.int_to_node = int_to_node
+
+    # verifying that this is a valid temporal network
+    tc.verify(el)
+
+    # save this edge_lists instance
+    with open(os.path.abspath(os.path.expanduser(filename)),'w') as f:
+        write_json_taco(el,f)
+
+    # remove the downloaded gzipped file
+    os.remove(gzip_file)
+
+    return el
+
 def write_fwP_args(args,filename):
     """Dump Flockwork-P arguments to a json-file"""
 
@@ -305,6 +444,36 @@ def load_sociopatterns_hypertext_2009(filename="~/.tacoma/ht09.taco"):
 
     if not os.path.exists(filename):
         raise ValueError("File "+filename+" does not exist. Have you called tacoma.download_and_convert_sociopatterns_hypertext_2009() before?")
+
+    return load_json_taco(filename)
+
+def load_sociopatterns_high_school_2013(filename="~/.tacoma/hs13.taco"):
+    """Once :mod:`download_sociopatterns_high_school_2013` was called,
+    use this function to retrieve an :mod:`edge_lists` instance
+    of the conference data set 'High school 2013 dynamic contact network'
+    (from the SocioPatterns project).
+    
+    Parameters
+    ----------
+    filename : :obj:`str`, optional
+        this is the path where the taco was saved to. default : "~/.tacoma/hs13.taco"
+
+    Returns
+    -------
+    edge_lists : :mod:`edge_lists`
+        The temporal network of the 'High school 2013 dynamic contact network'.
+    
+    If you use this data, please cite
+
+    R. Mastrandrea, J. Fournet, A. Barrat,
+    Contact patterns in a high school: a comparison between data collected using wearable sensors, contact diaries and friendship surveys.
+    PLoS ONE 10(9): e0136497 (2015)
+    """
+
+    filename = os.path.abspath(os.path.expanduser(filename))
+
+    if not os.path.exists(filename):
+        raise ValueError("File "+filename+" does not exist. Have you called tacoma.download_and_convert_sociopatterns_high_school_2013() before?")
 
     return load_json_taco(filename)
 
