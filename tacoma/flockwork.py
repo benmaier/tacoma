@@ -345,6 +345,11 @@ def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flock
 
     # estimate mean degree from integrating ODE
     new_t, k = flockwork_P_mean_degree_for_varying_rates(flockwork_P_params,N)
+    
+    kmin = 2.0 / N
+    ind = np.where(k>=kmin)
+    new_t = new_t[ind]
+    k = k[ind]
 
     alpha, err, xmin = fit_power_law_clauset(k)
     kmin = k.min()
