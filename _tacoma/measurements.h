@@ -72,4 +72,14 @@ tuple < vector < size_t >, vector < size_t >, vector < size_t > >
     get_edge_counts (
                 edge_changes &ec
             );
+
+vector < double >
+    degree_distribution_from_edge_changes(
+                edge_changes &ec
+               );
+
+vector < double >
+    degree_distribution_from_edge_lists(
+                edge_lists &el
+               );
 #endif

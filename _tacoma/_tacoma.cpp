@@ -151,6 +151,14 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("edge_changes")
          );
 
+    m.def("degree_distribution_from_edge_lists", &degree_distribution_from_edge_lists, "Get a list of doubles, where the k-th entry of the list is the time-averaged probability that a node has degree k.",
+            py::arg("edge_lists")
+         );
+
+    m.def("degree_distribution_from_edge_changes", &degree_distribution_from_edge_changes, "Get a list of doubles, where the k-th entry of the list is the time-averaged probability that a node has degree k.",
+            py::arg("edge_changes")
+         );
+
     m.def("get_edge_counts", &get_edge_counts, "Given an instance of `edge_changes`, returns the lists `m_in`, `m_out` and `m`, which count the edge events as well as the edges at the given times. Note that `m` contains one entry more than `m_in` and `m_out` due to the initial edge list.",
             py::arg("edge_changes")
          );

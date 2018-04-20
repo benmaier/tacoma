@@ -699,3 +699,114 @@ tuple < vector < size_t >, vector < size_t >, vector < size_t > >
 
     return make_tuple( m_in, m_out, m );
 }
+
+vector < double >
+    degree_distribution_from_edge_lists(
+                edge_lists &el 
+               )
+{
+    double N = (double) el.N;
+    auto it_time = el.t.begin();
+
+    vector < set < size_t > > G(el.N);
+
+    double t_next;
+
+    vector < double > P_k(el.N,0.0);
+
+    for(auto &this_el: el.edges)
+    {
+        double t = *it_time;
+        //cout << "t = " <<  t << endl;
+
+        if ((it_time+1) == el.t.end())
+            t_next = el.tmax;
+        else
+            t_next = *(it_time+1);
+
+        //cout << "t_next = " <<  t_next << endl;
+
+        graph_from_edgelist(G,this_el);
+
+        //cout << "t_next = " <<  t_next << endl;
+        double dt = t_next - t;
+
+        for(auto const &neighbors: G)
+            P_k[ neighbors.size() ] += dt;
+
+        it_time++;
+    }
+
+    // normalize 
+    for(auto &p: P_k)
+        p /= ((el.tmax - el.t[0]) * N);
+
+    return P_k;
+}
+
+vector < double >
+    degree_distribution_from_edge_changes(
+                edge_changes &ec
+               )
+{
+    double N = (double) ec.N;
+    double t_ = ec.t0;
+    double t_next = ec.t[0];
+
+    double dt = t_next - t_;
+
+    auto it_edges_in = ec.edges_in.begin();
+    auto it_edges_out = ec.edges_out.begin();
+    auto it_time = ec.t.begin();
+
+    vector < set < size_t > > G(ec.N);
+    graph_from_edgelist(G,ec.edges_initial);
+
+    vector < double > P_k(ec.N,0.0);
+
+    for(auto const &neighbors: G)
+        P_k[ neighbors.size() ] += dt;
+
+    for(auto const &t: ec.t)
+    {
+        if (it_time + 1 == ec.t.end())
+            t_next = ec.tmax;
+        else
+            t_next = *(it_time + 1);
+
+        dt = t_next - t;
+
+        // get a sorted edge list
+        vector < pair < size_t, size_t > > & these_edges_in = (*it_edges_in);
+        vector < pair < size_t, size_t > > & these_edges_out = (*it_edges_out);
+
+        for(auto &edge: these_edges_out)
+        {
+            size_t &i = edge.first;
+            size_t &j = edge.second;
+            G[i].erase(j);
+            G[j].erase(i);
+        }
+
+        for(auto &edge: these_edges_in)
+        {
+            size_t &i = edge.first;
+            size_t &j = edge.second;
+            G[i].insert(j);
+            G[j].insert(i);
+        }
+
+        for(auto const &neighbors: G)
+            P_k[ neighbors.size() ] += dt;
+
+        it_edges_in++;
+        it_edges_out++;
+        it_time++;
+    }
+
+    // normalize
+    for(auto &p: P_k)
+        p /= ((ec.tmax - ec.t0) * N);
+
+    return P_k;
+}

@@ -58,6 +58,31 @@ def measure_group_sizes_and_durations(temporal_network,*args,**kwargs):
 
     return result
     
+def degree_distribution(temporal_network,*args,**kwargs):
+    """Measures the time-averaged degree distribution.
+
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+
+    Returns 
+    -------
+    :obj:`list` of `float`
+        A list of N entries where the k-th entry is the time-averaged probability of finding a node with degree k.
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == ec:
+        result = degree_distribution_from_edge_changes(temporal_network,*args,**kwargs)
+    elif type(temporal_network) == el:
+        result = degree_distribution_from_edge_lists(temporal_network,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+
+    return result
+
 def bin(temporal_network,*args,**kwargs):
     """Bins a temporal network for each `dt` (after each step, respectively, if `N_time_steps` was provided).
 
