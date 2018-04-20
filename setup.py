@@ -3,18 +3,22 @@
 from setuptools import setup, Extension
 import setuptools
 from setuptools.command.build_ext import build_ext
-import setuptools
 import os, sys
-from pip import locations
+
+__version__ = '0.0.21'
 
 class get_pybind_include(object):
+    """Helper class to determine the pybind11 include path
+    The purpose of this class is to postpone importing pybind11
+    until it is actually installed, so that the ``get_include()``
+    method can be invoked. """
 
-    def __init__(self,user=False):
+    def __init__(self, user=False):
         self.user = user
 
     def __str__(self):
-        pybind_include = os.path.dirname(locations.distutils_scheme('pybind11',self.user)['headers'])
-        return pybind_include
+        import pybind11
+        return pybind11.get_include(self.user)
 
 ext_modules = [
     Extension(
@@ -23,11 +27,11 @@ ext_modules = [
             '_tacoma/Utilities.cpp', 
             '_tacoma/Events.cpp', 
             '_tacoma/verify_formats.cpp', 
+            '_tacoma/measurements.cpp', 
             '_tacoma/social_trajectories.cpp', 
             '_tacoma/concatenation.cpp', 
             '_tacoma/flockwork_parameter_estimation.cpp', 
             '_tacoma/conversion.cpp', 
-            '_tacoma/measurements.cpp', 
             '_tacoma/SIS.cpp', 
             '_tacoma/SIR.cpp',             
             '_tacoma/SIRS.cpp',
@@ -97,7 +101,7 @@ class BuildExt(build_ext):
 
 setup(
     name = 'tacoma',
-    version = '0.0.21',
+    version = __version__,
     author = 'Benjamin F. Maier',
     author_email = 'bfmaier@physik.hu-berlin.de',
     url = 'https://github.com/benmaier/tacoma',
