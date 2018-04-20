@@ -16,7 +16,7 @@ pyclean:
 	-rm -rf ./build/
 
 python:
-	pip install -e ../tacoma --no-use-wheel
+	pip install -e ../tacoma --no-binary :all:
 
 grootinstall:
 	/usr/local/bin/python2.7 setup.py install --user
