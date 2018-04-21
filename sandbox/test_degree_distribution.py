@@ -25,6 +25,10 @@ P_k = tc.degree_distribution_from_edge_lists(L)
 for k, P in enumerate(P_k):
     print(k, P)
 
+P_k = tc.degree_distribution(L)
+for k, P in enumerate(P_k):
+    print(k, P)
+
 print("===== edge_changes => edge_changes =====")
 
 C = tc.edge_changes()
@@ -54,3 +58,8 @@ C.edges_out = [
 P_k = tc.degree_distribution_from_edge_changes(C)
 for k, P in enumerate(P_k):
     print(k, P)
+
+P_k = tc.degree_distribution(C)
+for k, P in enumerate(P_k):
+    print(k, P)
+
