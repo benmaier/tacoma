@@ -20,7 +20,7 @@ def power_law_log_likelihood_continuous(
                          data,
                          alpha,
                          x_min = None,
-                         x_max = None
+                         x_max = None,
                          ):
     """ Get Log-Likelihood of a power-law fit to the given continuous data
     after https://arxiv.org/pdf/0706.1062.pdf .
@@ -55,7 +55,7 @@ def power_law_log_likelihood_continuous(
 
     n = float(len(x))
 
-    L = n * np.log(alpha-1) - np.log(x_min) - alpha * np.log(x/x_max).sum()
+    L = n * np.log(alpha-1) - np.log(x_min) - alpha * np.log(x/x_min).sum()
 
     return L
 
@@ -103,6 +103,43 @@ def power_law_log_likelihood_discrete(
 
     return L
 
+def power_law_log_likelihood_discrete_distribution(
+                         x,
+                         P,
+                         alpha,
+                         ):
+    """ Get Log-Likelihood of a power-law fit to the given 
+    discrete distribution
+    after https://arxiv.org/pdf/0706.1062.pdf .
+
+    Parameters
+    ----------
+    x : `numpy.array` or :obj:`list` of `float`
+        mean values of the bins (for discrete data 
+        this is just the values of the discrete data).
+    P : `numpy.array` or :obj:`list` of `float` 
+        The corresponding weights for bin means given 
+        in `x` (`P` does not have to be normalized)
+    alpha : `float`
+        Fitted exponent of the power law P(x) ~ x^{-alpha}
+
+    Returns
+    -------
+    L : `float`
+        Log-Likelihood of alpha given the distribution P(x).
+    """
+
+    x = np.array(x,dtype=float)
+    P = np.array(P,dtype=float)
+
+    x_min = x.min()
+
+    n = P.sum()
+    sum_ln_x = np.log(x).dot(P)
+
+    L = - n * np.log(zeta(alpha,x_min)) - alpha * sum_ln_x
+
+    return L
 
 def fit_power_law_clauset(data,
                           x_min = None,
@@ -191,9 +228,11 @@ def fit_discrete_power_law_from_distribution(
         The inferred minimum value of the data.
     """
     
+   
     x = np.array(x,dtype=float)
-    P = np.array(P,dtype=float)
+    P = np.array(P,dtype=float) 
 
+    x_min = x.min()
     n = P.sum()
     sum_ln_x = np.log(x).dot(P)
 
