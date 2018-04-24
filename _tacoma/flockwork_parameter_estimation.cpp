@@ -212,6 +212,8 @@ flockwork_args
     vector < pair < double, double > > gamma;
     vector < double > P;
 
+    bool last_bin_was_for_emptying = false;
+
     while(it_m_in != m_in.end())
     {
         size_t & this_m = *it_m;
@@ -276,7 +278,7 @@ flockwork_args
         }
 
         // if in the beginning of this bin and at the end of this bin
-        // there's no nodes and we want this to be ensured
+        // there's no edges and we want this to be ensured
         if ( ( ensure_empty_network ) and 
              ( this_m == 0 ) and 
              ( *(it_m+1) == 0 ) and
@@ -284,7 +286,25 @@ flockwork_args
              ( _P == 0.0 )
            )
         {
-            _g = 20.0 / dt / ((double) N);
+            // we want to pick every node in the network at least once, s.t.
+            // all nodes have zero edges in the end of the time bin.
+            // This is the classic problem of "how often do I have to pick
+            // in order to have picked every number at least once" with solution
+            // <T> = N log(N)
+            // Since we want <Events([t,t+dt])> = N * log(N), we need
+            //  gamma_per_node = (N log(N)) / (N / dt) such that
+            //  \int_t^{t+dt} dt' gamma_per_node * N = N * log(N)
+            //
+            //  Also, instead of doing this for two time bins, we double the rate
+            //  and just do it for one time bin
+            if ( not last_bin_was_for_emptying )
+                _g = 1 * log(N) / dt;
+
+            last_bin_was_for_emptying = true;
+        }
+        else
+        {
+            last_bin_was_for_emptying = false;
         }
 
         gamma.push_back( make_pair( *it_time, _g ) );
