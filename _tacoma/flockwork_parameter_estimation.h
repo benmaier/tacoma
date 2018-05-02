@@ -52,10 +52,41 @@ flockwork_args
              double k_over_k_real_scaling,
              double gamma_scaling,
              double P_scaling,
-             map < pair < size_t, size_t >, double > aggregated_network,
+             map < pair < size_t, size_t >, double > &aggregated_network,
              const bool ensure_empty_network,
              const bool adjust_last_bin_if_dt_does_not_fit,
              const bool verbose
          );
 
+double k_simulated_over_k_real(
+                vector < pair < double, double > > &k_original, 
+                vector < pair < double, double > > &k_simulated
+             );
+
+double k_RMSE(
+             edge_lists &original_binned,
+             edge_lists &simulated_binned
+             );
+
+double estimate_k_scaling_gradient_descent(
+             edge_changes &original_edge_changes,
+             double dt_for_inference,
+             double dt_for_binning,
+             size_t measurements_per_configuration = 6,
+             double learning_rate = 0.5,
+             double relative_error = 1e-2,
+             size_t N_eval_max = 100,
+             bool   verbose = true
+        );
+
+double estimate_k_scaling_gradient_descent_RMSE(
+             edge_changes &original_edge_changes,
+             double dt_for_inference,
+             double dt_for_binning,
+             size_t measurements_per_configuration = 6,
+             double learning_rate = 0.5,
+             double relative_error = 1e-2,
+             size_t N_eval_max = 100,
+             bool   verbose = true
+        );
 #endif

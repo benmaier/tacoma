@@ -27,7 +27,9 @@
 #include "ResultClasses.h"
 #include "measurements.h"
 #include "resampling.h"
+#include "resampling.h"
 #include "conversion.h"
+#include "FW_P_varying.h"
 
 using namespace std;
 
@@ -40,7 +42,7 @@ flockwork_args
              double k_over_k_real_scaling,
              double gamma_scaling,
              double P_scaling,
-             map < pair < size_t, size_t >, double > aggregated_network,
+             map < pair < size_t, size_t >, double > &aggregated_network,
              const bool ensure_empty_network,
              const bool adjust_last_bin_if_dt_does_not_fit,
              const bool verbose
@@ -358,3 +360,292 @@ flockwork_args
     return fw_args;
 }
 
+double k_simulated_over_k_real(
+                vector < pair < double, double > > &k_original, 
+                vector < pair < double, double > > &k_simulated
+             )
+{
+
+    if (k_simulated.size() != k_original.size())
+        throw length_error("Original network and simulated network differ in number of time points.");
+
+    double sum = 0.0;
+    size_t N_meas = 0;
+
+    auto sim = k_simulated.begin();
+    auto orig = k_original.begin();
+    for(; sim != k_simulated.end(); ++sim)
+    {
+        double &k_s = sim->second;
+        double &k_o = orig->second;
+
+        if ((k_o > 0.0) and (k_s > 0.0))
+        {
+            sum += k_s / k_o;
+            N_meas += 1;
+        }
+        //else if ((k_o == 0.0) and (k_s == 0.0))
+        //{
+        //    sum += 1.0;
+        //    N_meas += 1;
+        //}
+
+
+        ++orig;
+    }
+
+    return sum / (double) N_meas;
+}
+
+double k_RMSE(
+             edge_lists &original_binned,
+             edge_lists &simulated_binned
+             )
+{
+    vector < pair < double, double > > k_simulated = mean_degree_from_edge_lists(simulated_binned);
+    vector < pair < double, double > > k_original = mean_degree_from_edge_lists(original_binned);
+
+    if (k_simulated.size() != k_original.size())
+        throw length_error("Original network and simulated network differ in number of time points.");
+
+    double sum = 0.0;
+    size_t N_meas = 0;
+
+    auto sim = k_simulated.begin();
+    auto orig = k_original.begin();
+    for(; sim != k_simulated.end(); ++sim)
+    {
+        double &k_s = sim->second;
+        double &k_o = orig->second;
+        sum += pow( k_s - k_o, 2);
+
+        ++orig;
+        ++N_meas;
+    }
+
+    return sqrt(sum / (double) N_meas);
+}
+
+double estimate_k_scaling_gradient_descent(
+             edge_changes &original_edge_changes,
+             double dt_for_inference,
+             double dt_for_binning,
+             size_t measurements_per_configuration,
+             double learning_rate,
+             double relative_error,
+             size_t N_eval_max,
+             bool   verbose
+        )
+{
+    edge_lists original_binned = bin_from_edge_changes(original_edge_changes, dt_for_binning);
+    vector < pair < double, double > > k_original = mean_degree_from_edge_lists(original_binned);
+
+    double this_k_over_k_real_scaling = 1.0;
+    double last_k_over_k_real_scaling = 0.0;
+
+    size_t N_eval = 0;
+
+    size_t update_every = 1;
+    map < pair < size_t, size_t >, double > dummy_network;
+
+    while ( 
+            ( abs(last_k_over_k_real_scaling - this_k_over_k_real_scaling) / this_k_over_k_real_scaling > relative_error )
+           and
+            ( N_eval < N_eval_max )
+          )
+    {
+
+        double mean = 0.0;
+        vector < double > vals;
+        vector < pair < double, double > > new_k( k_original.size() );
+
+        for(unsigned int measurement = 0; measurement < measurements_per_configuration; ++measurement)
+        {
+            flockwork_args these_args = get_flockwork_P_args(
+                                            original_edge_changes,
+                                            dt_for_inference,
+                                            0,
+                                            this_k_over_k_real_scaling,
+                                            1.0,
+                                            1.0,
+                                            dummy_network,
+                                            true,
+                                            true,
+                                            false
+                                            );
+            edge_changes fw = flockwork_P_varying_rates(
+                                these_args.E,
+                                these_args.N,
+                                these_args.P,
+                                these_args.tmax,
+                                these_args.rewiring_rate,
+                                these_args.tmax
+                              );
+
+            edge_lists fw_binned = bin_from_edge_changes(fw, dt_for_binning);
+
+            vector < pair < double, double > > this_k = mean_degree_from_edge_lists(fw_binned);
+            auto this_t_k = this_k.begin();
+            for(auto &t_k: new_k)
+            {
+                t_k.second += this_t_k->second / (double) measurements_per_configuration;
+                ++this_t_k;
+            }
+
+        }
+
+        mean = k_simulated_over_k_real(k_original, new_k);
+
+        last_k_over_k_real_scaling = this_k_over_k_real_scaling;
+
+        double inverse_scaling = 1.0 / this_k_over_k_real_scaling - learning_rate * (1.0-1.0/mean);
+        this_k_over_k_real_scaling = 1.0 / inverse_scaling;
+
+        if (verbose and N_eval % update_every == 0)
+        {
+            cout << "== generation: " << N_eval+1 << " ==" << endl;
+            cout << "  k_simulated_over_k_real = " << mean << endl;
+            cout << "  k_scaling = " << this_k_over_k_real_scaling << endl;
+            cout << "  scaling_err = " << abs(last_k_over_k_real_scaling - this_k_over_k_real_scaling) / this_k_over_k_real_scaling << endl;
+        }
+
+        ++N_eval;
+    }
+
+    return this_k_over_k_real_scaling;
+}
+
+double estimate_k_scaling_gradient_descent_RMSE(
+             edge_changes &original_edge_changes,
+             double dt_for_inference,
+             double dt_for_binning,
+             size_t measurements_per_configuration,
+             double learning_rate,
+             double relative_error,
+             size_t N_eval_max,
+             bool   verbose
+        )
+{
+    edge_lists original_binned = bin_from_edge_changes(original_edge_changes, dt_for_binning);
+
+    double this_k_over_k_real_scaling = 1.0;
+    double last_k_over_k_real_scaling = 0.0;
+
+    size_t N_eval = 0;
+
+    size_t update_every = 1;
+    map < pair < size_t, size_t >, double > dummy_network;
+
+    double last_RMSE;
+    double d_scaling = 0.1;
+
+    double mean = 0.0;
+    vector < double > vals;
+
+    for(unsigned int measurement = 0; measurement < measurements_per_configuration; ++measurement)
+    {
+        flockwork_args these_args = get_flockwork_P_args(
+                                        original_edge_changes,
+                                        dt_for_inference,
+                                        0,
+                                        this_k_over_k_real_scaling,
+                                        1.0,
+                                        1.0,
+                                        dummy_network,
+                                        true,
+                                        true,
+                                        false
+                                        );
+        edge_changes fw = flockwork_P_varying_rates(
+                            these_args.E,
+                            these_args.N,
+                            these_args.P,
+                            these_args.tmax,
+                            these_args.rewiring_rate,
+                            these_args.tmax
+                          );
+
+        edge_lists fw_binned = bin_from_edge_changes(fw, dt_for_binning);
+
+        double this_value;
+
+        this_value = k_RMSE(original_binned, fw_binned);
+
+        mean += this_value;
+        vals.push_back( this_value );
+    }
+    mean /= (double) measurements_per_configuration;
+    last_RMSE = mean;
+
+    this_k_over_k_real_scaling = 1.0 / (1.0 / this_k_over_k_real_scaling - d_scaling);
+
+    while ( 
+            ( abs(last_k_over_k_real_scaling - this_k_over_k_real_scaling) / this_k_over_k_real_scaling > relative_error )
+           and
+            ( N_eval < N_eval_max )
+          )
+    {
+
+        double mean = 0.0;
+        vector < double > vals;
+
+        for(unsigned int measurement = 0; measurement < measurements_per_configuration; ++measurement)
+        {
+            flockwork_args these_args = get_flockwork_P_args(
+                                            original_edge_changes,
+                                            dt_for_inference,
+                                            0,
+                                            this_k_over_k_real_scaling,
+                                            1.0,
+                                            1.0,
+                                            dummy_network,
+                                            true,
+                                            true,
+                                            false
+                                            );
+            edge_changes fw = flockwork_P_varying_rates(
+                                these_args.E,
+                                these_args.N,
+                                these_args.P,
+                                these_args.tmax,
+                                these_args.rewiring_rate,
+                                these_args.tmax
+                              );
+
+            edge_lists fw_binned = bin_from_edge_changes(fw, dt_for_binning);
+
+            double this_value;
+
+            this_value = k_RMSE(original_binned, fw_binned);
+
+            mean += this_value;
+            vals.push_back( this_value );
+        }
+        mean /= (double) measurements_per_configuration;
+
+        double err = 0.0;
+        for(auto val = vals.begin(); val != vals.end(); ++val)
+            err += pow(mean - *val,2);
+        err /= (double) measurements_per_configuration*(measurements_per_configuration-1);
+        err = sqrt(err);
+
+        last_k_over_k_real_scaling = this_k_over_k_real_scaling;
+
+        double inverse_scaling = 1.0 / this_k_over_k_real_scaling - d_scaling;
+        this_k_over_k_real_scaling = 1.0 / inverse_scaling;
+
+        if (verbose and N_eval % update_every == 0)
+        {
+            cout << "== generation: " << N_eval+1 << " ==" << endl;
+            
+            cout << "  k_RMSE = " << mean << " +/- " << err << endl;
+
+            cout << "  k_scaling = " << this_k_over_k_real_scaling << endl;
+            cout << "  scaling_err = " << abs(last_k_over_k_real_scaling - this_k_over_k_real_scaling) / this_k_over_k_real_scaling << endl;
+        }
+
+        ++N_eval;
+    }
+
+    return this_k_over_k_real_scaling;
+}

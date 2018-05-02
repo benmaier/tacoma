@@ -276,6 +276,28 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
+    m.def("estimate_k_scaling_gradient_descent", &estimate_k_scaling_gradient_descent, "Estimate the scaling of <k> that's necessary to revert the effects of binning using gradient descent",
+            py::arg("edge_changes"),
+            py::arg("dt_for_inference"),
+            py::arg("dt_for_binning"),
+            py::arg("measurements_per_configuration") = 6,
+            py::arg("learning_rate") = 0.5,
+            py::arg("relative_error") = 1e-2,
+            py::arg("N_eval_max") = 100,
+            py::arg("verbose") = true
+        );
+
+    m.def("estimate_k_scaling_gradient_descent_RMSE", &estimate_k_scaling_gradient_descent_RMSE, "Estimate the scaling of <k> that's necessary to revert the effects of binning using gradient descent",
+            py::arg("edge_changes"),
+            py::arg("dt_for_inference"),
+            py::arg("dt_for_binning"),
+            py::arg("measurements_per_configuration") = 6,
+            py::arg("learning_rate") = 0.5,
+            py::arg("relative_error") = 1e-2,
+            py::arg("N_eval_max") = 100,
+            py::arg("verbose") = true
+        );
+
     m.def("ZSBB_model", &ZSBB_model, "Simulate model after Zhao, Stehle, Bianconi, and Barrat.",
             py::arg("E"),
             py::arg("N"),
