@@ -268,6 +268,8 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
             py::arg("k_over_k_real_scaling") = 1.0,
+            py::arg("gamma_scaling") = 1.0,
+            py::arg("P_scaling") = 1.0,
             py::arg("aggregated_network") = map < pair < size_t, size_t >, double >(),
             py::arg("ensure_empty_network") = false,
             py::arg("adjust_last_bin_if_dt_does_not_fit") = false,

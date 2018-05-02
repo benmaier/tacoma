@@ -38,6 +38,8 @@ flockwork_args
              double dt,
              size_t N_time_steps,
              double k_over_k_real_scaling,
+             double gamma_scaling,
+             double P_scaling,
              map < pair < size_t, size_t >, double > aggregated_network,
              const bool ensure_empty_network,
              const bool adjust_last_bin_if_dt_does_not_fit,
@@ -257,9 +259,9 @@ flockwork_args
         if (this_m_out > 0)
         {
             // standard case
-            _g = 0.5 * _m_out / _m / dt;
+            _g = 0.5 * _m_out / _m / dt * gamma_scaling;
             _P = min(
-                     2.0 * _m / (N+2.0*_m) * _m_in / _m_out ,
+                     2.0 * _m / (N+2.0*_m) * _m_in / _m_out * P_scaling,
                      1.0
                      );
         }
@@ -267,8 +269,8 @@ flockwork_args
         {
             // secondary case if there's no outgoing edges
             double next_m = ((double) *(it_m+1)) / k_over_k_real_scaling;
-            _P = 2.0 * next_m / (N+2.0*next_m);
-            _g = _m_in / ( _P * (N+2.0*_m) * dt);
+            _P = 2.0 * next_m / (N+2.0*next_m) * P_scaling;
+            _g = _m_in / ( _P * (N+2.0*_m) * dt) * gamma_scaling;
         }
         else
         {
