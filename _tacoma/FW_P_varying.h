@@ -46,15 +46,15 @@ using namespace std;
 
 edge_changes
      flockwork_P_varying_rates(
-                 vector < pair < size_t, size_t > > E, //edgelist
+                 vector < pair < size_t, size_t > > &E, //edgelist
                  const size_t N,       //number of nodes
-                 vector < double > P,       //probability to reconnect after cutting
+                 vector < double > &P,       //probability to reconnect after cutting
                  const double t_run_total,
-                 vector < pair < double, double > > rewiring_rate,
+                 vector < pair < double, double > > &rewiring_rate,
                  const double tmax,
-                 const bool   use_random_rewiring,
-                 const bool   equilibrate_flockwork,
-                 const size_t seed
+                 const bool   use_random_rewiring = false,
+                 const bool   equilibrate_flockwork = false,
+                 const size_t seed = 0
         );
 
 edge_changes
