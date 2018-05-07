@@ -477,6 +477,41 @@ def load_sociopatterns_high_school_2013(filename="~/.tacoma/hs13.taco"):
 
     return load_json_taco(filename)
 
+def write_edge_trajectory_coordinates(temporal_network, filename):
+    """Write the coordinates of the edge activation periods to a json-file
+    such that each entry corresponds to a line to be drawn.
+
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    filename : :obj:`str`
+        Write to this file.
+    """
+
+    traj = tc.get_edge_trajectories(temporal_network).trajectories
+
+    try:
+        t0 = temporal_network.t[0]
+    except:
+        t0 = temporal_network.t0
+    tmax = temporal_network.tmax
+
+    coords = []
+    for i_edge, entry in enumerate(traj):
+        for time_pair in entry.time_pairs:
+            coords.append( (i_edge, time_pair[0], time_pair[1]) )
+
+    data = { 
+             'xlim': (t0, tmax),
+             'ylim': (0, len(traj)),
+             'data': coords,
+           }
+
+    filename = os.path.abspath(os.path.expanduser(filename))
+    with open(filename,'w') as f:
+        json.dump(data, f)
+
 if __name__ == "__main__":
     el = download_and_convert_sociopatterns_hypertext_2009()
 
