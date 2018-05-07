@@ -477,7 +477,7 @@ def load_sociopatterns_high_school_2013(filename="~/.tacoma/hs13.taco"):
 
     return load_json_taco(filename)
 
-def write_edge_trajectory_coordinates(temporal_network, filename):
+def write_edge_trajectory_coordinates(temporal_network, filename, filter_for_duration = 0.0):
     """Write the coordinates of the edge activation periods to a json-file
     such that each entry corresponds to a line to be drawn.
 
@@ -500,7 +500,10 @@ def write_edge_trajectory_coordinates(temporal_network, filename):
     coords = []
     for i_edge, entry in enumerate(traj):
         for time_pair in entry.time_pairs:
-            coords.append( (i_edge, time_pair[0], time_pair[1]) )
+            t_i = time_pair[0]
+            t_f = time_pair[1]
+            if t_f - t_i > filter_for_duration:
+                coords.append( (i_edge, t_i, t_f) )
 
     data = { 
              'xlim': (t0, tmax),
