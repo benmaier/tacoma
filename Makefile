@@ -19,7 +19,7 @@ python:
 	pip install -e ../tacoma --no-binary :all:
 
 grootinstall:
-	/usr/local/bin/pip2.7 install --user ../tacoma
+	/opt/python/bin/pip3.5 install --user ../tacoma
 
 groot:
 	git fetch
