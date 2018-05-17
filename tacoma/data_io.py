@@ -166,7 +166,6 @@ def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatte
     """
 
     # get directory name for download
-
     directory, single = os.path.split(os.path.abspath(os.path.expanduser(filename)))
     mkdirp_customdir(directory)
 
