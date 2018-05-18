@@ -1,0 +1,115 @@
+
+.slider {
+	stroke-linecap: round;
+}
+
+.toggle {
+	stroke-linecap: round;
+}
+
+.radiobutton-background {
+	fill: #ddd;
+	stroke:#000;
+		stroke-width:0.5px;
+}
+
+.radiobutton-off {
+	fill: #fff;
+		stroke:#000;
+	pointer-events: none;
+		stroke-width:0.5px;
+}
+
+.radiobutton-on {
+	fill: #000;
+		stroke:#000;
+	pointer-events: none;
+		stroke-width:0.5px;
+}
+
+.radiobutton-hover {
+	fill: #bbb;
+		stroke:#000;
+	pointer-events: none;
+		stroke-width:0.5px;
+}
+
+.button {
+	fill:none;
+	stroke:#000;
+	stroke-width:0.5px;
+}
+
+.button-background {
+	fill: #ddd;
+	cursor: pointer;
+}
+
+.button-background-hover {
+	fill: #ddd;
+	cursor: pointer;
+}
+
+.button-background-lit{
+	fill: #ddd;
+	cursor: pointer;
+}
+
+.button-symbol {
+	fill: #fff;
+	pointer-events: none;
+}
+
+
+.button-symbol-hover {
+		fill: #bbb;
+		pointer-events: none;
+}
+
+.button-symbol-lit {
+		fill: #000;
+		pointer-events: none;
+}
+
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 1;
+  stroke-width: .5px;
+
+}
+
+.tag {
+  font-size: 10px; 
+  font-family: sans-serif;
+  fill:black;
+  stroke:none;
+}
+
+ .track {
+  stroke: #000;
+  stroke-width: 4px;
+}
+
+ .track-inset {
+  stroke: #ddd;
+  stroke-width: 2px;
+}
+
+ .track-inset-lit {
+  stroke: #100000;
+  stroke-width: 2px;
+}
+
+ .track-inset-animation-speed{
+    stroke: url(#animationSpeedGradient);
+    /*stroke: "#f00";*/
+   stroke-width: 2px;
+ }
+
+ .track-overlay {
+  pointer-events: stroke;
+  cursor: pointer;
+  stroke: transparent;
+}
+

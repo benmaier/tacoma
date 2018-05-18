@@ -1,0 +1,32 @@
+.titleImage {
+    /*
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+    */
+    float: left;
+}
+
+.screenshot
+{
+    float: left;
+    margin: 5px;
+    padding: 5px;
+    border-width: 1px;
+    border-style: dotted;
+}
+
+a:link {
+    color: #000;    
+}
+a:visited {
+    color: #000;    
+}
+a:hover {
+    color: #777;
+}
+a:active {
+    color: #ccc;
+}
