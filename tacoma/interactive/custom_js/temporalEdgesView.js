@@ -42,6 +42,8 @@ class temporalEdgesView {
 
         this.critical_dx = this.plot_width / 5.0;
         this.critical_dy = this.plot_height / 3.0;
+        this.fisheye = new fisheye(this.critical_dx,10,0.25);
+        this.fisheye.range([this.offset_X + this.padding, this.offset_X + this.plot_width-this.padding]);
 
         // set domains of scales
         //
@@ -61,13 +63,25 @@ class temporalEdgesView {
             self.edge_coordinates.push([ x1, x2, y ]);
         });
 
-        this.draw(this.mark_T, -1, -1);
+        this.draw(this.mark_T, -1, -1 );
+
+        console.log(this.fisheye);
+
     }
 
     update_aggregation_time (aggregation_time)
     {
         this.aggregation_time = aggregation_time;
     }
+
+    fisheye_X(x) {
+        return this.fisheye.fisheye(x);
+    }
+
+    inverse_fisheye_X(x){
+        return this.fisheye.fisheyeInverse(x);
+    }
+    /*
 
     fisheye_X(x, focusX) {
         var dx = x - focusX;
@@ -122,6 +136,7 @@ class temporalEdgesView {
         else
             return y;
     }
+    */
 
 
 
@@ -206,13 +221,16 @@ class temporalEdgesView {
         var markX;
         if (markT>=0)
         {
-            var markX = this.xScale(markT);
+            markX = this.xScale(markT);
             //mouseX = markX;
+            this.fisheye.focus(markX);
         }
 
         this.context.strokeStyle = 'rgba(0, 0, 0, 1)';
         this.context.lineWidth = this.edge_line_width;
         this.context.beginPath();
+
+
         for(var i = 0;  i < this.edge_coordinates.length; i++)
         {
             var d = this.edge_coordinates[i];
@@ -223,8 +241,8 @@ class temporalEdgesView {
             if (fisheye)
             {
                 var old_x1 = x1;
-                x1 = this.fisheye_X(x1, markX);
-                x2 = this.fisheye_X(x2, markX);
+                x1 = this.fisheye_X(x1);
+                x2 = this.fisheye_X(x2);
                 //x1 = 0.5*(this.fisheye_X(x1, mouseX) + this.fisheye_X(x1, markX));
                 //x2 = 0.5*(this.fisheye_X(x2, mouseX) + this.fisheye_X(x2, markX));
                 //x2 = this.fisheye_X(x2, mouseX);
@@ -244,8 +262,8 @@ class temporalEdgesView {
             var markX2 = this.xScale(markT+this.aggregation_time);
             if (fisheye)
             {
-                markX = this.fisheye_X(markX, markX);
-                markX2 = this.fisheye_X(markX2, markX);
+                markX = this.fisheye_X(markX);
+                markX2 = this.fisheye_X(markX2);
                 //markX = this.fisheye_X(markX, mouseX);
                 //markX2 = this.fisheye_X(markX2, mouseX);
             }
@@ -276,15 +294,15 @@ class temporalEdgesView {
         var markX_new = null;
         if (mouse_in_picture)
         {
-            markX_new = this.inverse_fisheye_X(mouseX, markX);
+            markX_new = this.inverse_fisheye_X(mouseX);
 
             //var markX = this.xScale(markT);
             var this_time = this.xScale.invert(markX_new);
             var markX2 = this.xScale(this_time+this.aggregation_time);
             if (fisheye)
             {
-                markX_new = this.fisheye_X(markX_new, markX);
-                markX2 = this.fisheye_X(markX2, markX);
+                markX_new = this.fisheye_X(markX_new);
+                markX2 = this.fisheye_X(markX2);
                 //markX = this.fisheye_X(markX, mouseX);
                 //markX2 = this.fisheye_X(markX2, mouseX);
             }

@@ -214,8 +214,7 @@ class temporalNetworkFigure {
                         self.mouseY < this_ev.plot_height - 2*this_ev.padding + this_ev.offset_Y)
                     {
                         // get the current T marker position
-                        var mouseX_in_original_coordinates = this_ev.inverse_fisheye_X(self.mouseX, 
-                                                                  this_ev.xScale(self.time[self.global_it]));
+                        var mouseX_in_original_coordinates = this_ev.inverse_fisheye_X(self.mouseX);
                         var this_mark_T = this_ev.xScale.invert(mouseX_in_original_coordinates);
 
                         // figure out whether or not the whole thing is paused and if it isn't, resume 
