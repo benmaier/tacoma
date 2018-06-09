@@ -43,7 +43,6 @@
 #include "ZSBB_model.h"
 #include "dyn_RGG.h"
 #include "measurements.h"
-#include "dtu_week.h"
 #include "resampling.h"
 #include "social_trajectories.h"
 #include "verify_formats.h"
@@ -60,7 +59,51 @@ using namespace std;
 namespace py = pybind11;
 
 PYBIND11_MODULE(_tacoma, m) {
-    m.doc() = "TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks and simulate Gillespie processes on them.";
+    //TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks and simulate Gillespie processes on them.
+    m.doc() = R"pbdoc(
+        TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks and simulate Gillespie processes on them.
+
+        .. currentmodule:: _tacoma
+
+        Temporal network classes
+        ------------------------------
+
+        .. autosummary::
+            :toctree: _generate
+
+            edge_lists
+            edge_changes
+            edge_trajectories
+
+        Compartmental infection models
+        ------------------------------
+
+        .. autosummary::
+            :toctree: _generate
+
+            SI
+            SIS
+            SIR
+            SIRS
+
+        Analysis classes
+        ---------------
+
+        .. autosummary::
+            :toctree: _generate
+
+            SI
+
+        Helper classes
+        --------------
+
+        .. autosummary::
+            :toctree: _generate
+
+            edge_trajectory_entry
+            social_trajectory_entry
+            edge_weight
+    )pbdoc";
     //m.attr("__name__") = "tacoma.core";
     
     m.def("flockwork_P_varying_rates", &flockwork_P_varying_rates, "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rate and varying P. Returns time points and concurrent edge changes.",
@@ -377,41 +420,53 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
             );
 
-    py::class_<edge_changes>(m,"edge_changes")
+    py::class_<edge_changes>(m,"edge_changes", R"pbdoc(Description of a temporal network by listing the changes of edges at a certain time.)pbdoc")
         .def(py::init<>())
         .def(py::init<const edge_changes_with_histograms &>(),
-                py::arg("edge_changes_with_histograms")
+                py::arg("edge_changes_with_histograms"),
+                "Initialize from an instance of :mod:`edge_changes_with_histograms`"
             )
-        .def("copy_from", &edge_changes::copy_from)
-        .def_readwrite("int_to_node", &edge_changes::int_to_node)
-        .def_readwrite("time_unit", &edge_changes::time_unit)
-        .def_readwrite("notes", &edge_changes::notes)
-        .def_readwrite("t", &edge_changes::t)
-        .def_readwrite("edges_out", &edge_changes::edges_out)
-        .def_readwrite("edges_in", &edge_changes::edges_in)
-        .def_readwrite("N", &edge_changes::N)
-        .def_readwrite("t0", &edge_changes::t0)
-        .def_readwrite("tmax", &edge_changes::tmax)
-        .def_readwrite("edges_initial", &edge_changes::edges_initial);
+        .def("copy_from", &edge_changes::copy_from, R"pbdoc([deprecated] copy the relevant information from an instance of :mod:`edge_changes_with_histograms`)pbdoc")
+        .def_readwrite("int_to_node", &edge_changes::int_to_node, R"pbdoc(A dictionary int -> string which keeps the original node names.)pbdoc")
+        .def_readwrite("time_unit", &edge_changes::time_unit, R"pbdoc(A string containing the unit of time for this network.)pbdoc")
+        .def_readwrite("notes", &edge_changes::notes, R"pbdoc(A string containing additional notes for this network.)pbdoc")
+        .def_readwrite("t", &edge_changes::t, R"pbdoc(An ordered list containing the time points at which changes occur.)pbdoc")
+        .def_readwrite("edges_out", &edge_changes::edges_out, R"pbdoc(A list containing the edges leaving the network at the correspoding time in `t`)pbdoc")
+        .def_readwrite("edges_in", &edge_changes::edges_in, R"pbdoc(A list containing the edges coming in to the network at the correspoding time in `t`)pbdoc")
+        .def_readwrite("N", &edge_changes::N, R"pbdoc(Number of nodes)pbdoc")
+        .def_readwrite("t0", &edge_changes::t0, R"pbdoc(The initial time)pbdoc")
+        .def_readwrite("tmax", &edge_changes::tmax, R"pbdoc(The final time)pbdoc")
+        .def_readwrite("edges_initial", &edge_changes::edges_initial, R"pbdoc(A list containing the edges of the network at time `t0`)pbdoc");
 
-    py::class_<edge_lists>(m,"edge_lists")
+    py::class_<edge_lists>(m,"edge_lists", R"pbdoc(
+            Description of a temporal network by listing 
+            the edges of the networks at a certain time.
+            )pbdoc")
         .def(py::init<>())
         .def(py::init<const edge_lists_with_histograms &>(),
-                py::arg("edge_lists_with_histograms")
+                py::arg("edge_lists_with_histograms"),
+                "Initialize from an instance of :mod:`edge_lists_with_histograms`"
             )
-        .def("copy_from", &edge_lists::copy_from)
-        .def_readwrite("int_to_node", &edge_lists::int_to_node)
-        .def_readwrite("time_unit", &edge_lists::time_unit)
-        .def_readwrite("notes", &edge_lists::notes)
-        .def_readwrite("t", &edge_lists::t)
-        .def_readwrite("edges", &edge_lists::edges)
-        .def_readwrite("N", &edge_lists::N)
-        .def_readwrite("tmax", &edge_lists::tmax);
+        .def("copy_from", &edge_lists::copy_from, R"pbdoc([deprecated] copy the relevant information from an instance of :mod:`edge_lists_with_histograms`)pbdoc")
+        .def_readwrite("int_to_node", &edge_lists::int_to_node, R"pbdoc(A dictionary int -> string which keeps the original node names.)pbdoc")
+        .def_readwrite("time_unit", &edge_lists::time_unit, R"pbdoc(A string containing the unit of time for this network.)pbdoc")
+        .def_readwrite("notes", &edge_lists::notes, R"pbdoc(A string containing additional notes for this network.)pbdoc")
+        .def_readwrite("t", &edge_lists::t, R"pbdoc(An ordered list containing the time points at which the new edge list becomes active.)pbdoc")
+        .def_readwrite("edges", &edge_lists::edges, R"pbdoc(A list containing the edge list of the network at the correspoding time in `t`)pbdoc")
+        .def_readwrite("N", &edge_lists::N, R"pbdoc(Number of nodes)pbdoc")
+        .def_readwrite("tmax", &edge_lists::tmax, R"pbdoc(The final time)pbdoc");
 
-    py::class_<edge_lists_with_histograms>(m,"edge_lists_with_histograms")
+    py::class_<edge_lists_with_histograms>(m,"edge_lists_with_histograms",R"pbdoc(
+            Similar to the :mod:`edge_lists` class but with additional analysis results.
+        )pbdoc")
         .def(py::init<>())
-        .def_readwrite("t", &edge_lists_with_histograms::t)
-        .def_readwrite("edges", &edge_lists_with_histograms::edges)
+        .def_readwrite("t", &edge_lists_with_histograms::t, R"pbdoc(
+            An ordered list containing the time points 
+            at which the new edge list becomes active.
+            )pbdoc")
+        .def_readwrite("edges", &edge_lists_with_histograms::edges, R"pbdoc(
+                A list containing the edge list of the network at the correspoding time in `t`
+        )pbdoc")
         .def_readwrite("size_histograms", &edge_lists_with_histograms::size_histograms)
         .def_readwrite("group_durations", &edge_lists_with_histograms::group_durations)
         .def_readwrite("N", &edge_lists_with_histograms::N)
@@ -442,48 +497,72 @@ PYBIND11_MODULE(_tacoma, m) {
         .def_readwrite("aggregated_size_histogram", &group_sizes_and_durations::aggregated_size_histogram)
         .def_readwrite("aggregated_network", &group_sizes_and_durations::aggregated_network);
 
-    py::class_<edge_weight>(m,"edge_weight")
+    py::class_<edge_weight>(m,"edge_weight",R"pbdoc(Helper class for internal usage. Creates `value = 0` when initiated
+    such that one can easily use it as a counter in a map without checking whether or not the object exists.)pbdoc")
         .def(py::init<>())
         .def_readwrite("value", &edge_weight::value);
 
-    py::class_<social_trajectory_entry>(m,"social_trajectory_entry")
+    py::class_<social_trajectory_entry>(m,"social_trajectory_entry","Each :mod:`social_trajectory_entry` ")
         .def(py::init<>())
-        .def_readwrite("hash", &social_trajectory_entry::hash)
-        .def_readwrite("size", &social_trajectory_entry::size)
-        .def_readwrite("time_pairs", &social_trajectory_entry::time_pairs);
+        .def_readwrite("hash", &social_trajectory_entry::hash, "A group identifier which has low probability of doubling.")
+        .def_readwrite("size", &social_trajectory_entry::size, "Number of nodes within this group.")
+        .def_readwrite("time_pairs", &social_trajectory_entry::time_pairs, R"pbdoc(List[Tuple[double, double]] ordered time pairs denoting the time intervals in which the group existed)pbdoc");
 
-    py::class_<edge_trajectory_entry>(m,"edge_trajectory_entry")
+    py::class_<edge_trajectory_entry>(m,"edge_trajectory_entry",R"pbdoc(
+        This is an entry of an edge-based notation of a temporal 
+        network. Instead of getting lists of edges
+        ordered in time, a list of :mod:`edge_trajectory_entry` contains, 
+        for each edge, a list of time pairs denoting the times the edge exists.
+         )pbdoc")
         .def(py::init<>())
-        .def_readwrite("edge", &edge_trajectory_entry::edge)
-        .def_readwrite("time_pairs", &edge_trajectory_entry::time_pairs);
+        .def_readwrite("edge", &edge_trajectory_entry::edge, R"pbdoc(Tuple[int, int] containing the nodes belonging to this edge.)pbdoc")
+        .def_readwrite("time_pairs", &edge_trajectory_entry::time_pairs, R"pbdoc(
+            List[Tuple[double, double]] 
+            A list containing ordered time pairs :math:`(t_i^{(i)}, t_i^{(f)})`, where each time pair contains 
+            the time point :math:`t_i^{(i)}` when the edge is switched on (created) and 
+            the time :math:`t_i^{(f)}` when the edge is switched off (deleted).
+            )pbdoc"
+                );
 
-    py::class_<flockwork_args>(m,"flockwork_args",py::dynamic_attr())
+    py::class_<flockwork_args>(m,"flockwork_args",py::dynamic_attr(), R"pbdoc(
+                    The arguments which are passed to the flockwork simulation 
+                    function. An instance of this is returned by the parameter estimation procedure.
+                )pbdoc")
         .def(py::init<>())
-        .def_readwrite("E", &flockwork_args::E)
-        .def_readwrite("N", &flockwork_args::N)
-        .def_readwrite("P", &flockwork_args::P)
-        .def_readwrite("rewiring_rate", &flockwork_args::rewiring_rate)
-        .def_readwrite("neighbor_affinity", &flockwork_args::neighbor_affinity)
-        .def_readwrite("tmax", &flockwork_args::tmax)
-        .def_readwrite("m", &flockwork_args::m)
-        .def_readwrite("m_in", &flockwork_args::m_in)
-        .def_readwrite("m_out", &flockwork_args::m_out)
-        .def_readwrite("new_time", &flockwork_args::new_time)
+        .def_readwrite("E", &flockwork_args::E, "Edge list of the initial state")
+        .def_readwrite("N", &flockwork_args::N, "Number of nodes")
+        .def_readwrite("P", &flockwork_args::P, R"pbdoc(A list of floats describing the time-dependent connection probability (corresponding times in `rewiring_rate`))pbdoc")
+        .def_readwrite("rewiring_rate", &flockwork_args::rewiring_rate, R"pbdoc(A list of pairs of doubles, each entry contains the time and the rewiring rate per node)pbdoc")
+        .def_readwrite("neighbor_affinity", &flockwork_args::neighbor_affinity, R"pbdoc(
+        A list, for each node contains two lists, one containing the node's 
+        neighbors and the second one containing the node affinity between them.)pbdoc")
+        .def_readwrite("tmax", &flockwork_args::tmax, R"pbdoc(The time at which the last value of `P` and the `rewiring_rate` changes (i.e. the maximum time until the parameteres are defined))pbdoc")
+        .def_readwrite("m", &flockwork_args::m, "The number of edges in the network at this time")
+        .def_readwrite("m_in", &flockwork_args::m_in, "The number of edges being created in the last time interval")
+        .def_readwrite("m_out", &flockwork_args::m_out, "The number of edges being deleted in the last time interval")
+        .def_readwrite("new_time", &flockwork_args::new_time, "The bin edges of the new time bins")
         ;
 
-    py::class_<edge_trajectories>(m,"edge_trajectories")
-        .def(py::init<>())
-        .def_readwrite("trajectories", &edge_trajectories::trajectories)
-        .def_readwrite("edge_similarities", &edge_trajectories::edge_similarities);
+    py::class_<edge_trajectories>(m,"edge_trajectories",R"pbdoc(
+        Instead of getting lists of edges ordered in time, this description 
+        of a temporal network consists of a list of :mod:`edge_trajectory_entry`. Each entry
+        contains the edge and a list of time pairs denoting the times the edge exists.
 
-    py::class_<dtu_week>(m,"dtu_week")
+        Optionally, dependent on the function which created this object, this object can
+        contain edge similarities, which are defined as follows. 
+        Two edges are considered similar when they are connected to the same node at the same time
+        Each edge :math:`i`, where
+        :math:`i` is the edge's index in the trajectory list, 
+    )pbdoc")
         .def(py::init<>())
-        .def_readwrite("N", &dtu_week::N)
-        .def_readwrite("tmax", &dtu_week::tmax)
-        .def_readwrite("gamma", &dtu_week::gamma)
-        .def_readwrite("P", &dtu_week::P);
+        .def_readwrite("trajectories", &edge_trajectories::trajectories, R"pbdoc(Each entry of this list has properties `.edge` containing 
+            its nodes and `.time_pairs` containing the time intervals when the edge was active.)pbdoc")
+        .def_readwrite("edge_similarities", &edge_trajectories::edge_similarities, R"pbdoc(
+            Each entry of this list is a triple (i, j, w), where `i` is the `i`-th edge in `trajectories` (similarly for `j`) and `w`
+            is their similarity.
+        )pbdoc");
 
-    py::class_<SIS>(m,"SIS")
+    py::class_<SIS>(m,"SIS","Base class for the simulation of an SIS compartmental infection model on a temporal network. Pass this to :mod:`gillespie_SIS` to simulate and retrieve the simulation results.")
         .def(py::init<size_t,double,double,double,size_t,size_t,bool,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
@@ -493,14 +572,44 @@ PYBIND11_MODULE(_tacoma, m) {
                 py::arg("number_of_initially_vaccinated") = 0, 
                 py::arg("prevent_disease_extinction") = false,
                 py::arg("seed") = 0,
-                py::arg("verbose") = false
+                py::arg("verbose") = false,
+                R"pbdoc(
+                    Parameters
+                    ----------
+                    N : int
+                        Number of nodes in the temporal network.
+                    t_simulation : float
+                        Maximum time for the simulation to run. Can possibly be greater than the maximum time of the temporal
+                        network in which case the temporal network is looped.
+                    infection_rate : float
+                        Infection rate per :math:`SI`-link (expected number of reaction events :math:`SI\rightarrow II`
+                        for a single :math:`SI`-link per dimension of time).
+                    recovery_rate : float
+                        Recovery rate per infected (expected number of reaction events :math:`I\rightarrow S`
+                        for a single infected node per dimension of time).
+                    number_of_initially_infected : int, default = 1
+                        Number of nodes which will be in the infected compartment at :math:`t = t_0`. Note that the default
+                        value 1 is not an ideal initial value as fluctuations may lead to a quick end of the simulation
+                        skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
+                    number_of_initially_vaccinated : int, default = 0
+                        Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    prevent_disease_extinction : bool, default: False
+                        If this is `True`, the recovery of the last infected node will always be prevented.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc"
             )
-        .def_readwrite("time", &SIS::time)
-        .def_readwrite("R0", &SIS::R0)
-        .def_readwrite("SI", &SIS::SI)
-        .def_readwrite("I", &SIS::I);
+        .def_readwrite("time", &SIS::time, "A list containing the time points at which one or more of the observables changed.")
+    .def_readwrite("R0", &SIS::R0, R"pbdoc(
+                   A list containing the basic reproduction number defined as :math:`R_0(t) = \eta\left\langle k \right\rangle(t) / \rho`
+                   where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
+                   )pbdoc")
+        .def_readwrite("SI", &SIS::SI, "A list containing the number of infected at time :math:`t`.")
+        .def_readwrite("I", &SIS::I, "A list containing the number of recovered at time :math:`t`.");
 
-    py::class_<SI>(m,"SI")
+    py::class_<SI>(m,"SI","Base class for the simulation of an SI compartmental infection model on a temporal network. Pass this to :mod:`gillespie_SI` to simulate and retrieve the simulation results.")
         .def(py::init<size_t,double,double,size_t,size_t,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
@@ -508,13 +617,33 @@ PYBIND11_MODULE(_tacoma, m) {
                 py::arg("number_of_initially_infected") = 1, 
                 py::arg("number_of_initially_vaccinated") = 0, 
                 py::arg("seed") = 0,
-                py::arg("verbose") = false
+                py::arg("verbose") = false,
+                R"pbdoc(
+                    Parameters
+                    ----------
+                    N : int
+                        Number of nodes in the temporal network.
+                    t_simulation : float
+                        Maximum time for the simulation to run. Can possibly be greater than the maximum time of the temporal
+                        network in which case the temporal network is looped.
+                    infection_rate : float
+                        Infection rate per :math:`SI`-link (expected number of reaction events :math:`SI\rightarrow II`
+                        for a single :math:`SI`-link per dimension of time).
+                    number_of_initially_infected : int, default = 1
+                        Number of nodes which will be in the infected compartment at :math:`t = t_0`. 
+                    number_of_initially_vaccinated : int, default = 0
+                        Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc"
             )
-        .def_readwrite("time", &SI::time)
-        .def_readwrite("SI", &SI::_SI)
-        .def_readwrite("I", &SI::I);
+        .def_readwrite("time", &SI::time, "A list containing the time points at which one or more of the observables changed.")
+        .def_readwrite("SI", &SI::_SI, "A list containing the number of infected at time :math:`t`.")
+        .def_readwrite("I", &SI::I, "A list containing the number of recovered at time :math:`t`.");
 
-    py::class_<SIR>(m,"SIR")
+    py::class_<SIR>(m,"SIR","Base class for the simulation of an SIR compartmental infection model on a temporal network. Pass this to :mod:`gillespie_SIR` to simulate and retrieve the simulation results.")
         .def(py::init<size_t,double,double,double,size_t,size_t,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
@@ -523,30 +652,89 @@ PYBIND11_MODULE(_tacoma, m) {
                 py::arg("number_of_initially_infected") = 1, 
                 py::arg("number_of_initially_vaccinated") = 0, 
                 py::arg("seed") = 0,
-                py::arg("verbose") = false
+                py::arg("verbose") = false,
+                R"pbdoc(
+                    Parameters
+                    ----------
+                    N : int
+                        Number of nodes in the temporal network.
+                    t_simulation : float
+                        Maximum time for the simulation to run. Can possibly be greater than the maximum time of the temporal
+                        network in which case the temporal network is looped.
+                    infection_rate : float
+                        Infection rate per :math:`SI`-link (expected number of reaction events :math:`SI\rightarrow II`
+                        for a single :math:`SI`-link per dimension of time).
+                    recovery_rate : float
+                        Recovery rate per infected (expected number of reaction events :math:`I\rightarrow R`
+                        for a single infected node per dimension of time).
+                    number_of_initially_infected : int, default = 1
+                        Number of nodes which will be in the infected compartment at :math:`t = t_0`. Note that the default
+                        value 1 is not an ideal initial value as fluctuations may lead to a quick end of the simulation
+                        skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
+                    number_of_initially_vaccinated : int, default = 0
+                        Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc"
             )
-        .def_readwrite("time", &SIR::time)
-        .def_readwrite("R0", &SIR::R0)
-        .def_readwrite("SI", &SIR::SI)
-        .def_readwrite("I", &SIR::I)
-        .def_readwrite("R", &SIR::R);
+        .def_readwrite("time", &SIR::time, "A list containing the time points at which one or more of the observables changed.")
+        .def_readwrite("R0", &SIR::R0, R"pbdoc(
+                   A list containing the basic reproduction number defined as :math:`R_0(t) = \eta\left\langle k \right\rangle(t) / \rho`
+                   where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
+                   )pbdoc")
+        .def_readwrite("SI", &SIR::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
+        .def_readwrite("I", &SIR::I, "A list containing the number of infected at time :math:`t`.")
+        .def_readwrite("R", &SIR::R, "A list containing the number of recovered at time :math:`t`.");
 
-    py::class_<SIRS>(m,"SIRS")
+    py::class_<SIRS>(m,"SIRS","Base class for the simulation of an SIRS compartmental infection model on a temporal network. Pass this to :mod:`gillespie_SIRS` to simulate and retrieve the simulation results.")
         .def(py::init<size_t,double,double,double,double,size_t,size_t,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
                 py::arg("infection_rate"),
                 py::arg("recovery_rate"),
-                py::arg("becoming_susceptible_rate"),
+                py::arg("waning_immunity_rate"),
                 py::arg("number_of_initially_infected") = 1, 
                 py::arg("number_of_initially_vaccinated") = 0, 
                 py::arg("seed") = 0,
-                py::arg("verbose") = false
+                py::arg("verbose") = false,
+                R"pbdoc(
+                    Parameters
+                    ----------
+                    N : int
+                        Number of nodes in the temporal network.
+                    t_simulation : float
+                        Maximum time for the simulation to run. Can possibly be greater than the maximum time of the temporal
+                        network in which case the temporal network is looped.
+                    infection_rate : float
+                        Infection rate per :math:`SI`-link (expected number of reaction events :math:`SI\rightarrow II`
+                        for a single :math:`SI`-link per dimension of time).
+                    recovery_rate : float
+                        Recovery rate per infected (expected number of reaction events :math:`I\rightarrow R`
+                        for a single infected node per dimension of time).
+                    waning_immunity_rate : float
+                        Recovery rate per infected (expected number of reaction events :math:`R\rightarrow S`
+                        for a single recovered node per dimension of time).
+                    number_of_initially_infected : int, default = 1
+                        Number of nodes which will be in the infected compartment at :math:`t = t_0`. Note that the default
+                        value 1 is not an ideal initial value as fluctuations may lead to a quick end of the simulation
+                        skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
+                    number_of_initially_vaccinated : int, default = 0
+                        Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc"
             )
-        .def_readwrite("time", &SIRS::time)
-        .def_readwrite("R0", &SIRS::R0)
-        .def_readwrite("SI", &SIRS::SI)
-        .def_readwrite("I", &SIRS::I)
-        .def_readwrite("R", &SIRS::R);
+        .def_readwrite("time", &SIRS::time, "A list containing the time points at which one or more of the observables changed.")
+        .def_readwrite("R0", &SIRS::R0, R"pbdoc(
+                    A list containing the basic reproduction number defined as :math:`R_0(t) = \eta\left\langle k \right\rangle(t) / \rho`
+                    where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
+            )pbdoc" )
+        .def_readwrite("SI", &SIRS::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
+        .def_readwrite("I", &SIRS::I, "A list containing the number of infected at time :math:`t`.")
+        .def_readwrite("R", &SIRS::R, "A list containing the number of recovered at time :math:`t`.");
 
 }
