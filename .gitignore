@@ -21,3 +21,5 @@ a.out
 /jupyter_notebooks/.ipynb_checkpoints/
 
 /docs/
+/cppdocs/_build/
+/cppdocs/_generate/
