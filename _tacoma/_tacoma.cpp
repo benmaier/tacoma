@@ -117,6 +117,18 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("seed") = 0
          );
 
+    m.def("flockwork_P_varying_rates_for_each_node", &flockwork_P_varying_rates_for_each_node, 
+            "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rates and varying P (varying both over time and for each node). Returns time points and concurrent edge changes.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("P"),
+            py::arg("t_run_total"),
+            py::arg("rewiring_rates"),
+            py::arg("tmax"),
+            py::arg("use_random_rewiring") = false,
+            py::arg("seed") = 0
+         );
+
     m.def("flockwork_P_varying_rates_neighbor_affinity", &flockwork_P_varying_rates_neighbor_affinity, "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rate and varying P. Rewiring neighbors are chosen according to a neighbor affinity value. Returns time points and concurrent edge changes.",
             py::arg("E"),
             py::arg("N"),

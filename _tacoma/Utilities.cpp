@@ -240,6 +240,115 @@ void get_gillespie_tau_and_event_with_varying_gamma(
 
 }
 
+void get_gillespie_tau_and_event_with_varying_gamma_for_each_node( 
+                vector < double > & standard_rates,
+                vector < pair < double, double > > const & gamma,
+                vector < pair < double, vector < double > > > const & gamma_single_nodes,
+                double t0,
+                double t_max,
+                size_t & i_t,
+                double & tau,
+                size_t & event,
+                mt19937_64 & generator, 
+                uniform_real_distribution<double> & distribution
+             )
+{
+    // ======================= FIND TAU ========================
+    size_t N_gamma = gamma.size();
+    double beta0 = accumulate(standard_rates.begin(), standard_rates.end(), 0.0);
+    double m_log_1mU = - log( 1. - distribution(generator));
+
+    double t_basic = (i_t / N_gamma) * t_max;
+
+    double t_iP1 = get<0>(gamma[(i_t+1) % N_gamma]) + ((i_t+1) / N_gamma) * t_max; 
+    double t_i   = t0;
+    double g_i   = get<1>(gamma[i_t % N_gamma]);
+
+    double S_i = 0.;
+    double S_iP1 = (t_iP1 - t0) * g_i;
+
+    size_t N_nodes = gamma_single_nodes[0].second.size();
+
+    //cout << "N_nodes = " << N_nodes << endl;
+
+    vector < double > S_i_single_nodes( N_nodes, 0.0 );
+
+    double next_limit = (t_iP1 - t0) * beta0 + S_iP1;
+
+    while (m_log_1mU > next_limit) 
+    {
+        //fill the total amount of events happened per node
+        for(size_t node=0; node<N_nodes; ++node)
+            S_i_single_nodes[node] += (t_iP1 - t0) * gamma_single_nodes[i_t % N_gamma].second[node];
+
+        i_t++;
+        t_basic = (i_t / N_gamma) * t_max;
+
+        g_i   = get<1>(gamma[i_t % N_gamma]);
+        t_i   = get<0>(gamma[i_t % N_gamma]) + t_basic;
+        t_iP1 = get<0>(gamma[(i_t+1) % N_gamma]) + ((i_t+1) / N_gamma) * t_max;
+
+        S_i = S_iP1;
+        S_iP1 += (t_iP1 - t_i) * g_i;
+        next_limit = (t_iP1 - t0) * beta0 + S_iP1;
+    }
+
+    //cout << "found tau." << endl;
+
+
+    //tau = ( m_log_1mU - S_i + g_i*t_i + t0*beta0 ) / (beta0 + g_i) - t0;
+    //
+    tau = (m_log_1mU - S_i + g_i * (t_i-t0) ) / (beta0 + g_i);
+    double Lambda = g_i * (tau+(t0-t_i)) + S_i;
+
+
+
+
+    //================ FIND EVENT ========================
+    size_t N = standard_rates.size();
+    double a0 = 0.0;
+
+    //get the mean number of events happened per channel
+    for(size_t rate=0; rate<N; rate++)
+    {
+        standard_rates[rate] *= tau;
+        a0 += standard_rates[rate];
+    }
+
+    //push rewiring events to the end
+    for(size_t node=0; node<N_nodes; ++node)
+    {
+        double g_ = gamma_single_nodes[i_t % N_gamma].second[node];
+        S_i_single_nodes[node] += g_ * (tau+(t0-t_i));
+        standard_rates.push_back(S_i_single_nodes[node]);
+        a0 += S_i_single_nodes[node];
+        N++;
+    }
+
+    if ((t0+tau) == t_iP1)
+        i_t++;
+
+    //find event as usual
+    double rProduct = distribution(generator) * a0;
+
+    event = 0;
+
+    if (N==0)
+    {
+        throw length_error( "Rate list is empty." );
+    }
+
+    double sum_event = 0.0;
+    while ( (event<N) and not ( (sum_event < rProduct) and (rProduct <= sum_event+standard_rates[event]) ) )
+    {
+        sum_event += standard_rates[event];
+        event++;
+    }
+
+    //cout << "found event " << event << endl;
+
+}
+
 void remove_from_vector(vector <size_t> &vec, const size_t to_be_removed){
     vec.erase(
                 remove_if(vec.begin(), vec.end(),

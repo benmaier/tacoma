@@ -82,6 +82,19 @@ void get_gillespie_tau_and_event_with_varying_gamma(
                 uniform_real_distribution<double> & distribution
              );
 
+void get_gillespie_tau_and_event_with_varying_gamma_for_each_node( 
+                vector < double > & standard_rates,
+                vector < pair < double, double > > const & gamma,
+                vector < pair < double, vector < double > > > const & gamma_single_nodes,
+                double t0,
+                double t_max,
+                size_t & i_t,
+                double & tau,
+                size_t & event,
+                mt19937_64 & generator, 
+                uniform_real_distribution<double> & distribution
+             );
+
 void remove_from_vector(vector <size_t> &vec, const size_t to_be_removed);
 void remove_2_from_vector(vector <size_t> &vec, const size_t first_to_be_removed, const size_t second_to_be_removed);
 /*

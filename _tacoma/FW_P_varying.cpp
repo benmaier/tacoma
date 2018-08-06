@@ -89,7 +89,7 @@ edge_changes
         get<1>(rewiring_rate[it]) *= N;
 
     if ( N_gamma != P.size() )
-        throw length_error( "Q and rewiring rate need to have the same length." );
+        throw length_error( "P and rewiring rate need to have the same length." );
 
     //simulate
     double t = get<0>(rewiring_rate[0]);
@@ -125,6 +125,129 @@ edge_changes
                 pair < vector < pair <size_t,size_t> >, 
                        vector < pair <size_t,size_t> > 
                      > curr_edge_change = rewire_P_without_SI_checking(G,P[i_t%N_gamma],generator,uni_distribution);
+
+                if ( (curr_edge_change.first.size()>0) || (curr_edge_change.second.size()>0) )
+                {
+                    time.push_back(t);
+                    edges_out.push_back( curr_edge_change.first );
+                    edges_in.push_back( curr_edge_change.second );
+                }
+            }
+            else
+            {
+                throw length_error("There was an event chosen other than rewiring, this should not happen.");
+            }
+        }
+            
+
+    }
+
+    edge_changes result;
+
+    result.t = time;
+    result.tmax = t_run_total;
+    result.t0 = 0;
+    result.edges_initial = E;
+    result.edges_out = edges_out;
+    result.edges_in = edges_in;
+    result.N = N;
+
+    return result;
+}
+
+edge_changes
+     flockwork_P_varying_rates_for_each_node(
+                 vector < pair < size_t, size_t > > &E, //edgelist
+                 const size_t N,       //number of nodes
+                 vector < vector < double > > &Ps,       //probability to reconnect after cutting
+                 const double t_run_total,
+                 vector < pair < double, vector < double > > > &rewiring_rates,
+                 const double tmax,
+                 const bool   use_random_rewiring,
+                 const size_t seed
+        )
+{
+
+    //initialize random generators
+    mt19937_64 generator;
+    seed_engine(generator,seed);
+    uniform_real_distribution<double> uni_distribution(0.,1.);
+
+    //initialize Graph vector
+    vector < set < size_t > * > G;
+
+    //if we use random rewiring, we need a vector containing the node ints
+    //this seems to be very bad style but I don't have a better idea right now
+    vector < size_t > node_ints;
+
+    for(size_t node=0; node<N; node++)
+    {
+        G.push_back(new set < size_t >);
+        node_ints.push_back(node);
+    }
+
+    vector < vector < pair <size_t,size_t> > > edges_out;
+    vector < vector < pair <size_t,size_t> > > edges_in;
+    vector < double > time;
+
+    //multiply rewiring rate with number of nodes
+    size_t N_gamma = rewiring_rates.size();
+    vector < pair < double, double > > rewiring_rate_sum;
+
+    for(auto &gamma_entry : rewiring_rates)
+    {
+        double this_gamma = accumulate(gamma_entry.second.begin(), gamma_entry.second.end(), 0.0);
+        rewiring_rate_sum.push_back(make_pair(gamma_entry.first, this_gamma));
+    }
+
+    if ( N_gamma != Ps.size() )
+        throw length_error( "P and rewiring rate need to have the same length." );
+
+    //simulate
+    double t = get<0>(rewiring_rates[0]);
+    ssize_t last_event = -1;
+    size_t i_t = 0;
+
+    while (t < t_run_total)
+    {
+        //calculate rates
+        vector <double> rates;
+        rates.push_back(0.0);
+
+        double tau;
+        size_t event;
+
+        //cout << "finding event using Gillespie SSA... " << endl;
+
+        get_gillespie_tau_and_event_with_varying_gamma_for_each_node(
+                            rates,
+                            rewiring_rate_sum,
+                            rewiring_rates,
+                            t,
+                            tmax,
+                            i_t,
+                            tau,
+                            event,
+                            generator,
+                            uni_distribution);
+        t = t + tau;
+        last_event = event;
+
+        if (t<t_run_total)
+        {
+
+            if (event>0)
+            {
+                size_t node = event - 1;
+
+                //cout << "found node " << node << endl;
+                //cout << "Ps[i_t%N_gamma].size() = " << Ps[i_t%N_gamma].size() << endl;
+                
+                pair < vector < pair <size_t,size_t> >, 
+                       vector < pair <size_t,size_t> > 
+                     > curr_edge_change = rewire_P_without_SI_checking_single_node(node,G,Ps[i_t%N_gamma][node],generator,uni_distribution);
+
+                //cout << "rewired." << endl;
 
                 if ( (curr_edge_change.first.size()>0) || (curr_edge_change.second.size()>0) )
                 {

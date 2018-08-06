@@ -175,6 +175,73 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
 }
 
 
+pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
+    rewire_P_without_SI_checking_single_node(
+                 size_t i,
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 mt19937_64 & generator, 
+                 uniform_real_distribution<double> & distribution
+            )
+{
+    //choose second node
+    size_t N = G.size();
+
+    uniform_int_distribution<size_t> random_node(0,N-2);
+    size_t j = random_node(generator);
+
+    if (j>=i)
+        ++j;
+
+    //cout << "found pair (" << i << ", " << j << ")" << endl;
+
+    bool do_rewiring = distribution(generator) < P;
+
+    vector < pair < size_t, size_t > > edges_out;
+    vector < pair < size_t, size_t > > edges_in;
+
+    //check if new neighbor is actually an old neighbor
+    //and if this is the case return an empty event
+    if ( do_rewiring and (G[i]->find(j) != G[i]->end()) )
+    {
+        return make_pair(edges_out,edges_in);
+    }
+
+    //loop through the neighbors of i
+    for(auto neigh_i : *G[i] )
+    {
+        //and erase the link to i
+        G[neigh_i]->erase(i);
+        
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_i);
+        edges_out.push_back( current_edge );
+    } 
+
+    //erase the links from the perspective of i
+    G[i]->clear();
+
+    if ( do_rewiring )
+    {
+        //loop through the neighbors of j
+        for(auto neigh_j : *G[j] ) 
+        {
+            G[ neigh_j ]->insert( i );
+            G[ i ]->insert( neigh_j );
+
+            pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_j);
+            edges_in.push_back( current_edge );
+        }
+
+        //add j as neighbor and count additional edge
+        G[ j ]->insert( i );
+        G[ i ]->insert( j );
+
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,j);
+        edges_in.push_back( current_edge );
+    }
+
+    return make_pair(edges_out,edges_in);
+}
 
 
 pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 

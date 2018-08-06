@@ -57,6 +57,18 @@ edge_changes
         );
 
 edge_changes
+     flockwork_P_varying_rates_for_each_node(
+                 vector < pair < size_t, size_t > > &E, //edgelist
+                 const size_t N,       //number of nodes
+                 vector < vector < double > > &Ps,       //probability to reconnect after cutting
+                 const double t_run_total,
+                 vector < pair < double, vector < double > > > &rewiring_rates,
+                 const double tmax,
+                 const bool   use_random_rewiring,
+                 const size_t seed
+        );
+
+edge_changes
      flockwork_P_varying_rates_neighbor_affinity(
                  vector < pair < size_t, size_t > > E, //edgelist
                  const size_t N,       //number of nodes
