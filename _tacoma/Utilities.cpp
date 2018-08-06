@@ -279,7 +279,7 @@ void get_gillespie_tau_and_event_with_varying_gamma_for_each_node(
     {
         //fill the total amount of events happened per node
         for(size_t node=0; node<N_nodes; ++node)
-            S_i_single_nodes[node] += (t_iP1 - t0) * gamma_single_nodes[i_t % N_gamma].second[node];
+            S_i_single_nodes[node] += (t_iP1 - t_i) * gamma_single_nodes[i_t % N_gamma].second[node];
 
         i_t++;
         t_basic = (i_t / N_gamma) * t_max;
