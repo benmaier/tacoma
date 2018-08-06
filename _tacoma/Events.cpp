@@ -112,6 +112,72 @@ void rewire(
 }
 
 pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
+    rewire_P_without_SI_checking(
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 mt19937_64 & generator, 
+                 uniform_real_distribution<double> & distribution
+            )
+{
+    //choose two nodes
+    size_t N = G.size();
+    double r1 = distribution(generator);
+    double r2 = distribution(generator);
+    size_t i,j;
+    choose(N,i,j,r1,r2);
+
+    bool do_rewiring = distribution(generator) < P;
+
+    vector < pair < size_t, size_t > > edges_out;
+    vector < pair < size_t, size_t > > edges_in;
+
+    //check if new neighbor is actually an old neighbor
+    //and if this is the case return an empty event
+    if ( do_rewiring and (G[i]->find(j) != G[i]->end()) )
+    {
+        return make_pair(edges_out,edges_in);
+    }
+
+    //loop through the neighbors of i
+    for(auto neigh_i : *G[i] )
+    {
+        //and erase the link to i
+        G[neigh_i]->erase(i);
+        
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_i);
+        edges_out.push_back( current_edge );
+    } 
+
+    //erase the links from the perspective of i
+    G[i]->clear();
+
+    if ( do_rewiring )
+    {
+        //loop through the neighbors of j
+        for(auto neigh_j : *G[j] ) 
+        {
+            G[ neigh_j ]->insert( i );
+            G[ i ]->insert( neigh_j );
+
+            pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_j);
+            edges_in.push_back( current_edge );
+        }
+
+        //add j as neighbor and count additional edge
+        G[ j ]->insert( i );
+        G[ i ]->insert( j );
+
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,j);
+        edges_in.push_back( current_edge );
+    }
+
+    return make_pair(edges_out,edges_in);
+}
+
+
+
+
+pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
     rewire_P(
                  vector < set < size_t > * > & G, //Adjacency matrix
                  double P,       //probability to connect with neighbors of neighbor
@@ -369,6 +435,125 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
 
 }
 
+pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
+    rewire_P_neighbor_affinity_without_SI_checking(
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 vector < pair < vector < size_t >, vector < double > > > &neighbor_affinity,
+                 vector < double > &total_affinity,
+                 mt19937_64 & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 const bool use_preferential_node_selection
+            )
+{
+    if (EVENT_VERBOSE)
+        cout << "entering event function" << endl;
+    //choose two nodes
+    size_t N = G.size();
+
+    size_t i, j;
+
+    bool do_rewiring = distribution(generator) < P;
+
+
+    if (EVENT_VERBOSE)
+        cout << "choosing node" << endl;
+
+    vector < pair < size_t, size_t > > edges_out;
+    vector < pair < size_t, size_t > > edges_in;
+
+    if (use_preferential_node_selection)
+    {
+        i = arg_choose_from_vector(total_affinity, generator, distribution);
+    }
+    else
+    {   
+        do
+        {
+            double r1 = distribution(generator);
+            i = r1 * N;
+        } while ( neighbor_affinity[i].second.size() == 0 );
+        
+    }
+
+    // get second node from social network structure
+    if (EVENT_VERBOSE)
+        cout << "getting neighbor node of neighbor " << i << endl;
+
+
+    size_t neighbor_index = arg_choose_from_vector(neighbor_affinity[i].second, generator, distribution);        
+
+    if (EVENT_VERBOSE)
+        cout << "found neighbor index... " << neighbor_index << endl;
+
+    j = neighbor_affinity[i].first[neighbor_index];
+
+    if (EVENT_VERBOSE)
+        cout << "found neighbor node... " << j << endl;
+
+    //check if new neighbor is actually an old neighbor
+    //and if this is the case return an empty event
+    if ( do_rewiring and (G[i]->find(j) != G[i]->end()) )
+    {
+        return make_pair(edges_out,edges_in);
+    }
+
+    if (EVENT_VERBOSE)
+        cout << "chose node " << i << endl;
+
+    if (EVENT_VERBOSE)
+        cout << "looping through neighbors of " << i << endl;
+
+    //loop through the neighbors of i
+    for(auto neigh_i : *G[i] )
+    {
+        //and erase the link to i
+        if (EVENT_VERBOSE)
+            cout << "erasing " << i << " from list of neighbors of node " << neigh_i <<  endl;
+
+        G[neigh_i]->erase(i);
+        
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_i);
+        edges_out.push_back( current_edge );
+    } 
+
+    if (EVENT_VERBOSE)
+        cout << "clearing neighbors of " << i << endl;
+
+    //erase the links from the perspective of i
+    G[i]->clear();
+
+    if ( do_rewiring )
+    {
+
+        //loop through the neighbors of j
+        for(auto neigh_j : *G[j] ) 
+        {
+            G[ neigh_j ]->insert( i );
+            G[ i ]->insert( neigh_j );
+
+            pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_j);
+            edges_in.push_back( current_edge );
+
+        }
+
+        //add j as neighbor and count additional edge
+        G[ j ]->insert( i );
+        G[ i ]->insert( j );
+
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,j);
+        edges_in.push_back( current_edge );
+
+    }
+
+    //calculate new number of edges
+    if (EVENT_VERBOSE)
+        cout << "leaving event function" << endl;
+
+    return make_pair(edges_out,edges_in);
+
+}
+
 void random_rewire(
                  vector < set < size_t > * > & G, //Adjacency matrix
                  mt19937_64 & generator, 
@@ -428,6 +613,58 @@ void random_rewire(
                 {
                     SI_E.insert( get_sorted_pair(i,neigh) );
                 }
+            } else {
+                //if it's i itself, skip this neighbor and increase the total
+                //number of evaluated neighbors by one
+                number_of_old_edges++; 
+            }
+
+            //advance to next neighbor
+            neigh_int++;
+        }
+    }
+}
+
+void random_rewire_without_SI_checking(
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 mt19937_64 & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 vector < size_t > & node_ints
+            )
+{
+    //choose two nodes
+    size_t N = G.size();
+    size_t i = N * distribution(generator);
+
+    size_t number_of_old_edges = 0;
+
+    //loop through the neighbors of i
+    for(auto neigh : *G[i] )
+    {
+        //and erase the link to i
+        G[neigh]->erase(i);
+        number_of_old_edges++;
+    } 
+
+    if (number_of_old_edges > 0)
+    {
+        //erase the links from the perspective of i
+        G[i]->clear();
+
+        choose_random_unique(node_ints.begin(), node_ints.end(), number_of_old_edges+1,generator,distribution);
+
+        //loop through the new_neighbors
+        size_t neigh_int = 0;
+        while (neigh_int < number_of_old_edges)
+        {
+            size_t neigh = node_ints[neigh_int];
+
+            //add as neighbor of i if it's not i itself
+            if ( neigh != i )
+            {
+                G[ neigh ]->insert( i );
+                G[ i ]->insert( neigh );
+
             } else {
                 //if it's i itself, skip this neighbor and increase the total
                 //number of evaluated neighbors by one

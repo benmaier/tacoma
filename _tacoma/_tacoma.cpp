@@ -114,7 +114,6 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("rewiring_rate"),
             py::arg("tmax"),
             py::arg("use_random_rewiring") = false,
-            py::arg("equilibrate_flockwork") = false,
             py::arg("seed") = 0
          );
 
@@ -127,7 +126,6 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("neighbor_affinity"),
             py::arg("tmax"),
             py::arg("use_random_rewiring") = false,
-            py::arg("equilibrate_flockwork") = false,
             py::arg("use_preferential_node_selection") = false,
             py::arg("use_unweighted_k_for_selection") = false,
             py::arg("seed") = 0

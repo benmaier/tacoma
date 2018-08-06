@@ -65,6 +65,14 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
            );
 
 pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
+    rewire_P_without_SI_checking(
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 mt19937_64 & generator, 
+                 uniform_real_distribution<double> & distribution
+           );
+
+pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
     rewire_P_neighbor_affinity(
                  vector < set < size_t > * > & G, //Adjacency matrix
                  double P,       //probability to connect with neighbors of neighbor
@@ -78,12 +86,30 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
                  const bool use_preferential_node_selection = false
             );
 
+pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
+    rewire_P_neighbor_affinity_without_SI_checking(
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 vector < pair < vector < size_t >, vector < double > > > &neighbor_affinity,
+                 vector < double > &total_affinity,
+                 mt19937_64 & generator, 
+                 uniform_real_distribution<double> & distribution,
+                 const bool use_preferential_node_selection = false
+            );
+
 void random_rewire(
                  vector < set < size_t > * > & G, //Adjacency matrix
                  mt19937_64 & generator, 
                  uniform_real_distribution<double> & distribution,
                  set < pair < size_t, size_t > > & SI_E, //edge list of SI links
                  const vector < size_t > & node_status,
+                 vector < size_t > & node_ints
+           );
+
+void random_rewire_without_SI_checking(
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 mt19937_64 & generator, 
+                 uniform_real_distribution<double> & distribution,
                  vector < size_t > & node_ints
            );
 #endif

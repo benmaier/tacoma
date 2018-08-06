@@ -57,52 +57,17 @@ edge_changes
                  vector < pair < double, double > > &rewiring_rate,
                  const double tmax,
                  const bool   use_random_rewiring,
-                 const bool   equilibrate_flockwork,
                  const size_t seed
         )
 {
-
-    double recovery_rate = 0;
-    size_t number_of_vaccinated = 0;
-    size_t number_of_infected = 1;
-
-    //check if number of infected and number of vaccinated does not
-    //exceed total node number
-    if (number_of_vaccinated + number_of_infected > N) 
-        throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
 
     //initialize random generators
     mt19937_64 generator;
     seed_engine(generator,seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
-    if (equilibrate_flockwork)
-    {
-        size_t eq_time = 0;
-        E = equilibrate_edgelist_generator(E,N,P[0],generator,uni_distribution,eq_time,true);
-    }
-
-    //initialize status vector of nodes and vector of infected
-    vector < size_t > node_status;
-    set < size_t > infected;
-
-    for(size_t node=0; node<number_of_vaccinated; node++)
-        node_status.push_back( R );
-
-    for(size_t node=number_of_vaccinated; node<number_of_vaccinated+number_of_infected; node++)
-    {
-        node_status.push_back( I );
-        infected.insert( node );
-    }
-
-    for(size_t node=number_of_vaccinated+number_of_infected; node<N; node++)
-        node_status.push_back( S );
-
     //initialize Graph vector
     vector < set < size_t > * > G;
-
-    //count number of edges in Graph
-    size_t number_of_edges = 0;
 
     //if we use random rewiring, we need a vector containing the node ints
     //this seems to be very bad style but I don't have a better idea right now
@@ -113,42 +78,6 @@ edge_changes
         G.push_back(new set < size_t >);
         node_ints.push_back(node);
     }
-
-    //initialize edge list of infected-susceptible links
-    set < pair < size_t, size_t > > SI_E;
-
-    //loop through edge list and push neighbors
-    for(auto edge: E)
-    {
-        //get nodes belonging to that edge
-        size_t i = edge.first;
-        size_t j = edge.second;
-
-        //check if j is already a neighbor of i
-        const bool already_counted = G[i]->find(j) != G[i]->end();
-
-        //check if edge has been added already
-        if (!(already_counted)) 
-        {
-            G[ i ]->insert( j );
-            G[ j ]->insert( i );
-            number_of_edges++;
-
-            //check if this is an SI link
-            if ( 
-                 ( (node_status[i] == I) && (node_status[j] == S) ) ||
-                 ( (node_status[i] == S) && (node_status[j] == I) )
-               ) 
-            {
-                pair <size_t,size_t> current_pair = get_sorted_pair(i,j);
-                SI_E.insert( current_pair );
-            }
-        }
-
-    }
-
-    //calculate mean degree
-    double k = (2.0 / N) * number_of_edges;
 
     vector < vector < pair <size_t,size_t> > > edges_out;
     vector < vector < pair <size_t,size_t> > > edges_in;
@@ -164,14 +93,14 @@ edge_changes
 
     //simulate
     double t = get<0>(rewiring_rate[0]);
-    size_t last_event = -1;
+    ssize_t last_event = -1;
     size_t i_t = 0;
 
-    while ( (t < t_run_total) && (infected.size()>0) )
+    while (t < t_run_total)
     {
         //calculate rates
         vector <double> rates;
-        rates.push_back(infected.size()*recovery_rate);
+        rates.push_back(0.0);
 
         double tau;
         size_t event;
@@ -195,7 +124,7 @@ edge_changes
             {
                 pair < vector < pair <size_t,size_t> >, 
                        vector < pair <size_t,size_t> > 
-                     > curr_edge_change = rewire_P(G,P[i_t%N_gamma],generator,uni_distribution,k,SI_E,node_status);
+                     > curr_edge_change = rewire_P_without_SI_checking(G,P[i_t%N_gamma],generator,uni_distribution);
 
                 if ( (curr_edge_change.first.size()>0) || (curr_edge_change.second.size()>0) )
                 {
@@ -203,26 +132,6 @@ edge_changes
                     edges_out.push_back( curr_edge_change.first );
                     edges_in.push_back( curr_edge_change.second );
                 }
-                /*
-
-                cout << t << endl;
-
-                cout << "out" << endl;
-
-                for(auto edge: curr_edge_change.first)
-                    cout << edge.first << " " << edge.second<< endl;
-
-                cout << "in" << endl;
-                for(auto edge: curr_edge_change.second)
-                    cout << edge.first << " " << edge.second<< endl;
-
-                for(size_t u=0; u<N; u++)
-                    for( auto v: *G[u])
-                    {
-                        cout << u << " " << v << endl;
-
-                    }
-                */
             }
             else
             {
@@ -257,32 +166,16 @@ edge_changes
                  vector < pair < vector < size_t >, vector < double > > > neighbor_affinity,
                  const double tmax,
                  const bool   use_random_rewiring,
-                 const bool   equilibrate_flockwork,
                  const bool   use_preferential_node_selection,
                  const bool   use_unweighted_k_for_selection,
                  const size_t seed
         )
 {
 
-    double recovery_rate = 0;
-    size_t number_of_vaccinated = 0;
-    size_t number_of_infected = 1;
-
-    //check if number of infected and number of vaccinated does not
-    //exceed total node number
-    if (number_of_vaccinated + number_of_infected > N) 
-        throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
-
     //initialize random generators
     mt19937_64 generator;
     seed_engine(generator,seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
-
-    if (equilibrate_flockwork)
-    {
-        size_t eq_time = 0;
-        E = equilibrate_edgelist_generator(E,N,P[0],generator,uni_distribution,eq_time,true);
-    }
 
     vector < double > total_affinity(N);
 
@@ -298,22 +191,6 @@ edge_changes
         total_affinity[node] = k_total;
 
     }
-
-    //initialize status vector of nodes and vector of infected
-    vector < size_t > node_status;
-    set < size_t > infected;
-
-    for(size_t node=0; node<number_of_vaccinated; node++)
-        node_status.push_back( R );
-
-    for(size_t node=number_of_vaccinated; node<number_of_vaccinated+number_of_infected; node++)
-    {
-        node_status.push_back( I );
-        infected.insert( node );
-    }
-
-    for(size_t node=number_of_vaccinated+number_of_infected; node<N; node++)
-        node_status.push_back( S );
 
     //initialize Graph vector
     vector < set < size_t > * > G;
@@ -331,42 +208,6 @@ edge_changes
         node_ints.push_back(node);
     }
 
-    //initialize edge list of infected-susceptible links
-    set < pair < size_t, size_t > > SI_E;
-
-    //loop through edge list and push neighbors
-    for(auto edge: E)
-    {
-        //get nodes belonging to that edge
-        size_t i = edge.first;
-        size_t j = edge.second;
-
-        //check if j is already a neighbor of i
-        const bool already_counted = G[i]->find(j) != G[i]->end();
-
-        //check if edge has been added already
-        if (!(already_counted)) 
-        {
-            G[ i ]->insert( j );
-            G[ j ]->insert( i );
-            number_of_edges++;
-
-            //check if this is an SI link
-            if ( 
-                 ( (node_status[i] == I) && (node_status[j] == S) ) ||
-                 ( (node_status[i] == S) && (node_status[j] == I) )
-               ) 
-            {
-                pair <size_t,size_t> current_pair = get_sorted_pair(i,j);
-                SI_E.insert( current_pair );
-            }
-        }
-
-    }
-
-    //calculate mean degree
-    double k = (2.0 / N) * number_of_edges;
-
     vector < vector < pair <size_t,size_t> > > edges_out;
     vector < vector < pair <size_t,size_t> > > edges_in;
     vector < double > time;
@@ -377,18 +218,18 @@ edge_changes
         get<1>(rewiring_rate[it]) *= N;
 
     if ( N_gamma != P.size() )
-        throw length_error( "Q and rewiring rate need to have the same length." );
+        throw length_error( "P and rewiring rate need to have the same length." );
 
     //simulate
     double t = get<0>(rewiring_rate[0]);
-    size_t last_event = -1;
+    ssize_t last_event = -1;
     size_t i_t = 0;
 
-    while ( (t < t_run_total) && (infected.size()>0) )
+    while (t < t_run_total)
     {
         //calculate rates
         vector <double> rates;
-        rates.push_back(infected.size()*recovery_rate);
+        rates.push_back(0.0);
 
         double tau;
         size_t event;
@@ -412,16 +253,15 @@ edge_changes
             {
                 pair < vector < pair <size_t,size_t> >, 
                        vector < pair <size_t,size_t> > 
-                     > curr_edge_change = rewire_P_neighbor_affinity(G,
+                     > curr_edge_change = rewire_P_neighbor_affinity_without_SI_checking(
+                                                                     G,
                                                                      P[i_t%N_gamma],
                                                                      neighbor_affinity,
                                                                      total_affinity,
                                                                      generator,
                                                                      uni_distribution,
-                                                                     k,
-                                                                     SI_E,
-                                                                     node_status,
-                                                                     use_preferential_node_selection);
+                                                                     use_preferential_node_selection
+                                                                     );
 
                 if ( (curr_edge_change.first.size()>0) || (curr_edge_change.second.size()>0) )
                 {

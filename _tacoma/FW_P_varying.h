@@ -53,7 +53,6 @@ edge_changes
                  vector < pair < double, double > > &rewiring_rate,
                  const double tmax,
                  const bool   use_random_rewiring = false,
-                 const bool   equilibrate_flockwork = false,
                  const size_t seed = 0
         );
 
@@ -67,7 +66,6 @@ edge_changes
                  vector < pair < vector < size_t >, vector < double > > > neighbor_affinity,
                  const double tmax,
                  const bool   use_random_rewiring,
-                 const bool   equilibrate_flockwork,
                  const bool   use_preferential_node_selection,
                  const bool   use_unweighted_k_for_selection,
                  const size_t seed
