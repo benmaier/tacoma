@@ -89,4 +89,11 @@ double estimate_k_scaling_gradient_descent_RMSE(
              size_t N_eval_max = 100,
              bool   verbose = true
         );
+
+pair < vector < double >, vector < double > >
+    get_node_gamma_and_P(
+                edge_changes &ec,
+                vector < pair < double, double > > &gamma,
+                vector < double > &P
+                );
 #endif

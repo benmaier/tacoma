@@ -649,3 +649,176 @@ double estimate_k_scaling_gradient_descent_RMSE(
 
     return this_k_over_k_real_scaling;
 }
+
+pair < vector < double >, vector < double > >
+    get_node_gamma_and_P(
+                edge_changes &ec,
+                vector < pair < double, double > > &gamma,
+                vector < double > &P
+                )
+{
+    // get references to edge_list and time
+    vector < vector < pair < size_t, size_t > > > & all_edges_in = ec.edges_in;
+    vector < vector < pair < size_t, size_t > > > & all_edges_out = ec.edges_out;
+    vector < double > &ec_time = ec.t;
+
+    // get vectors from gamma and P
+    vector < double > gp_time;
+    vector < double > g;
+
+    for(auto &g_entry: gamma)
+    {
+        gp_time.push_back(g_entry.first);
+        g.push_back(g_entry.second);
+    }
+
+    // set initial and final time
+    double tmax = ec.tmax;
+
+    // graph observables
+    size_t N = ec.N;
+    double Nf(N);
+    size_t number_of_edges = ec.edges_initial.size();
+
+    // intialize the node properties
+    vector < size_t > k_node(N);
+    vector < size_t > M_out(N);
+    vector < size_t > M_in(N);
+
+    // intialize the integrals
+    vector < double > I_out(N);
+    vector < double > I_in_1(N);
+    vector < double > I_in_2(N);
+
+    for(auto const &edge : ec.edges_initial)
+    {
+        ++k_node[edge.first];
+        ++k_node[edge.second];
+    }
+
+    auto it_e_in = all_edges_in.begin();
+    auto it_e_out = all_edges_out.begin();
+
+    auto it_t_gp = gp_time.begin();
+    auto it_t_ec = ec_time.begin();
+
+    auto it_g = g.begin();
+    auto it_P = P.begin();
+
+    double t = ec.t0;
+
+    double t_next_gp;
+    double t_next_ec;
+    double t_next;
+
+    do
+    {
+
+        // check which is the next event time at which stuff changes
+        if ((it_t_gp == gp_time.end()) or (it_t_gp+1 == gp_time.end()))
+            t_next_gp = tmax;
+        else
+            t_next_gp = *(it_t_gp+1);
+
+        if ((it_t_ec == ec_time.end()) or (it_t_ec+1 == ec_time.end()))
+            t_next_ec = tmax;
+        else
+            t_next_ec = *(it_t_ec+1);
+
+        if ( t_next_ec <= t_next_gp )
+            t_next = t_next_ec;
+        else
+            t_next = t_next_gp;
+
+        // compute the integrals up to the next change
+
+        double dt = t_next - t;
+        double mean_degree = ((double) number_of_edges) * 2.0 / Nf;
+
+        auto i_k = k_node.begin();
+        auto i_I_out = I_out.begin();
+        auto i_I_in_1 = I_in_1.begin();
+        auto i_I_in_2 = I_in_2.begin();
+
+        double &_g = *it_g;
+        double &_P = *it_P;
+
+        while(i_k != k_node.end())
+        {
+            double _k = (double) *i_k;
+
+            (*i_I_out) += _g * _k * dt;
+            (*i_I_in_1) += _g * _P * (Nf - _k - 1.0) * (_k + 1.0) / (Nf - 1.0) * dt;
+            (*i_I_in_2) += _g * _P * (1.0 + mean_degree) * dt;
+
+            ++i_k;
+            ++i_I_out;
+            ++i_I_in_1;
+            ++i_I_in_2;
+        }
+
+        // advance time
+        t = t_next;
+
+        // change either the network or gamma and P or both
+
+        if (t_next_ec <= t_next_gp)
+        {
+            // update observables for this advancement
+            for(auto const &edge : *it_e_in)
+            {
+                size_t const &u = edge.first;
+                size_t const &v = edge.second;
+                ++k_node[u];
+                ++k_node[v];
+                ++M_in[u];
+                ++M_in[v];
+
+                number_of_edges++;
+            }
+
+            for(auto const &edge : *it_e_out)
+            {
+                size_t const &u = edge.first;
+                size_t const &v = edge.second;
+                --k_node[u];
+                --k_node[v];
+                ++M_out[u];
+                ++M_out[v];
+
+                number_of_edges--;
+            }
+
+            // advance network 
+            ++it_t_ec;
+            ++it_e_out;
+            ++it_e_in;
+        }
+
+        if (t_next_gp <= t_next_ec)
+        {
+            // advance gamma and P
+            ++it_g;
+            ++it_P;
+            ++it_t_gp;
+        }
+
+    } while ((t_next_gp < tmax) or (t_next_ec < tmax));
+
+
+    vector < double > g_node;
+    vector < double > P_node;
+
+    for (size_t node = 0; node < N; ++node)
+    {
+        double this_g = (M_out[node] - I_out[node]) / I_out[node];
+        double this_P = (M_in[node] - I_in_1[node]) / I_in_2[node] / this_g;
+
+        g_node.push_back(this_g);
+        P_node.push_back(this_P);
+    }
+
+
+    return make_pair(g_node, P_node);
+}
+

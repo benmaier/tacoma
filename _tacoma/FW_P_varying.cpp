@@ -43,9 +43,9 @@
 
 using namespace std;
 
-const size_t S = 0;
-const size_t I = 1;
-const size_t R = 2;
+//const size_t S = 0;
+//const size_t I = 1;
+//const size_t R = 2;
 
         
 edge_changes
