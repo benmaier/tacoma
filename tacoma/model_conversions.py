@@ -202,7 +202,7 @@ def estimate_flockwork_P_args_for_single_nodes(temporal_network,*args,**kwargs):
     # compute single node rewiring rate and P factors
     g_node, P_node = get_flockwork_P_node_parameters(temporal_network, kw['rewiring_rate'], kw['P'])
     g_node = np.array(g_node)
-    P_node = np.array(g_node)
+    P_node = np.array(P_node)
 
     new_g_node = []
     new_P_node = []
