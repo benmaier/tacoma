@@ -18,6 +18,7 @@ from tacoma import _get_raw_temporal_network
 from tacoma import mean_coordination_number
 from tacoma import convert
 from tacoma import get_flockwork_P_args
+from tacoma import get_flockwork_P_node_parameters
 import tacoma as tc
 
 # ========================================================= ZSBB ==================================================
@@ -136,6 +137,112 @@ def estimate_ZSBB_args(temporal_network,
 
 # ==================================================== FLOCKWORK P-MODEL ===============================================
 
+def estimate_flockwork_P_args_for_single_nodes(temporal_network,*args,**kwargs):
+    """Bins an `edge_changes` instance for each `dt` (after each step, respectively,
+    if `N_time_steps` was provided) and computes the rewiring rate gamma and probability
+    to stay alone P  from the binned `edges_in` and `edges_out`.
+    Additionally
+
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    t_run_total : float
+        this is just plainly copied to the returned kwargs. If it is set to `None`, t_run_total will be set to `temporal_network.tmax`
+    dt : float
+        The demanded bin size. default : 0.0
+    N_time_steps : int
+        Number of time bins (use either this or dt). default : 0
+    aggregated_network : :obj:`dict` of :obj:`tuple` of int -> float, optional
+        dict(edge -> similarity), if this is given,
+        the kwargs are supposed to be for the function
+        :mod:`flockwork_P_varying_rates_neighbor_affinity`,
+        you can get this network from the `aggregated_network`
+        property from the results returned by
+        :mod:`measure_group_sizes_and_durations`. default : `{}`
+    ensure_empty_network : bool, optional
+        if this is True, bins where the original network
+        is empty (n_edges = 0) will be an artificially 
+        set high gamma with P = 0, such that nodes will
+        lose all edges. default : False
+    use_preferential_node_selection : bool, optional
+        this is just plainly copied to 
+        the returned kwargs if `aggregated_network`
+        is not empty. default : False
+    verbose: bool, optional
+        Be chatty.
+
+
+    Returns
+    -------
+    :obj:`dict`
+        kwargs for the functions :mod:`flockwork_P_varying_rates` or 
+        :mod:`flockwork_P_varying_rates_neighbor_affinity`, if `aggregated_network` was provided
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == el:
+        temporal_network = convert(temporal_network)
+
+    if type(temporal_network) == ec:
+        kw = estimate_flockwork_P_args(temporal_network,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+
+    # get rewiring rate and P
+    gamma = np.array(kw['rewiring_rate'])
+    t, gamma_t = gamma[:,0], gamma[:,1]
+    P_t = np.array(kw['P'])
+
+    # convert to active reconnection event rate and active disconnection event rate
+    alpha = gamma_t * P_t
+    beta = gamma_t * (1 - P_t)
+
+    # compute single node rewiring rate and P factors
+    g_node, P_node = get_flockwork_P_node_parameters(temporal_network, kw['rewiring_rate'], kw['P'])
+    g_node = np.array(g_node)
+    P_node = np.array(g_node)
+
+    new_g_node = []
+    new_P_node = []
+
+    # for each time bin
+    for t, g, P, a, b in zip(t, gamma_t, P_t, alpha, beta):
+
+        # convert to active reconnection event rates and active disconnection event rates
+        a_node = np.array(g_node*g) * np.array(P_node*P)
+        b_node = np.array(g_node*g) * (1-np.array(P_node*P))
+
+        # set negative rate factors to zero and norm factors
+        b_node[b_node<0] = 0.0
+        a_node[a_node<0] = 0.0
+        if not np.all(a_node == 0.0):
+            a_node /= a_node.mean()
+        if not np.all(b_node == 0.0):
+            b_node /= b_node.mean()
+
+        # multiply activity rates with normed factors s.t. the mean of a and b is conserved
+        a_node *= a
+        b_node *= b
+
+        # convert back to gamma and P
+        new_g = a_node + b_node
+        _temp_new_g = new_g.copy()
+        _temp_new_g[new_g==0.0] = 1.0
+        new_P = a_node / _temp_new_g
+
+        new_g_node.append((t, new_g.tolist()))
+        new_P_node.append(new_P.tolist())
+
+    kw['P'] = new_P_node
+    kw['rewiring_rates'] = new_g_node
+
+    kw.pop('rewiring_rate')
+
+    return kw
+
+    
 def estimate_flockwork_P_args(temporal_network,*args,**kwargs):
     """Bins an `edge_changes` instance for each `dt` (after each step, respectively,
     if `N_time_steps` was provided) and computes the rewiring rate gamma and probability
@@ -211,8 +318,6 @@ def estimate_flockwork_P_args(temporal_network,*args,**kwargs):
         raise ValueError('Unknown temporal network format: ' + str(type(_t)))
 
     return new_kwargs 
-
-    
 
 # =============================================== DYNAMIC RGG ===============================================
 
