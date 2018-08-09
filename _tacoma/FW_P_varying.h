@@ -52,8 +52,8 @@ edge_changes
                  const double t_run_total,
                  vector < pair < double, double > > &rewiring_rate,
                  const double tmax,
-                 const bool   use_random_rewiring,
-                 const size_t seed
+                 const bool   use_random_rewiring = false,
+                 const size_t seed = 0
         );
 
 edge_changes
@@ -64,8 +64,8 @@ edge_changes
                  const double t_run_total,
                  vector < pair < double, vector < double > > > &rewiring_rates,
                  const double tmax,
-                 const bool   use_random_rewiring,
-                 const size_t seed
+                 const bool   use_random_rewiring = false,
+                 const size_t seed = 0
         );
 
 edge_changes
@@ -80,6 +80,6 @@ edge_changes
                  const bool   use_random_rewiring,
                  const bool   use_preferential_node_selection,
                  const bool   use_unweighted_k_for_selection,
-                 const size_t seed
+                 const size_t seed = 0
         );
 #endif

@@ -27,6 +27,7 @@
 #include "Utilities.h"
 #include "ResultClasses.h"
 #include "Flockwork.h"
+#include "FW_P_varying.h"
 
 #include <iostream>
 #include <algorithm>
