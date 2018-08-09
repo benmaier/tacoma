@@ -38,6 +38,7 @@
 #include <pybind11/stl.h>
 #include "Flockwork.h"
 #include "FW_P_varying.h"
+#include "FW_P_varying_alpha_beta.h"
 #include "ResultClasses.h"
 #include "test_varying_rate.h"
 #include "ZSBB_model.h"
@@ -140,6 +141,29 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("use_random_rewiring") = false,
             py::arg("use_preferential_node_selection") = false,
             py::arg("use_unweighted_k_for_selection") = false,
+            py::arg("seed") = 0
+         );
+
+    m.def("flockwork_alpha_beta_varying_rates", &flockwork_alpha_beta_varying_rates, "Simulate a flockwork alpha-beta-model given an initial state as an edge list with varying reconnection rate alpha and varying disconnection rate beta. Returns time points and concurrent edge changes.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("reconnection_rate"),
+            py::arg("disconnection_rate"),
+            py::arg("t_run_total"),
+            py::arg("tmax"),
+            py::arg("use_random_rewiring") = false,
+            py::arg("seed") = 0
+         );
+
+    m.def("flockwork_P_varying_rates_for_each_node", &flockwork_alpha_beta_varying_rates_for_each_node, 
+            "Simulate a flockwork alpha-beta-model given an initial state as an edge list with varying reconnection rate alpha and varying disconnection rate beta (varying both over time and for each node). Returns time points and concurrent edge changes.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("reconnection_rates"),
+            py::arg("disconnection_rates"),
+            py::arg("t_run_total"),
+            py::arg("tmax"),
+            py::arg("use_random_rewiring") = false,
             py::arg("seed") = 0
          );
 

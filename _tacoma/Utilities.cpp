@@ -269,8 +269,6 @@ void get_gillespie_tau_and_event_with_varying_gamma_for_each_node(
 
     size_t N_nodes = gamma_single_nodes[0].second.size();
 
-    //cout << "N_nodes = " << N_nodes << endl;
-
     vector < double > S_i_single_nodes( N_nodes, 0.0 );
 
     double next_limit = (t_iP1 - t0) * beta0 + S_iP1;
