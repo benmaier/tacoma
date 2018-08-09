@@ -329,11 +329,20 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("get_flockwork_P_node_parameters", get_node_gamma_and_P,
+    m.def("get_flockwork_P_node_parameters_gamma_and_P", get_node_gamma_and_P,
             R"pbdoc(Calculate the mean node specific activity gamma_i and reconnection probability P_i for each node.)pbdoc",
             py::arg("edge_changes"),
             py::arg("gamma"),
-            py::arg("P")
+            py::arg("P"),
+            py::arg("use_event_rate_method") = false
+        );
+
+    m.def("get_flockwork_P_node_parameters_alpha_and_beta", get_node_gamma_and_P,
+            R"pbdoc(Calculate the mean node specific activity gamma_i and reconnection probability P_i for each node.)pbdoc",
+            py::arg("edge_changes"),
+            py::arg("gamma"),
+            py::arg("P"),
+            py::arg("use_event_rate_method") = true
         );
 
     m.def("estimate_k_scaling_gradient_descent", &estimate_k_scaling_gradient_descent, "Estimate the scaling of <k> that's necessary to revert the effects of binning using gradient descent",

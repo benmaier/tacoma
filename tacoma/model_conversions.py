@@ -18,7 +18,8 @@ from tacoma import _get_raw_temporal_network
 from tacoma import mean_coordination_number
 from tacoma import convert
 from tacoma import get_flockwork_P_args
-from tacoma import get_flockwork_P_node_parameters
+from tacoma import get_flockwork_P_node_parameters_gamma_and_P
+from tacoma import get_flockwork_P_node_parameters_alpha_and_beta
 import tacoma as tc
 
 # ========================================================= ZSBB ==================================================
@@ -137,7 +138,7 @@ def estimate_ZSBB_args(temporal_network,
 
 # ==================================================== FLOCKWORK P-MODEL ===============================================
 
-def estimate_flockwork_P_args_for_single_nodes(temporal_network,*args,**kwargs):
+def estimate_flockwork_P_args_for_single_nodes(temporal_network,use_event_rate_method=False,*args,**kwargs):
     """Bins an `edge_changes` instance for each `dt` (after each step, respectively,
     if `N_time_steps` was provided) and computes the rewiring rate gamma and probability
     to stay alone P  from the binned `edges_in` and `edges_out`.
@@ -186,54 +187,101 @@ def estimate_flockwork_P_args_for_single_nodes(temporal_network,*args,**kwargs):
         temporal_network = convert(temporal_network)
 
     if type(temporal_network) == ec:
+        # kwargs.pop('use_event_rate_method')
         kw = estimate_flockwork_P_args(temporal_network,*args,**kwargs)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(_t)))
 
-    # get rewiring rate and P
-    gamma = np.array(kw['rewiring_rate'])
-    t, gamma_t = gamma[:,0], gamma[:,1]
-    P_t = np.array(kw['P'])
+    if not use_event_rate_method:
 
-    # convert to active reconnection event rate and active disconnection event rate
-    alpha = gamma_t * P_t
-    beta = gamma_t * (1 - P_t)
+        # get rewiring rate and P
+        gamma = np.array(kw['rewiring_rate'])
+        t, gamma_t = gamma[:,0], gamma[:,1]
+        P_t = np.array(kw['P'])
 
-    # compute single node rewiring rate and P factors
-    g_node, P_node = get_flockwork_P_node_parameters(temporal_network, kw['rewiring_rate'], kw['P'])
-    g_node = np.array(g_node)
-    P_node = np.array(P_node)
+        # convert to active reconnection event rate and active disconnection event rate
+        alpha = gamma_t * P_t
+        beta = gamma_t * (1 - P_t)
 
-    new_g_node = []
-    new_P_node = []
+        # compute single node rewiring rate and P factors
+        g_node, P_node = get_flockwork_P_node_parameters_gamma_and_P(temporal_network, kw['rewiring_rate'], kw['P'])
+        g_node = np.array(g_node)
+        P_node = np.array(P_node)
 
-    # for each time bin
-    for t, g, P, a, b in zip(t, gamma_t, P_t, alpha, beta):
+        new_g_node = []
+        new_P_node = []
 
-        # convert to active reconnection event rates and active disconnection event rates
-        a_node = np.array(g_node*g) * np.array(P_node*P)
-        b_node = np.array(g_node*g) * (1-np.array(P_node*P))
+        # for each time bin
+        for t, g, P, a, b in zip(t, gamma_t, P_t, alpha, beta):
 
-        # set negative rate factors to zero and norm factors
-        b_node[b_node<0] = 0.0
-        a_node[a_node<0] = 0.0
-        if not np.all(a_node == 0.0):
-            a_node /= a_node.mean()
-        if not np.all(b_node == 0.0):
-            b_node /= b_node.mean()
+            # convert to active reconnection event rates and active disconnection event rates
+            a_node = np.array(g_node*g) * np.array(P_node*P)
+            b_node = np.array(g_node*g) * (1-np.array(P_node*P))
 
-        # multiply activity rates with normed factors s.t. the mean of a and b is conserved
-        a_node *= a
-        b_node *= b
+            # set negative rate factors to zero and norm factors
+            b_node[b_node<0] = 0.0
+            a_node[a_node<0] = 0.0
+            if not np.all(a_node == 0.0):
+                a_node /= a_node.mean()
+            if not np.all(b_node == 0.0):
+                b_node /= b_node.mean()
 
-        # convert back to gamma and P
-        new_g = a_node + b_node
-        _temp_new_g = new_g.copy()
-        _temp_new_g[new_g==0.0] = 1.0
-        new_P = a_node / _temp_new_g
+            # multiply activity rates with normed factors s.t. the mean of a and b is conserved
+            a_node *= a
+            b_node *= b
 
-        new_g_node.append((t, new_g.tolist()))
-        new_P_node.append(new_P.tolist())
+            # convert back to gamma and P
+            new_g = a_node + b_node
+            _temp_new_g = new_g.copy()
+            _temp_new_g[new_g==0.0] = 1.0
+            new_P = a_node / _temp_new_g
+
+            new_g_node.append((t, new_g.tolist()))
+            new_P_node.append(new_P.tolist())
+    else:
+        # get rewiring rate and P
+        gamma = np.array(kw['rewiring_rate'])
+        t, gamma_t = gamma[:,0], gamma[:,1]
+        P_t = np.array(kw['P'])
+
+        # convert to active reconnection event rate and active disconnection event rate
+        alpha = gamma_t * P_t
+        beta = gamma_t * (1 - P_t)
+
+        # compute single node rewiring rate and P factors
+        a_node, b_node = get_flockwork_P_node_parameters_alpha_and_beta(temporal_network, kw['rewiring_rate'], kw['P'])
+        a_node = np.array(a_node)
+        b_node = np.array(b_node)
+
+        print(gamma_t)
+
+        new_g_node = []
+        new_P_node = []
+
+        # for each time bin
+        for t, g, P, a, b in zip(t, gamma_t, P_t, alpha, beta):
+
+            this_a_node = a_node.copy()
+            this_b_node = b_node.copy()
+
+            if not np.all(this_a_node == 0.0):
+                this_a_node /= this_a_node.mean()
+            if not np.all(this_b_node == 0.0):
+                this_b_node /= this_b_node.mean()
+
+            # multiply activity rates with normed factors s.t. the mean of a and b is conserved
+            this_a_node *= a
+            this_b_node *= b
+
+            # convert back to gamma and P
+            new_g = this_a_node + this_b_node
+            _temp_new_g = new_g.copy()
+            _temp_new_g[new_g==0.0] = 1.0
+            new_P = this_a_node / _temp_new_g
+
+            new_g_node.append((t, new_g.tolist()))
+            new_P_node.append(new_P.tolist())
+        
 
     kw['P'] = new_P_node
     kw['rewiring_rates'] = new_g_node

@@ -94,6 +94,7 @@ pair < vector < double >, vector < double > >
     get_node_gamma_and_P(
                 edge_changes &ec,
                 vector < pair < double, double > > &gamma,
-                vector < double > &P
+                vector < double > &P,
+                bool use_event_rate_method = false
                 );
 #endif

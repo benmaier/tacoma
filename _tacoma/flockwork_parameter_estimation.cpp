@@ -654,7 +654,8 @@ pair < vector < double >, vector < double > >
     get_node_gamma_and_P(
                 edge_changes &ec,
                 vector < pair < double, double > > &gamma,
-                vector < double > &P
+                vector < double > &P,
+                bool use_event_rate_method
                 )
 {
     // get references to edge_list and time
@@ -687,6 +688,7 @@ pair < vector < double >, vector < double > >
 
     // intialize the integrals
     vector < double > I_out(N);
+    vector < double > I_out_2(N);
     vector < double > I_in_1(N);
     vector < double > I_in_2(N);
 
@@ -737,22 +739,34 @@ pair < vector < double >, vector < double > >
 
         auto i_k = k_node.begin();
         auto i_I_out = I_out.begin();
+        auto i_I_out_2 = I_out_2.begin();
         auto i_I_in_1 = I_in_1.begin();
         auto i_I_in_2 = I_in_2.begin();
 
         double &_g = *it_g;
         double &_P = *it_P;
+        double a = _g * _P;
+        double b = _g * (1.0-_P);
 
         while(i_k != k_node.end())
         {
             double _k = (double) *i_k;
 
-            (*i_I_out) += _g * _k * dt;
-            (*i_I_in_1) += _g * _P * (Nf - _k - 1.0) * (_k + 1.0) / (Nf - 1.0) * dt;
-            (*i_I_in_2) += _g * _P * (1.0 + mean_degree) * dt;
+            if (use_event_rate_method)
+            {
+                (*i_I_out) += a * _k * dt;
+                (*i_I_out_2) += b * _k * dt;
+                (*i_I_in_1) += a * (Nf - _k - 1.0) * (_k + 1.0) / (Nf - 1.0) * dt;
+                (*i_I_in_2) += a * (1.0 + mean_degree) * dt;
+            } else {
+                (*i_I_out) += _g * _k * dt;
+                (*i_I_in_1) += _g * _P * (Nf - _k - 1.0) * (_k + 1.0) / (Nf - 1.0) * dt;
+                (*i_I_in_2) += _g * _P * (1.0 + mean_degree) * dt;
+            }
 
             ++i_k;
             ++i_I_out;
+            ++i_I_out_2;
             ++i_I_in_1;
             ++i_I_in_2;
         }
@@ -808,17 +822,40 @@ pair < vector < double >, vector < double > >
 
     vector < double > g_node;
     vector < double > P_node;
+    vector < double > a_node;
+    vector < double > b_node;
+
 
     for (size_t node = 0; node < N; ++node)
     {
-        double this_g = (M_out[node] - I_out[node]) / I_out[node];
-        double this_P = (M_in[node] - I_in_1[node]) / I_in_2[node] / this_g;
+        if (use_event_rate_method)
+        {
+            double this_a = (M_in[node] - I_in_1[node]) / I_in_2[node];
+            double this_b = (M_out[node] - I_out[node] - I_out_2[node] - this_a * I_out[node]) / I_out_2[node];
 
-        g_node.push_back(this_g);
-        P_node.push_back(this_P);
+            if (this_a < 0.0)
+                this_a = 0.0;
+
+            if (this_b < 0.0)
+                this_b = 0.0;
+
+            a_node.push_back(this_a);
+            b_node.push_back(this_b);
+        } else
+        {
+            double this_g = (M_out[node] - I_out[node]) / I_out[node];
+            double this_P = (M_in[node] - I_in_1[node]) / I_in_2[node] / this_g;
+
+            g_node.push_back(this_g);
+            P_node.push_back(this_P);
+        }
     }
 
 
-    return make_pair(g_node, P_node);
+    if (use_event_rate_method)
+        return make_pair(a_node, b_node);
+    else
+        return make_pair(g_node, P_node);
+
 }
 
