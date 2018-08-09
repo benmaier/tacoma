@@ -97,4 +97,25 @@ pair < vector < double >, vector < double > >
                 vector < double > &P,
                 bool use_event_rate_method = false
                 );
+
+pair < vector < double >, vector < double > >
+    get_node_alpha_and_beta(
+                edge_changes &ec,
+                vector < pair < double, double > > &alpha,
+                vector < double > &beta
+                );
+
+flockwork_alpha_beta_args
+     get_flockwork_alpha_beta_args(
+             edge_changes &list_of_edge_changes,
+             double dt,
+             size_t N_time_steps,
+             double k_over_k_real_scaling,
+             double alpha_scaling,
+             double beta_scaling,
+             map < pair < size_t, size_t >, double > &aggregated_network,
+             const bool ensure_empty_network,
+             const bool adjust_last_bin_if_dt_does_not_fit,
+             const bool verbose
+             );
 #endif

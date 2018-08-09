@@ -320,7 +320,7 @@ edge_changes
     vector < set < size_t > * > G;
 
     //count number of edges in Graph
-    size_t number_of_edges = 0;
+    //size_t number_of_edges = 0;
 
     //if we use random rewiring, we need a vector containing the node ints
     //this seems to be very bad style but I don't have a better idea right now

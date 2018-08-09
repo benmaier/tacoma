@@ -184,4 +184,17 @@ struct flockwork_args {
 
 };
 
+struct flockwork_alpha_beta_args {
+    size_t N;
+    vector < pair < size_t, size_t > > E;
+    vector < pair < double, double > > reconnection_rate;
+    vector < double > disconnection_rate;
+    vector < pair < vector < size_t >, vector < double > > > neighbor_affinity;
+    double tmax;
+    vector < double > new_time;
+    vector < size_t > m_in;
+    vector < size_t > m_out;
+    vector < size_t > m;
+
+};
 #endif

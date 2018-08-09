@@ -353,6 +353,19 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
+    m.def("get_flockwork_alpha_beta_args", &get_flockwork_alpha_beta_args, "Calculate the reconnection rate alpha(t) and disconnection rate beta(t) as well as the other important parameters to simulate a flockwork_alpha_beta model with varying rates.",
+            py::arg("edge_changes"),
+            py::arg("dt") = 0.0,
+            py::arg("N_time_steps") = 0,
+            py::arg("k_over_k_real_scaling") = 1.0,
+            py::arg("alpha_scaling") = 1.0,
+            py::arg("beta_scaling") = 1.0,
+            py::arg("aggregated_network") = map < pair < size_t, size_t >, double >(),
+            py::arg("ensure_empty_network") = false,
+            py::arg("adjust_last_bin_if_dt_does_not_fit") = false,
+            py::arg("verbose") = false
+         );
+
     m.def("get_flockwork_P_node_parameters_gamma_and_P", get_node_gamma_and_P,
             R"pbdoc(Calculate the mean node specific activity gamma_i and reconnection probability P_i for each node.)pbdoc",
             py::arg("edge_changes"),
@@ -361,7 +374,14 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("use_event_rate_method") = false
         );
 
-    m.def("get_flockwork_P_node_parameters_alpha_and_beta", get_node_gamma_and_P,
+    m.def("get_flockwork_node_parameters_alpha_and_beta", get_node_alpha_and_beta,
+            R"pbdoc(Calculate the mean node specific reconnection rate factor alpha_i and disconnection rate factor beta_i for each node.)pbdoc",
+            py::arg("edge_changes"),
+            py::arg("reconnection_rate"),
+            py::arg("disconnecton_rate")
+        );
+
+    m.def("get_flockwork_P_node_parameters_alpha_and_beta_from_gamma_and_P", get_node_gamma_and_P,
             R"pbdoc(Calculate the mean node specific activity gamma_i and reconnection probability P_i for each node.)pbdoc",
             py::arg("edge_changes"),
             py::arg("gamma"),
