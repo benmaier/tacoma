@@ -155,7 +155,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("seed") = 0
          );
 
-    m.def("flockwork_P_varying_rates_for_each_node", &flockwork_alpha_beta_varying_rates_for_each_node, 
+    m.def("flockwork_alpha_beta_varying_rates_for_each_node", &flockwork_alpha_beta_varying_rates_for_each_node, 
             "Simulate a flockwork alpha-beta-model given an initial state as an edge list with varying reconnection rate alpha and varying disconnection rate beta (varying both over time and for each node). Returns time points and concurrent edge changes.",
             py::arg("E"),
             py::arg("N"),
@@ -611,6 +611,25 @@ PYBIND11_MODULE(_tacoma, m) {
         .def_readwrite("m_in", &flockwork_args::m_in, "The number of edges being created in the last time interval")
         .def_readwrite("m_out", &flockwork_args::m_out, "The number of edges being deleted in the last time interval")
         .def_readwrite("new_time", &flockwork_args::new_time, "The bin edges of the new time bins")
+        ;
+
+    py::class_<flockwork_alpha_beta_args>(m,"flockwork_alpha_beta_args",py::dynamic_attr(), R"pbdoc(
+                    The arguments which are passed to the flockwork alpha-beta simulation 
+                    function. An instance of this is returned by the parameter estimation procedure.
+                )pbdoc")
+        .def(py::init<>())
+        .def_readwrite("E", &flockwork_alpha_beta_args::E, "Edge list of the initial state")
+        .def_readwrite("N", &flockwork_alpha_beta_args::N, "Number of nodes")
+        .def_readwrite("disconnection_rate", &flockwork_alpha_beta_args::disconnection_rate, R"pbdoc(A list of floats describing the time-dependent disconnection rate (corresponding times in `reconnection_rate`))pbdoc")
+        .def_readwrite("reconnection_rate", &flockwork_alpha_beta_args::reconnection_rate, R"pbdoc(A list of pairs of doubles, each entry contains the time and the reconnection rate per node)pbdoc")
+        .def_readwrite("neighbor_affinity", &flockwork_alpha_beta_args::neighbor_affinity, R"pbdoc(
+        A list, for each node contains two lists, one containing the node's 
+        neighbors and the second one containing the node affinity between them.)pbdoc")
+        .def_readwrite("tmax", &flockwork_alpha_beta_args::tmax, R"pbdoc(The time at which the last value of `P` and the `rewiring_rate` changes (i.e. the maximum time until the parameteres are defined))pbdoc")
+        .def_readwrite("m", &flockwork_alpha_beta_args::m, "The number of edges in the network at this time")
+        .def_readwrite("m_in", &flockwork_alpha_beta_args::m_in, "The number of edges being created in the last time interval")
+        .def_readwrite("m_out", &flockwork_alpha_beta_args::m_out, "The number of edges being deleted in the last time interval")
+        .def_readwrite("new_time", &flockwork_alpha_beta_args::new_time, "The bin edges of the new time bins")
         ;
 
     py::class_<edge_trajectories>(m,"edge_trajectories",R"pbdoc(

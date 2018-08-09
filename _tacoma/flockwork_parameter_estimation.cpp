@@ -1083,12 +1083,12 @@ flockwork_alpha_beta_args
         double _m_in = (double) this_m_in;
         double _m = ((double) this_m) / k_over_k_real_scaling;
 
-        _a = _m_in / (N+2.0*_m);
+        _a = _m_in / (N+2.0*_m) / dt;
 
         if ( (_m_out == 0.0) and (_m == 0.0) )
             _b = 0.0;
         else
-            _b = _m_out / 2.0 / _m - _a;
+            _b = (_m_out / 2.0 / _m) / dt - _a;
 
         if (_b < 0.0)
             _b = 0.0;
@@ -1267,6 +1267,9 @@ pair < vector < double >, vector < double > >
         double &_a = *it_a;
         double &_b = *it_b;
 
+        //cout << "_a = " << _a << endl;
+        //cout << "_b = " << _b << endl;
+
         while(i_k != k_node.end())
         {
             double _k = (double) *i_k;
@@ -1340,8 +1343,23 @@ pair < vector < double >, vector < double > >
 
     for (size_t node = 0; node < N; ++node)
     {
+
+        /*
+        cout << "M_in[" << node << "] = " << M_in[node] << endl;
+        cout << "M_out[" << node << "] = " << M_out[node] << endl;
+        cout << "I_in_1[" << node << "] = " << I_in_1[node] << endl;
+        cout << "I_in_2[" << node << "] = " << I_in_2[node] << endl;
+        cout << "I_out[" << node << "] = " << I_out[node] << endl;
+        cout << "I_out_2[" << node << "] = " << I_out_2[node] << endl;
+        */
+
         double this_a = (M_in[node] - I_in_1[node]) / I_in_2[node];
         double this_b = (M_out[node] - I_out[node] - I_out_2[node] - this_a * I_out[node]) / I_out_2[node];
+
+        /*
+        cout << "node " << node << " ; alpha = "<< this_a << endl;
+        cout << "node " << node << " ; beta  = "<< this_b << endl;
+        */
 
         if (this_a < 0.0)
             this_a = 0.0;
@@ -1356,8 +1374,8 @@ pair < vector < double >, vector < double > >
         Beta += this_b;
     }
 
-    Alpha /= N;
-    Beta /= N;
+    Alpha /= (double) N;
+    Beta /= (double) N;
 
     for (size_t node = 0; node < N; ++node)
     {

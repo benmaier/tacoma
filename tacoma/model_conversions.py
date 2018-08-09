@@ -20,6 +20,7 @@ from tacoma import convert
 from tacoma import get_flockwork_P_args
 from tacoma import get_flockwork_P_node_parameters_gamma_and_P
 from tacoma import get_flockwork_P_node_parameters_alpha_and_beta_from_gamma_and_P
+from tacoma import get_flockwork_alpha_beta_args
 from tacoma import get_flockwork_node_parameters_alpha_and_beta
 import tacoma as tc
 
@@ -418,13 +419,13 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,*args,*
 
     if type(temporal_network) == ec:
         # kwargs.pop('use_event_rate_method')
-        kw = estimate_flockwork_P_args(temporal_network,*args,**kwargs)
+        kw = estimate_flockwork_alpha_beta_args(temporal_network,*args,**kwargs)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(_t)))
 
     # get rewiring rate and P
     alpha = np.array(kw['reconnection_rate'])
-    t, alpha = gamma[:,0], gamma[:,1]
+    t, alpha = alpha[:,0], alpha[:,1]
     beta = np.array(kw['disconnection_rate'])
 
     # compute single node rewiring rate and P factors
@@ -445,8 +446,8 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,*args,*
         new_a_node.append((t, this_a_node.tolist()))
         new_b_node.append(this_b_node.tolist())
 
-    kw['disconnection_rates'] = new_a_node
-    kw['reconnection_rates'] = new_b_node
+    kw['reconnection_rates'] = new_a_node
+    kw['disconnection_rates'] = new_b_node
 
     kw.pop('disconnection_rate')
     kw.pop('reconnection_rate')
@@ -516,7 +517,7 @@ def estimate_flockwork_alpha_beta_args(temporal_network,*args,**kwargs):
         temporal_network = convert(temporal_network)
 
     if type(temporal_network) == ec:
-        kw = get_flockwork_P_args(temporal_network,*args,**kwargs)
+        kw = get_flockwork_alpha_beta_args(temporal_network,*args,**kwargs)
         new_kwargs['E'] = kw.E
         new_kwargs['N'] = kw.N
         new_kwargs['disconnection_rate'] = kw.disconnection_rate
