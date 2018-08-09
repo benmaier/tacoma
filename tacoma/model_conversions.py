@@ -19,7 +19,8 @@ from tacoma import mean_coordination_number
 from tacoma import convert
 from tacoma import get_flockwork_P_args
 from tacoma import get_flockwork_P_node_parameters_gamma_and_P
-from tacoma import get_flockwork_P_node_parameters_alpha_and_beta
+from tacoma import get_flockwork_P_node_parameters_alpha_and_beta_from_gamma_and_P
+from tacoma import get_flockwork_node_parameters_alpha_and_beta
 import tacoma as tc
 
 # ========================================================= ZSBB ==================================================
@@ -249,7 +250,7 @@ def estimate_flockwork_P_args_for_single_nodes(temporal_network,use_event_rate_m
         beta = gamma_t * (1 - P_t)
 
         # compute single node rewiring rate and P factors
-        a_node, b_node = get_flockwork_P_node_parameters_alpha_and_beta(temporal_network, kw['rewiring_rate'], kw['P'])
+        a_node, b_node = get_flockwork_P_node_parameters_alpha_and_beta_from_gamma_and_P(temporal_network, kw['rewiring_rate'], kw['P'])
         a_node = np.array(a_node)
         b_node = np.array(b_node)
 
@@ -359,6 +360,167 @@ def estimate_flockwork_P_args(temporal_network,*args,**kwargs):
         new_kwargs['N'] = kw.N
         new_kwargs['P'] = kw.P
         new_kwargs['rewiring_rate'] = kw.rewiring_rate
+        new_kwargs['tmax'] = kw.tmax
+        if with_affinity:
+            new_kwargs['neighbor_affinity'] = kw.neighbor_affinity
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+
+    return new_kwargs 
+
+def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,*args,**kwargs):
+    """Bins an `edge_changes` instance for each `dt` (after each step, respectively,
+    if `N_time_steps` was provided) and computes the reconnection rate alpha and disconnection
+    rate beta from the binned `edges_in` and `edges_out`.
+    Additionally
+
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    t_run_total : float
+        this is just plainly copied to the returned kwargs. If it is set to `None`, t_run_total will be set to `temporal_network.tmax`
+    dt : float
+        The demanded bin size. default : 0.0
+    N_time_steps : int
+        Number of time bins (use either this or dt). default : 0
+    aggregated_network : :obj:`dict` of :obj:`tuple` of int -> float, optional
+        dict(edge -> similarity), if this is given,
+        the kwargs are supposed to be for the function
+        :mod:`flockwork_P_varying_rates_neighbor_affinity`,
+        you can get this network from the `aggregated_network`
+        property from the results returned by
+        :mod:`measure_group_sizes_and_durations`. default : `{}`
+    ensure_empty_network : bool, optional
+        if this is True, bins where the original network
+        is empty (n_edges = 0) will be an artificially 
+        set high gamma with P = 0, such that nodes will
+        lose all edges. default : False
+    use_preferential_node_selection : bool, optional
+        this is just plainly copied to 
+        the returned kwargs if `aggregated_network`
+        is not empty. default : False
+    verbose: bool, optional
+        Be chatty.
+
+
+    Returns
+    -------
+    :obj:`dict`
+        kwargs for the functions :mod:`flockwork_P_varying_rates` or 
+        :mod:`flockwork_P_varying_rates_neighbor_affinity`, if `aggregated_network` was provided
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == el:
+        temporal_network = convert(temporal_network)
+
+    if type(temporal_network) == ec:
+        # kwargs.pop('use_event_rate_method')
+        kw = estimate_flockwork_P_args(temporal_network,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+
+    # get rewiring rate and P
+    alpha = np.array(kw['reconnection_rate'])
+    t, alpha = gamma[:,0], gamma[:,1]
+    beta = np.array(kw['disconnection_rate'])
+
+    # compute single node rewiring rate and P factors
+    a_node, b_node = get_flockwork_node_parameters_alpha_and_beta(temporal_network, kw['reconnection_rate'], kw['disconnection_rate'])
+    a_node = np.array(a_node)
+    b_node = np.array(b_node)
+
+    new_a_node = []
+    new_b_node = []
+
+    # for each time bin
+    for t, a, b in zip(t, alpha, beta):
+
+        # multiply activity rates with normed factors s.t. the mean of a and b is conserved
+        this_a_node = a_node * a
+        this_b_node = b_node * b
+
+        new_a_node.append((t, this_a_node.tolist()))
+        new_b_node.append(this_b_node.tolist())
+
+    kw['disconnection_rates'] = new_a_node
+    kw['reconnection_rates'] = new_b_node
+
+    kw.pop('disconnection_rate')
+    kw.pop('reconnection_rate')
+
+    return kw
+
+def estimate_flockwork_alpha_beta_args(temporal_network,*args,**kwargs):
+    """Bins an `edge_changes` instance for each `dt` (after each step, respectively,
+    if `N_time_steps` was provided) and computes the reconnection rate alpha and 
+    disconnection rate beta from the binned `edges_in` and `edges_out`. For DTU data use 
+    dt = 3600, for sociopatterns use dt = 600.
+
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    t_run_total : float
+        this is just plainly copied to the returned kwargs. If it is set to `None`, t_run_total will be set to `temporal_network.tmax`
+    dt : float
+        The demanded bin size. default : 0.0
+    N_time_steps : int
+        Number of time bins (use either this or dt). default : 0
+    aggregated_network : :obj:`dict` of :obj:`tuple` of int -> float, optional
+        dict(edge -> similarity), if this is given,
+        the kwargs are supposed to be for the function
+        :mod:`flockwork_P_varying_rates_neighbor_affinity`,
+        you can get this network from the `aggregated_network`
+        property from the results returned by
+        :mod:`measure_group_sizes_and_durations`. default : `{}`
+    ensure_empty_network : bool, optional
+        if this is True, bins where the original network
+        is empty (n_edges = 0) will be an artificially 
+        set high gamma with P = 0, such that nodes will
+        lose all edges. default : False
+    use_preferential_node_selection : bool, optional
+        this is just plainly copied to 
+        the returned kwargs if `aggregated_network`
+        is not empty. default : False
+    verbose: bool, optional
+        Be chatty.
+
+
+    Returns
+    -------
+    :obj:`dict`
+        kwargs for the functions :mod:`flockwork_P_varying_rates` or 
+        :mod:`flockwork_P_varying_rates_neighbor_affinity`, if `aggregated_network` was provided
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    new_kwargs = {}
+    with_affinity = 'aggregated_network' in kwargs and len(kwargs['aggregated_network']) > 0
+    if with_affinity and\
+       'use_preferential_node_selection' in kwargs:
+            new_kwargs['use_preferential_node_selection'] = kwargs.pop('use_preferential_node_selection')
+
+    if 't_run_total' in kwargs and kwargs['t_run_total'] is not None:
+        new_kwargs['t_run_total'] = kwargs.pop('t_run_total')
+    elif 't_run_total' in kwargs and kwargs['t_run_total'] is None:
+        new_kwargs['t_run_total'] = temporal_network.tmax
+        kwargs.pop('t_run_total')
+    else:
+        new_kwargs['t_run_total'] = temporal_network.tmax
+
+    if type(temporal_network) == el:
+        temporal_network = convert(temporal_network)
+
+    if type(temporal_network) == ec:
+        kw = get_flockwork_P_args(temporal_network,*args,**kwargs)
+        new_kwargs['E'] = kw.E
+        new_kwargs['N'] = kw.N
+        new_kwargs['disconnection_rate'] = kw.disconnection_rate
+        new_kwargs['reconnection_rate'] = kw.reconnection_rate
         new_kwargs['tmax'] = kw.tmax
         if with_affinity:
             new_kwargs['neighbor_affinity'] = kw.neighbor_affinity

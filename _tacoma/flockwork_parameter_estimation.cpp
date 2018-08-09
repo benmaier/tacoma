@@ -1084,7 +1084,11 @@ flockwork_alpha_beta_args
         double _m = ((double) this_m) / k_over_k_real_scaling;
 
         _a = _m_in / (N+2.0*_m);
-        _b = _m_out / 2.0 / _m - _a;
+
+        if ( (_m_out == 0.0) and (_m == 0.0) )
+            _b = 0.0;
+        else
+            _b = _m_out / 2.0 / _m - _a;
 
         if (_b < 0.0)
             _b = 0.0;
