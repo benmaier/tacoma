@@ -61,7 +61,7 @@ edge_changes
                  vector < pair < size_t, size_t > > &E, //edgelist
                  const size_t N,       //number of nodes
                  vector < pair < double, vector < double > > > &reconnection_rates,
-                 vector < vector < double > > > &disconnection_rates,
+                 vector < vector < double > > &disconnection_rates,
                  const double t_run_total,
                  const double tmax,
                  const bool   use_random_rewiring,

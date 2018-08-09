@@ -297,7 +297,7 @@ void get_gillespie_tau_and_event_with_varying_gamma_for_each_node(
     //tau = ( m_log_1mU - S_i + g_i*t_i + t0*beta0 ) / (beta0 + g_i) - t0;
     //
     tau = (m_log_1mU - S_i + g_i * (t_i-t0) ) / (beta0 + g_i);
-    double Lambda = g_i * (tau+(t0-t_i)) + S_i;
+    //double Lambda = g_i * (tau+(t0-t_i)) + S_i;
 
 
 

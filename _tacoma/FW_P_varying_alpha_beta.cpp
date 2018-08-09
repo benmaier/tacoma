@@ -41,7 +41,7 @@
 #include <random>
 #include <ctime>
 #include <tuple>
-#include <assert>
+#include <assert.h>
 
 using namespace std;
 
@@ -83,22 +83,22 @@ edge_changes
     vector < double > time;
 
     vector < pair < double, double > > total_rate;
-    vector < pair < double, vector < double > > single_rates;
+    vector < pair < double, vector < double > > > single_rates;
      
     auto it_alpha = reconnection_rate.begin();
     auto it_beta = disconnection_rate.begin();
 
-    while (it_alpha != reconnection_rate.end)
+    while (it_alpha != reconnection_rate.end())
     {
-        double &alpha = (it_alpha->second) * N;
-        double &beta = (*it_beta) * N;
+        double alpha = (it_alpha->second) * N;
+        double beta = (*it_beta) * N;
 
         vector < double > this_vec;
         this_vec.push_back(alpha);
         this_vec.push_back(beta);
 
         single_rates.push_back( make_pair(it_alpha->first, this_vec) );
-        total_rate.push_back( make_pair(it_alpha->first, alpha + beta );
+        total_rate.push_back( make_pair(it_alpha->first, alpha + beta ));
 
         ++it_alpha;
         ++it_beta;
@@ -180,7 +180,7 @@ edge_changes
                  vector < pair < size_t, size_t > > &E, //edgelist
                  const size_t N,       //number of nodes
                  vector < pair < double, vector < double > > > &reconnection_rates,
-                 vector < vector < double > > > &disconnection_rates,
+                 vector < vector < double > > &disconnection_rates,
                  const double t_run_total,
                  const double tmax,
                  const bool   use_random_rewiring,
@@ -193,7 +193,7 @@ edge_changes
     seed_engine(generator,seed);
     uniform_real_distribution<double> uni_distribution(0.,1.);
 
-    assert(reconnection_rates.size() == disconnection_rates.size())
+    assert(reconnection_rates.size() == disconnection_rates.size());
 
     //initialize Graph vector
     vector < set < size_t > * > G;
@@ -214,22 +214,22 @@ edge_changes
 
     //multiply rewiring rate with number of nodes
     vector < pair < double, double > > total_rate;
-    vector < pair < double, vector < double > > single_rates;
+    vector < pair < double, vector < double > > > single_rates;
      
     auto it_alphas = reconnection_rates.begin();
     auto it_betas = disconnection_rates.begin();
 
-    while (it_alphas != reconnection_rate.end)
+    while (it_alphas != reconnection_rates.end())
     {
-        double this_t = it_alpha->first;
-        auto it_alpha = it_alpha->second.begin()
-        auto it_beta = it_beta->second.begin()
+        double this_t = it_alphas->first;
+        auto it_alpha = it_alphas->second.begin();
+        auto it_beta = it_betas->begin();
         double Alpha = 0.0;
         double Beta = 0.0;
 
         vector < double > this_vec;
 
-        while (it_alpha != reconnection_rate.end)
+        while (it_alpha != it_alphas->second.end())
         {
             Alpha += *it_alpha;
             this_vec.push_back(*it_alpha);
@@ -237,7 +237,7 @@ edge_changes
             ++it_alpha;
         }
 
-        while (it_beta != disconnection_rate.end)
+        while (it_beta != it_betas->end())
         {
             Beta += *it_beta;
             this_vec.push_back(*it_beta);
