@@ -378,7 +378,8 @@ PYBIND11_MODULE(_tacoma, m) {
             R"pbdoc(Calculate the mean node specific reconnection rate factor alpha_i and disconnection rate factor beta_i for each node.)pbdoc",
             py::arg("edge_changes"),
             py::arg("reconnection_rate"),
-            py::arg("disconnecton_rate")
+            py::arg("disconnecton_rate"),
+            py::arg("apply_mean_correction")
         );
 
     m.def("get_flockwork_P_node_parameters_alpha_and_beta_from_gamma_and_P", get_node_gamma_and_P,

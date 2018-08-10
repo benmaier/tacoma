@@ -369,7 +369,7 @@ def estimate_flockwork_P_args(temporal_network,*args,**kwargs):
 
     return new_kwargs 
 
-def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,*args,**kwargs):
+def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,apply_mean_correction=False,*args,**kwargs):
     """Bins an `edge_changes` instance for each `dt` (after each step, respectively,
     if `N_time_steps` was provided) and computes the reconnection rate alpha and disconnection
     rate beta from the binned `edges_in` and `edges_out`.
@@ -429,7 +429,7 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,*args,*
     beta = np.array(kw['disconnection_rate'])
 
     # compute single node rewiring rate and P factors
-    a_node, b_node = get_flockwork_node_parameters_alpha_and_beta(temporal_network, kw['reconnection_rate'], kw['disconnection_rate'])
+    a_node, b_node = get_flockwork_node_parameters_alpha_and_beta(temporal_network, kw['reconnection_rate'], kw['disconnection_rate'],apply_mean_correction)
     a_node = np.array(a_node)
     b_node = np.array(b_node)
 

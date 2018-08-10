@@ -1176,7 +1176,8 @@ pair < vector < double >, vector < double > >
     get_node_alpha_and_beta(
                 edge_changes &ec,
                 vector < pair < double, double > > &alpha,
-                vector < double > &beta
+                vector < double > &beta,
+                bool apply_mean_correction
                 )
 {
     // get references to edge_list and time
@@ -1208,7 +1209,7 @@ pair < vector < double >, vector < double > >
     vector < size_t > M_in(N);
 
     // intialize the integrals
-    vector < double > I_out(N);
+    vector < double > I_out_1(N);
     vector < double > I_out_2(N);
     vector < double > I_in_1(N);
     vector < double > I_in_2(N);
@@ -1259,7 +1260,7 @@ pair < vector < double >, vector < double > >
         double mean_degree = ((double) number_of_edges) * 2.0 / Nf;
 
         auto i_k = k_node.begin();
-        auto i_I_out = I_out.begin();
+        auto i_I_out_1 = I_out_1.begin();
         auto i_I_out_2 = I_out_2.begin();
         auto i_I_in_1 = I_in_1.begin();
         auto i_I_in_2 = I_in_2.begin();
@@ -1274,13 +1275,13 @@ pair < vector < double >, vector < double > >
         {
             double _k = (double) *i_k;
 
-            (*i_I_out) += _a * _k * dt;
+            (*i_I_out_1) += _a * _k * dt;
             (*i_I_out_2) += _b * _k * dt;
             (*i_I_in_1) += _a * (Nf - _k - 1.0) * (_k + 1.0) / (Nf - 1.0) * dt;
             (*i_I_in_2) += _a * (1.0 + mean_degree) * dt;
 
             ++i_k;
-            ++i_I_out;
+            ++i_I_out_1;
             ++i_I_out_2;
             ++i_I_in_1;
             ++i_I_in_2;
@@ -1341,6 +1342,26 @@ pair < vector < double >, vector < double > >
     double Alpha = 0.0;
     double Beta = 0.0;
 
+    double mean_M_in = 0.0;
+    double mean_M_out = 0.0;
+    double mean_I_in_1 = 0.0;
+    double mean_I_in_2 = 0.0;
+    double mean_I_out_1 = 0.0;
+    double mean_I_out_2 = 0.0;
+
+    for (size_t node = 0; node < N; ++node)
+    {
+        mean_M_in += M_in[node] / (double) N;
+        mean_M_out += M_out[node] / (double) N;
+        mean_I_in_1 += I_in_1[node] / (double) N;
+        mean_I_out_1 += I_out_1[node] / (double) N;
+        mean_I_in_2 += I_in_2[node] / (double) N;
+        mean_I_out_2 += I_out_2[node] / (double) N;
+    }
+
+    double mean_alpha = mean_M_in / ( mean_I_in_1 + mean_I_in_2 );
+    double mean_beta = mean_M_out / ( mean_I_out_1 + mean_I_out_2 ) - mean_alpha;
+
     for (size_t node = 0; node < N; ++node)
     {
 
@@ -1353,8 +1374,18 @@ pair < vector < double >, vector < double > >
         cout << "I_out_2[" << node << "] = " << I_out_2[node] << endl;
         */
 
-        double this_a = (M_in[node] - I_in_1[node]) / I_in_2[node];
-        double this_b = (M_out[node] - I_out[node] - I_out_2[node] - this_a * I_out[node]) / I_out_2[node];
+        double this_a, this_b;
+
+        if (not apply_mean_correction)
+        {
+            this_a = (M_in[node] - I_in_1[node]) / I_in_2[node];
+            this_b = (M_out[node] - I_out_1[node] - I_out_2[node] - this_a * I_out_1[node]) / I_out_2[node];
+        }
+        else
+        {
+            this_a = (M_in[node] - mean_alpha * I_in_1[node]) / I_in_2[node];
+            this_b = (M_out[node] - mean_alpha * I_out_1[node] - mean_beta * I_out_2[node] - this_a * I_out_1[node]) / I_out_2[node];
+        }
 
         /*
         cout << "node " << node << " ; alpha = "<< this_a << endl;

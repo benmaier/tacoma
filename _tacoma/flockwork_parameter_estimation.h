@@ -102,7 +102,8 @@ pair < vector < double >, vector < double > >
     get_node_alpha_and_beta(
                 edge_changes &ec,
                 vector < pair < double, double > > &alpha,
-                vector < double > &beta
+                vector < double > &beta,
+                bool apply_mean_correction
                 );
 
 flockwork_alpha_beta_args
