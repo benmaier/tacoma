@@ -80,6 +80,8 @@ edge_changes
         node_ints.push_back(node);
     }
 
+    graph_from_edgelist(G, E);
+
     vector < vector < pair <size_t,size_t> > > edges_out;
     vector < vector < pair <size_t,size_t> > > edges_in;
     vector < double > time;
@@ -186,6 +188,8 @@ edge_changes
         G.push_back(new set < size_t >);
         node_ints.push_back(node);
     }
+
+    graph_from_edgelist(G, E);
 
     vector < vector < pair <size_t,size_t> > > edges_out;
     vector < vector < pair <size_t,size_t> > > edges_in;
@@ -331,6 +335,8 @@ edge_changes
         G.push_back(new set < size_t >);
         node_ints.push_back(node);
     }
+
+    graph_from_edgelist(G, E);
 
     vector < vector < pair <size_t,size_t> > > edges_out;
     vector < vector < pair <size_t,size_t> > > edges_in;

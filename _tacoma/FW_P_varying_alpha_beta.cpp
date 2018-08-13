@@ -78,6 +78,8 @@ edge_changes
         node_ints.push_back(node);
     }
 
+    graph_from_edgelist(G, E);
+
     vector < vector < pair <size_t,size_t> > > edges_out;
     vector < vector < pair <size_t,size_t> > > edges_in;
     vector < double > time;
@@ -202,11 +204,13 @@ edge_changes
     //this seems to be very bad style but I don't have a better idea right now
     vector < size_t > node_ints;
 
-    for(size_t node=0; node<N; node++)
+    for(size_t node = 0; node < N; ++node)
     {
         G.push_back(new set < size_t >);
         node_ints.push_back(node);
     }
+
+    graph_from_edgelist(G, E);
 
     vector < vector < pair <size_t,size_t> > > edges_out;
     vector < vector < pair <size_t,size_t> > > edges_in;
@@ -252,6 +256,7 @@ edge_changes
         ++it_betas;
     }
 
+
     //simulate
     double t = reconnection_rates[0].first;
     ssize_t last_event = -1;
@@ -264,7 +269,7 @@ edge_changes
         rates.push_back(0.0);
 
         double tau;
-        size_t event;
+        size_t channel;
 
         //cout << "finding event using Gillespie SSA... " << endl;
 
@@ -276,21 +281,23 @@ edge_changes
                             tmax,
                             i_t,
                             tau,
-                            event,
+                            channel,
                             generator,
                             uni_distribution);
         t = t + tau;
-        last_event = event;
+        last_event = channel;
 
         if (t<t_run_total)
         {
 
-            if (event>0 and event < 2*N+1)
+            if (channel>0 and channel < 2*N+1)
             {
-                size_t node = (event - 1) % N;
-                size_t event = (event - 1) / N;
+                size_t node = (channel - 1) % N;
+                size_t event = (channel - 1) / N;
 
                 double P;
+
+                // cout << node << " " << event << endl;
 
                 if (event == 0)
                     P = 1.0;

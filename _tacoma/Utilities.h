@@ -131,6 +131,10 @@ void graph_from_edgelist(vector < set < size_t > > &G,
                          vector < pair < size_t, size_t > > &edge_list
                          );
 
+void graph_from_edgelist(vector < set < size_t > * > &G,
+                         vector < pair < size_t, size_t > > &edge_list
+                         );
+
 void edgelist_from_graph(
                          vector < pair < size_t, size_t > > &edge_list,
                          vector < set < size_t > > &G

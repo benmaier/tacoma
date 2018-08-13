@@ -177,7 +177,7 @@ void get_gillespie_tau_and_event_with_varying_gamma(
     double t_i   = t0;
     double g_i   = get<1>(gamma[i_t % N_gamma]);
 
-    double S_i = 0.;
+    double S_i = 0.0;
     double S_iP1 = (t_iP1 - t0) * g_i;
 
     double next_limit = (t_iP1 - t0) * beta0 + S_iP1;
@@ -264,7 +264,7 @@ void get_gillespie_tau_and_event_with_varying_gamma_for_each_node(
     double t_i   = t0;
     double g_i   = get<1>(gamma[i_t % N_gamma]);
 
-    double S_i = 0.;
+    double S_i = 0.0;
     double S_iP1 = (t_iP1 - t0) * g_i;
 
     size_t N_nodes = gamma_single_nodes[0].second.size();
@@ -327,7 +327,8 @@ void get_gillespie_tau_and_event_with_varying_gamma_for_each_node(
         i_t++;
 
     //find event as usual
-    double rProduct = distribution(generator) * a0;
+    uniform_real_distribution < double > uni(0,a0);
+    double rProduct = uni(generator);
 
     event = 0;
 
@@ -502,6 +503,24 @@ void graph_from_edgelist(vector < set < size_t > > &G,
         {
             G[edge.first].insert(edge.second);
             G[edge.second].insert(edge.first);
+        }
+    }
+}
+
+void graph_from_edgelist(vector < set < size_t > * > &G,
+                         vector < pair < size_t, size_t > > &edge_list
+                         )
+{
+    for(auto &neighbors: G)
+    {
+        neighbors->clear();
+    }
+    for(auto const &edge: edge_list)
+    {
+        if (edge.first != edge.second)
+        {
+            G[edge.first]->insert(edge.second);
+            G[edge.second]->insert(edge.first);
         }
     }
 }
