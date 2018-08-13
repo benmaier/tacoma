@@ -1418,3 +1418,271 @@ pair < vector < double >, vector < double > >
 
     return make_pair(a_node, b_node);
 }
+
+pair < vector < vector < double > >, vector < vector < double > > >
+    get_time_dependent_node_alpha_and_beta(
+                edge_changes &ec,
+                vector < pair < double, double > > &alpha,
+                vector < double > &beta,
+                bool apply_mean_correction
+                )
+{
+    // get references to edge_list and time
+    vector < vector < pair < size_t, size_t > > > & all_edges_in = ec.edges_in;
+    vector < vector < pair < size_t, size_t > > > & all_edges_out = ec.edges_out;
+    vector < double > &ec_time = ec.t;
+
+    // get vectors from gamma and P
+    vector < double > ab_time;
+    vector < double > a;
+
+    for(auto &a_entry: alpha)
+    {
+        ab_time.push_back(a_entry.first);
+        a.push_back(a_entry.second);
+    }
+
+    // set initial and final time
+    double tmax = ec.tmax;
+
+    // graph observables
+    size_t N = ec.N;
+    double Nf(N);
+    size_t number_of_edges = ec.edges_initial.size();
+
+    // intialize the node properties
+    vector < size_t > k_node(N);
+    vector < size_t > M_out(N);
+    vector < size_t > M_in(N);
+
+    // intialize the integrals
+    vector < double > I_out_1(N);
+    vector < double > I_out_2(N);
+    vector < double > I_in_1(N);
+    vector < double > I_in_2(N);
+
+    for(auto const &edge : ec.edges_initial)
+    {
+        ++k_node[edge.first];
+        ++k_node[edge.second];
+    }
+
+    auto it_e_in = all_edges_in.begin();
+    auto it_e_out = all_edges_out.begin();
+
+    auto it_t_ab = ab_time.begin();
+    auto it_t_ec = ec_time.begin();
+
+    auto it_a = a.begin();
+    auto it_b = beta.begin();
+
+    double t = ec.t0;
+
+    double t_next_ab;
+    double t_next_ec;
+    double t_next;
+
+    vector < vector < double > > alpha_t;
+    vector < vector < double > > beta_t;
+
+    do
+    {
+
+        // check which is the next event time at which stuff changes
+        if ((it_t_ab == ab_time.end()) or (it_t_ab+1 == ab_time.end()))
+            t_next_ab = tmax;
+        else
+            t_next_ab = *(it_t_ab+1);
+
+        if ((it_t_ec == ec_time.end()) or (it_t_ec+1 == ec_time.end()))
+            t_next_ec = tmax;
+        else
+            t_next_ec = *(it_t_ec+1);
+
+        if ( t_next_ec <= t_next_ab )
+            t_next = t_next_ec;
+        else
+            t_next = t_next_ab;
+
+        // compute the integrals up to the next change
+
+        double dt = t_next - t;
+        double mean_degree = ((double) number_of_edges) * 2.0 / Nf;
+
+        auto i_k = k_node.begin();
+        auto i_I_out_1 = I_out_1.begin();
+        auto i_I_out_2 = I_out_2.begin();
+        auto i_I_in_1 = I_in_1.begin();
+        auto i_I_in_2 = I_in_2.begin();
+
+        double &_a = *it_a;
+        double &_b = *it_b;
+
+        //cout << "_a = " << _a << endl;
+        //cout << "_b = " << _b << endl;
+
+        while(i_k != k_node.end())
+        {
+            double _k = (double) *i_k;
+
+            (*i_I_out_1) += _a * _k * dt;
+            (*i_I_out_2) += _b * _k * dt;
+            (*i_I_in_1) += _a * (Nf - _k - 1.0) * (_k + 1.0) / (Nf - 1.0) * dt;
+            (*i_I_in_2) += _a * (1.0 + mean_degree) * dt;
+
+            ++i_k;
+            ++i_I_out_1;
+            ++i_I_out_2;
+            ++i_I_in_1;
+            ++i_I_in_2;
+        }
+
+        // advance time
+        t = t_next;
+
+        // change either the network or gamma and P or both
+
+        if (t_next_ec <= t_next_ab)
+        {
+            // update observables for this advancement
+            for(auto const &edge : *it_e_in)
+            {
+                size_t const &u = edge.first;
+                size_t const &v = edge.second;
+                ++k_node[u];
+                ++k_node[v];
+                ++M_in[u];
+                ++M_in[v];
+
+                number_of_edges++;
+            }
+
+            for(auto const &edge : *it_e_out)
+            {
+                size_t const &u = edge.first;
+                size_t const &v = edge.second;
+                --k_node[u];
+                --k_node[v];
+                ++M_out[u];
+                ++M_out[v];
+
+                number_of_edges--;
+            }
+
+            // advance network 
+            ++it_t_ec;
+            ++it_e_out;
+            ++it_e_in;
+        }
+
+        if (t_next_ab <= t_next_ec)
+        {
+            vector < double > a_node;
+            vector < double > b_node;
+
+            double Alpha = 0.0;
+            double Beta = 0.0;
+
+            double mean_M_in = 0.0;
+            double mean_M_out = 0.0;
+            double mean_I_in_1 = 0.0;
+            double mean_I_in_2 = 0.0;
+            double mean_I_out_1 = 0.0;
+            double mean_I_out_2 = 0.0;
+
+            for (size_t node = 0; node < N; ++node)
+            {
+                mean_M_in += M_in[node] / (double) N;
+                mean_M_out += M_out[node] / (double) N;
+                mean_I_in_1 += I_in_1[node] / (double) N;
+                mean_I_out_1 += I_out_1[node] / (double) N;
+                mean_I_in_2 += I_in_2[node] / (double) N;
+                mean_I_out_2 += I_out_2[node] / (double) N;
+            }
+
+            double mean_alpha = mean_M_in / ( mean_I_in_1 + mean_I_in_2 );
+            double mean_beta = mean_M_out / ( mean_I_out_1 + mean_I_out_2 ) - mean_alpha;
+
+            if (( mean_I_in_1 + mean_I_in_2 ) == 0.0)
+                mean_alpha = 0.0;
+
+            if (( mean_I_out_1 + mean_I_out_2 ) == 0.0)
+                mean_beta = 0.0;
+
+            for (size_t node = 0; node < N; ++node)
+            {
+
+                double this_a, this_b;
+
+                if (not apply_mean_correction)
+                {
+                    if (I_in_2[node] == 0.0)
+                        this_a = 0.0;
+                    else
+                        this_a = (M_in[node] - I_in_1[node]) / I_in_2[node];
+
+                    if (I_out_2[node] == 0.0)
+                        this_b = 0.0;
+                    else
+                        this_b = (M_out[node] - I_out_1[node] - I_out_2[node] - this_a * I_out_1[node]) / I_out_2[node];
+                }
+                else
+                {
+                    if (I_in_2[node] == 0.0)
+                        this_a = 0.0;
+                    else
+                        this_a = (M_in[node] - mean_alpha * I_in_1[node]) / I_in_2[node];
+
+                    if (I_out_2[node] == 0.0)
+                        this_b = 0.0;
+                    else
+                        this_b = (M_out[node] - mean_alpha * I_out_1[node] - mean_beta * I_out_2[node] - this_a * I_out_1[node]) / I_out_2[node];
+                }
+
+                if (this_a < 0.0)
+                    this_a = 0.0;
+
+                if (this_b < 0.0)
+                    this_b = 0.0;
+
+                a_node.push_back(this_a);
+                b_node.push_back(this_b);
+
+                Alpha += this_a;
+                Beta += this_b;
+            }
+
+            Alpha /= (double) N;
+            Beta /= (double) N;
+
+            for (size_t node = 0; node < N; ++node)
+            {
+                if (Alpha > 0.0)
+                    a_node[node] *= (*it_a) / Alpha;
+                if (Beta > 0.0)
+                    b_node[node] *= (*it_b) / Beta;
+
+                // reset the integrals
+                M_out[node] = 0.0;
+                M_in[node] = 0.0;
+
+                I_out_1[node] = 0.0;
+                I_out_2[node] = 0.0;
+                I_in_1[node] = 0.0;
+                I_in_2[node] = 0.0;
+            }
+
+            alpha_t.push_back(a_node);
+            beta_t.push_back(b_node);
+            
+            // advance gamma and P
+            ++it_a;
+            ++it_b;
+            ++it_t_ab;
+
+        }
+
+    } while ((t_next_ab < tmax) or (t_next_ec < tmax));
+
+    return make_pair(alpha_t, beta_t);
+}

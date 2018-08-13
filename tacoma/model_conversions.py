@@ -22,6 +22,7 @@ from tacoma import get_flockwork_P_node_parameters_gamma_and_P
 from tacoma import get_flockwork_P_node_parameters_alpha_and_beta_from_gamma_and_P
 from tacoma import get_flockwork_alpha_beta_args
 from tacoma import get_flockwork_node_parameters_alpha_and_beta
+from tacoma import get_flockwork_node_rates_alpha_and_beta
 import tacoma as tc
 
 # ========================================================= ZSBB ==================================================
@@ -369,7 +370,9 @@ def estimate_flockwork_P_args(temporal_network,*args,**kwargs):
 
     return new_kwargs 
 
-def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,apply_mean_correction=False,*args,**kwargs):
+def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
+                                                        estimate_for_each_time_bin=True,
+                                                        apply_mean_correction=False,*args,**kwargs):
     """Bins an `edge_changes` instance for each `dt` (after each step, respectively,
     if `N_time_steps` was provided) and computes the reconnection rate alpha and disconnection
     rate beta from the binned `edges_in` and `edges_out`.
@@ -423,34 +426,49 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,apply_m
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(_t)))
 
-    # get rewiring rate and P
-    alpha = np.array(kw['reconnection_rate'])
-    t, alpha = alpha[:,0], alpha[:,1]
-    beta = np.array(kw['disconnection_rate'])
+    if not estimate_for_each_time_bin:
 
-    # compute single node rewiring rate and P factors
-    a_node, b_node = get_flockwork_node_parameters_alpha_and_beta(temporal_network, kw['reconnection_rate'], kw['disconnection_rate'],apply_mean_correction)
-    a_node = np.array(a_node)
-    b_node = np.array(b_node)
+        # get rewiring rate and P
+        alpha = np.array(kw['reconnection_rate'])
+        t, alpha = alpha[:,0], alpha[:,1]
+        beta = np.array(kw['disconnection_rate'])
 
-    new_a_node = []
-    new_b_node = []
+        # compute single node rewiring rate and P factors
+        a_node, b_node = get_flockwork_node_parameters_alpha_and_beta(temporal_network, kw['reconnection_rate'], kw['disconnection_rate'],apply_mean_correction)
+        a_node = np.array(a_node)
+        b_node = np.array(b_node)
 
-    # for each time bin
-    for t, a, b in zip(t, alpha, beta):
+        new_a_node = []
+        new_b_node = []
 
-        # multiply activity rates with normed factors s.t. the mean of a and b is conserved
-        this_a_node = a_node * a
-        this_b_node = b_node * b
+        # for each time bin
+        for t, a, b in zip(t, alpha, beta):
 
-        new_a_node.append((t, this_a_node.tolist()))
-        new_b_node.append(this_b_node.tolist())
+            # multiply activity rates with normed factors s.t. the mean of a and b is conserved
+            this_a_node = a_node * a
+            this_b_node = b_node * b
 
-    kw['reconnection_rates'] = new_a_node
-    kw['disconnection_rates'] = new_b_node
+            new_a_node.append((t, this_a_node.tolist()))
+            new_b_node.append(this_b_node.tolist())
 
-    kw.pop('disconnection_rate')
-    kw.pop('reconnection_rate')
+        kw['reconnection_rates'] = new_a_node
+        kw['disconnection_rates'] = new_b_node
+
+        kw.pop('disconnection_rate')
+        kw.pop('reconnection_rate')
+    else:
+        alpha_t, beta_t = get_flockwork_node_rates_alpha_and_beta(temporal_network, kw['reconnection_rate'], kw['disconnection_rate'],apply_mean_correction)
+
+        mean_alpha = np.array(kw['reconnection_rate'])
+        t, mean_alpha = mean_alpha[:,0], mean_alpha[:,1]
+
+        new_alpha = list(zip(t, alpha_t))
+
+        kw['reconnection_rates'] = new_alpha
+        kw['disconnection_rates'] = beta_t
+
+        kw.pop('disconnection_rate')
+        kw.pop('reconnection_rate')
 
     return kw
 

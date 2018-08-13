@@ -103,7 +103,7 @@ pair < vector < double >, vector < double > >
                 edge_changes &ec,
                 vector < pair < double, double > > &alpha,
                 vector < double > &beta,
-                bool apply_mean_correction
+                bool apply_mean_correction = true
                 );
 
 flockwork_alpha_beta_args
@@ -119,4 +119,12 @@ flockwork_alpha_beta_args
              const bool adjust_last_bin_if_dt_does_not_fit,
              const bool verbose
              );
+
+pair < vector < vector < double > >, vector < vector < double > > >
+    get_time_dependent_node_alpha_and_beta(
+                edge_changes &ec,
+                vector < pair < double, double > > &alpha,
+                vector < double > &beta,
+                bool apply_mean_correction = true
+                );
 #endif
