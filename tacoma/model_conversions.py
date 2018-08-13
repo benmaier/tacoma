@@ -25,6 +25,8 @@ from tacoma import get_flockwork_node_parameters_alpha_and_beta
 from tacoma import get_flockwork_node_rates_alpha_and_beta
 import tacoma as tc
 
+from scipy.stats import lognorm
+
 # ========================================================= ZSBB ==================================================
 
 def ZSBB_mean_coordination_number(b0,lam,N,b1):
@@ -469,6 +471,95 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
 
         kw.pop('disconnection_rate')
         kw.pop('reconnection_rate')
+
+    return kw
+
+def estimate_flockwork_alpha_beta_args_for_single_nodes_randomly(temporal_network,sigma,
+                                                                 *args,**kwargs):
+    """Bins an `edge_changes` instance for each `dt` (after each step, respectively,
+    if `N_time_steps` was provided) and computes the reconnection rate alpha and disconnection
+    rate beta from the binned `edges_in` and `edges_out`.
+    Additionally
+
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    t_run_total : float
+        this is just plainly copied to the returned kwargs. If it is set to `None`, t_run_total will be set to `temporal_network.tmax`
+    dt : float
+        The demanded bin size. default : 0.0
+    N_time_steps : int
+        Number of time bins (use either this or dt). default : 0
+    aggregated_network : :obj:`dict` of :obj:`tuple` of int -> float, optional
+        dict(edge -> similarity), if this is given,
+        the kwargs are supposed to be for the function
+        :mod:`flockwork_P_varying_rates_neighbor_affinity`,
+        you can get this network from the `aggregated_network`
+        property from the results returned by
+        :mod:`measure_group_sizes_and_durations`. default : `{}`
+    ensure_empty_network : bool, optional
+        if this is True, bins where the original network
+        is empty (n_edges = 0) will be an artificially 
+        set high gamma with P = 0, such that nodes will
+        lose all edges. default : False
+    use_preferential_node_selection : bool, optional
+        this is just plainly copied to 
+        the returned kwargs if `aggregated_network`
+        is not empty. default : False
+    verbose: bool, optional
+        Be chatty.
+
+    Returns
+    -------
+    :obj:`dict`
+        kwargs for the functions :mod:`flockwork_P_varying_rates` or 
+        :mod:`flockwork_P_varying_rates_neighbor_affinity`, if `aggregated_network` was provided
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == el:
+        temporal_network = convert(temporal_network)
+
+    if type(temporal_network) == ec:
+        # kwargs.pop('use_event_rate_method')
+        kw = estimate_flockwork_alpha_beta_args(temporal_network,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+
+    s = sigma
+    scale = 1.0
+    # get rewiring rate and P
+    alpha = np.array(kw['reconnection_rate'])
+    t, alpha = alpha[:,0], alpha[:,1]
+    beta = np.array(kw['disconnection_rate'])
+
+    # compute single node rewiring rate and P factors
+    a_node = lognorm.rvs(s, scale=scale, size=temporal_network.N)
+    b_node = lognorm.rvs(s, scale=scale, size=temporal_network.N)
+
+    a_node /= a_node.mean()
+    b_node /= b_node.mean()
+
+    new_a_node = []
+    new_b_node = []
+
+    # for each time bin
+    for t, a, b in zip(t, alpha, beta):
+
+        # multiply activity rates with normed factors s.t. the mean of a and b is conserved
+        this_a_node = a_node * a
+        this_b_node = b_node * b
+
+        new_a_node.append((t, this_a_node.tolist()))
+        new_b_node.append(this_b_node.tolist())
+
+    kw['reconnection_rates'] = new_a_node
+    kw['disconnection_rates'] = new_b_node
+
+    kw.pop('disconnection_rate')
+    kw.pop('reconnection_rate')
 
     return kw
 
