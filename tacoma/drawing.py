@@ -73,7 +73,7 @@ def draw_edges(traj,
 
     lines = [list(zip(x, y)) for x, y in lines]
 
-    ax.add_collection(LineCollection(lines))
+    ax.add_collection(LineCollection(lines,color='k',alpha=0.5,linewidth=1))
 
     t0 = min(all_t_min)
     ax.set_ylim(-1,max_i)
