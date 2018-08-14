@@ -32,6 +32,40 @@ def complete_graph(N):
 
     return this
 
+def convert_static_network(N,edge_list,tmax):
+    """Get a single frame which consists of the static network.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes.
+    edge_list : :obj:`list` of :obj:`tuple` of int
+        The edges of the static graph
+    tmax : double
+        The maximum time until the network is looped.
+        
+    Returns 
+    -------
+    :mod:`edge_lists`
+        An instance of `tacoma.edge_lists` with t = [0.0], tmax = 1.0.
+    """
+
+    new_edge_list = []
+
+    for e in edge_list:
+        if e[0] > e[1]:
+            new_edge_list.append((e[1],e[0]))
+        elif e[1] > e[0]:
+            new_edge_list.append((e[0],e[1]))
+
+    this = tc.edge_lists()
+    this.t = [0.]
+    this.tmax = tmax
+    this.edges = [ new_edge_list ]
+    this.N = N
+
+    return this
+
 def get_logarithmic_histogram(data,
                               bins, #number of bins
                               return_bin_means = True,
