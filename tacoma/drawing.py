@@ -41,13 +41,18 @@ def draw_edges(traj,
                ax = None,
                fit = False,
                edge_order = None,
+               color = None,
                ):
 
     if ax is None:
         fig, ax = pl.subplots(1,1)
     else:
         fig = None
-        
+
+    if color is None:
+        color = 'k'
+
+
     lines = []
     max_i = len(traj)
     all_t_max = []
@@ -72,8 +77,9 @@ def draw_edges(traj,
     
 
     lines = [list(zip(x, y)) for x, y in lines]
+    colors = [ color for _ in range(len(lines)) ] 
 
-    ax.add_collection(LineCollection(lines,color='k',alpha=0.5,linewidth=1))
+    ax.add_collection(LineCollection(lines,colors=colors,alpha=0.5,linewidth=1))
 
     t0 = min(all_t_min)
     ax.set_ylim(-1,max_i)
@@ -98,8 +104,27 @@ def draw_edges(traj,
         log_y = np.log(fit_y) - 1.
         log_x = np.log(fit_x) - 1.
 
-
     return fig, ax
+
+def edge_activity_plot(temporal_network,
+                       time_normalization_factor = 1.,
+                       time_unit = None,
+                       ax = None,
+                       fit = False,
+                       edge_order = None,
+                       color = None,
+                       ):
+    result = tc.get_edge_trajectories(temporal_network)
+    traj = result.trajectories
+    return draw_edges(
+                       traj,
+                       time_normalization_factor = time_normalization_factor,
+                       time_unit = time_unit,
+                       ax = ax,
+                       fit = fit,
+                       edge_order = edge_order,
+                       color = color,
+                     )
 
 def get_edge_order(edge_traj,threshold=0.):
 
