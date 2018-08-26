@@ -35,6 +35,30 @@ def draw_edge_lists(L):
         
         draw(G,pos=pos,ax=ax[i],layout_function=_layout_function)
 
+def fit_function(x, alpha, scale, fac, intervals_to_discard_for_fit ):
+
+    x_ = x.copy()
+
+    offset = 0.0
+
+    for interval in intervals_to_discard_for_fit:
+        t0, t1 = interval
+        x_[np.logical_and(x>=t0, x<t1)] = t0 - offset
+
+        x_[x>=t1] -= t1 - t0
+        offset += t1 - t0
+
+    #print(x_)
+
+    #pl.figure()
+    #pl.plot(x, x_)
+    #pl.show()
+
+    #return fac * (1.0 - np.exp(-alpha*(x_-x_.min())))
+    return fac * (1.0 - (scale/(scale+x_))**(alpha) )
+
+    
+
 def draw_edges(traj,
                time_normalization_factor = 1.,
                time_unit = None,
@@ -42,6 +66,9 @@ def draw_edges(traj,
                fit = False,
                edge_order = None,
                color = None,
+               intervals_to_discard_for_fit = [],
+               fit_color = 'k',
+               return_fit_params = False,
                ):
 
     if ax is None:
@@ -72,7 +99,14 @@ def draw_edges(traj,
 
             lines.append([ t_, [y,y]])
 
+    #if intervals_to_discard_for_fit is not None:
+    #    fit_x = []
+    #
+    #    for t_ in all_t_min:
+    #
+    #else:
     fit_x = np.array(all_t_min)
+
     fit_y = np.arange(len(traj),dtype=float)
     
 
@@ -93,18 +127,27 @@ def draw_edges(traj,
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
 
+
+
     if fit:
         N = max(max_node) + 1
         fac = N*(N-1)/2.
-        fit = lambda x, alpha, fac: fac * (1 - np.exp(-alpha*(x-t0)))
-        popt, pcov = curve_fit(fit, fit_x, fit_y,[1./fac,fac],maxfev=10000)
+        fit = lambda x, alpha, scale: fit_function(x, alpha, scale, fac, intervals_to_discard_for_fit)
+        #popt, pcov = curve_fit(fit, fit_x, fit_y,[1./fac,fac,10.0],maxfev=10000)
+        #popt, pcov = curve_fit(fit, fit_x, fit_y,[2,fac,10.0],maxfev=10000)
+        popt, pcov = curve_fit(fit, fit_x, fit_y,[0.5,10.0],maxfev=10000)
+
+        #print (popt)
 
         ax.plot(fit_x, fit(fit_x,*popt),'r')
 
         log_y = np.log(fit_y) - 1.
         log_x = np.log(fit_x) - 1.
 
-    return fig, ax
+    if not return_fit_params:
+        return fig, ax
+    else:
+        return fig, ax, popt
 
 def edge_activity_plot(temporal_network,
                        time_normalization_factor = 1.,
@@ -113,6 +156,9 @@ def edge_activity_plot(temporal_network,
                        fit = False,
                        edge_order = None,
                        color = None,
+                       intervals_to_discard_for_fit = [],
+                       fit_color = None,
+                       return_fit_params = False,
                        ):
     result = tc.get_edge_trajectories(temporal_network)
     traj = result.trajectories
@@ -124,6 +170,9 @@ def edge_activity_plot(temporal_network,
                        fit = fit,
                        edge_order = edge_order,
                        color = color,
+                       intervals_to_discard_for_fit = intervals_to_discard_for_fit,
+                       fit_color = fit_color,
+                       return_fit_params = return_fit_params,
                      )
 
 def get_edge_order(edge_traj,threshold=0.):

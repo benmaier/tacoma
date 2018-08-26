@@ -5,6 +5,9 @@ import numpy as np
 
 import tacoma as tc
 
+from scipy.optimize import curve_fit
+from scipy.stats import lognorm
+
 def complete_graph(N):
     """Get a single fram which consists of a complete network.
 
@@ -261,6 +264,85 @@ def rescale_time(temporal_network, new_t0, new_tmax):
     temporal_network.tmax = new_tmax
 
     return temporal_network
+
+def number_of_discovered_edges(temporal_network):
+    result = tc.get_edge_trajectories(temporal_network)
+    traj = result.trajectories
+    t = []
+    count = []
+    for iedge, entry in enumerate(traj):
+        t0 = entry.time_pairs[0][0]
+        if len(t)>0:
+            if t[-1] == t0:
+                count[-1] = iedge+1
+            else:
+                count.append(iedge+1)
+                t.append(t0)
+        else:
+            count.append(iedge+1)
+            t.append(t0)
+
+    return np.array(t), np.array(count,dtype=float)
+
+def get_reduced_time(x, intervals_to_discard_for_fit):
+
+    x_ = x.copy()
+
+    offset = 0.0
+
+    for interval in intervals_to_discard_for_fit:
+        t0, t1 = interval
+        x_[np.logical_and(x>=t0, x<t1)] = t0 - offset
+
+        x_[x>=t1] -= t1 - t0
+        offset += t1 - t0
+
+    return x_
+
+def fit_number_of_discovered_edges(N, time, edge_count, intervals_to_discard_for_fit=[],kind='gamma'):
+
+
+    fac = N*(N-1)/2.
+
+    if kind == 'gamma':
+        fit = lambda x, alpha, scale: fac * (1 - (scale/(scale + get_reduced_time(x, intervals_to_discard_for_fit)) )**alpha)
+        popt, pcov = curve_fit(fit, time, edge_count,[0.5,10.0],maxfev=10000)
+    elif kind == 'exponential':
+        alpha = 1.0
+        fit = lambda x, scale: fac * (1 - (scale/(scale + get_reduced_time(x, intervals_to_discard_for_fit)) )**alpha)
+        popt, pcov = curve_fit(fit, time, edge_count,[10.0],maxfev=10000)
+    elif kind == 'uniform':
+
+        def fit(x, alpha):
+            t = get_reduced_time(x, intervals_to_discard_for_fit)
+            result = fac * (1 - (1-np.exp(-alpha*t)) / (alpha * t))
+            result[t==0] = 0
+            return result
+
+        popt, pcov = curve_fit(fit, time, edge_count,[0.1],maxfev=10000)
+    elif kind == 'normal':
+        fit = lambda x, mean, sigma: fac * (1 - np.exp(-mean* get_reduced_time(x, intervals_to_discard_for_fit)+sigma**2/2.0*get_reduced_time(x, intervals_to_discard_for_fit)**2))
+        popt, pcov = curve_fit(fit, time, edge_count,[0.5,0.01],maxfev=10000)
+    elif kind == 'delta':
+        fit = lambda x, scale: fac * (1 - np.exp(-scale * get_reduced_time(x, intervals_to_discard_for_fit)))
+        popt, pcov = curve_fit(fit, time, edge_count,[0.5],maxfev=10000)
+    elif kind == 'lognormal':
+        def fit(x, mu, sigma):
+
+            t = get_reduced_time(x, intervals_to_discard_for_fit)
+            weights = lognorm.rvs(sigma,scale=np.exp(mu),size=N*(N-1)//2)
+            print(weights)
+            return fac * ( 1.0 - np.array([np.mean(np.exp(-weights*x_)) for x_ in x]))
+
+        popt, pcov = curve_fit(fit, time, edge_count,[0.5,0.5],maxfev=10000)
+    else:
+        raise ValueError('Unknown fit function:', kind)
+    #popt, pcov = curve_fit(fit, fit_x, fit_y,[1./fac,fac,10.0],maxfev=10000)
+    #popt, pcov = curve_fit(fit, fit_x, fit_y,[2,fac,10.0],maxfev=10000)
+
+
+    return fit, popt, np.sqrt(np.diag(pcov))
+
 
 def load_json_dict(fn):
     with open(fn,'r') as f:
