@@ -4,13 +4,13 @@ import matplotlib.pyplot as pl
 
 import numpy as np
 
-N = 4
+N = 1000
 k = 3
 rho = k/(N-1.0)
 
 tau = 4
 omega = 1.0/tau
-t_run_total = 1000
+t_run_total = 10
 
 temporal_network = activity_model(N,rho,omega,t_run_total,seed=1)
 
