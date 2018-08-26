@@ -268,6 +268,7 @@ def rescale_time(temporal_network, new_t0, new_tmax):
 def number_of_discovered_edges(temporal_network):
     result = tc.get_edge_trajectories(temporal_network)
     traj = result.trajectories
+
     t = []
     count = []
     for iedge, entry in enumerate(traj):
@@ -326,15 +327,24 @@ def fit_number_of_discovered_edges(N, time, edge_count, intervals_to_discard_for
     elif kind == 'delta':
         fit = lambda x, scale: fac * (1 - np.exp(-scale * get_reduced_time(x, intervals_to_discard_for_fit)))
         popt, pcov = curve_fit(fit, time, edge_count,[0.5],maxfev=10000)
-    elif kind == 'lognormal':
-        def fit(x, mu, sigma):
-
-            t = get_reduced_time(x, intervals_to_discard_for_fit)
-            weights = lognorm.rvs(sigma,scale=np.exp(mu),size=N*(N-1)//2)
-            print(weights)
-            return fac * ( 1.0 - np.array([np.mean(np.exp(-weights*x_)) for x_ in x]))
-
-        popt, pcov = curve_fit(fit, time, edge_count,[0.5,0.5],maxfev=10000)
+#    elif kind == 'lognormal':
+#
+#
+#        def fit(x, mu, sigma):
+#            nmax = 15
+#            moments = np.array([ np.exp(n*mu + n**2*sigma**2 / 2.0 for n in range(nmax+1) ))
+#            def M(t_,nmax):
+#                pass
+#                
+#
+#            t = get_reduced_time(x, intervals_to_discard_for_fit)
+#
+#            pdf = lognorm(sigma,scale=np.exp(mu)).pdf
+#            #weights = lognorm.rvs(sigma,scale=np.exp(mu),size=N*(N-1)//2)
+#            #print(weights)
+#            return fac * ( 1.0 - np.array([np.mean(np.exp(-weights*x_)) for x_ in x]))
+#
+#        popt, pcov = curve_fit(fit, time, edge_count,[0.5,0.5],maxfev=10000)
     else:
         raise ValueError('Unknown fit function:', kind)
     #popt, pcov = curve_fit(fit, fit_x, fit_y,[1./fac,fac,10.0],maxfev=10000)

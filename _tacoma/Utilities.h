@@ -54,6 +54,12 @@ size_t arg_choose_from_vector(
         uniform_real_distribution<double> & distribution
       );
 
+size_t arg_choose_from_vector(
+        vector < size_t > const & weights, 
+        mt19937_64 & generator, 
+        uniform_real_distribution<double> & distribution
+      );
+
 void get_gillespie_tau_and_event( 
                 vector < double > const & rates,
                 double & tau,
@@ -150,4 +156,9 @@ void seed_engine(
         size_t seed
         );
 
+vector < set < size_t > > get_random_graph(
+        size_t n,
+        double p,
+        mt19937_64 &generator
+        );
 #endif

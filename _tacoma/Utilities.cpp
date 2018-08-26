@@ -124,6 +124,32 @@ size_t arg_choose_from_vector(
     return event;
 }
 
+size_t arg_choose_from_vector(
+        vector < size_t > const & weights, 
+        mt19937_64 & generator, 
+        uniform_real_distribution<double> & distribution
+      )
+{
+    double a0 = accumulate(weights.begin(), weights.end(), 0);
+    double rProduct = distribution(generator) * a0;
+
+    int event = 0;
+    int N = weights.size();
+
+    if (N==0)
+    {
+        throw length_error( "Rate list is empty." );
+    }
+
+    double sum_event = 0.0;
+    while ( (event<N) and not ( (sum_event < rProduct) and (rProduct <= sum_event+weights[event]) ) )
+    {
+        sum_event += weights[event];
+        event++;
+    }
+
+    return event;
+}
 
 void get_gillespie_tau_and_event( 
                 vector < double > const & rates,
@@ -570,3 +596,34 @@ void seed_engine(
         generator.seed(seed);
 }
 
+vector < set < size_t > > get_random_graph(
+        size_t n,
+        double p,
+        mt19937_64 &generator
+        )
+{
+    size_t start_node = 0;
+    uniform_real_distribution<double> distribution(0.0,1.0);
+
+    vector < set < size_t > > G(n);
+
+    size_t v = 1;
+    ssize_t w = -1;
+    while (v < n)
+    {
+        double r = distribution(generator);
+        w = w + 1 + floor( log(1-r)/log(1-p) );
+        while ( (w>=v ) and (v<n) )
+        {
+            w = w - v;
+            v++;
+        }
+        if (v<n)
+        {
+            G[w].insert(v);
+            G[v].insert(w);
+        }
+    }
+
+    return G;
+}
