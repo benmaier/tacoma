@@ -141,6 +141,16 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
+    m.def("activity_model_inefficient", &activity_model_inefficient, 
+            "Simulate an activity rate model where active edges become inactive with rate omega- and inactive edges become active with rate omega+.",
+            py::arg("N"),
+            py::arg("rho"),
+            py::arg("omega"),
+            py::arg("t_run_total"),
+            py::arg("seed") = 0,
+            py::arg("verbose") = false
+         );
+
     m.def("flockwork_P_varying_rates_neighbor_affinity", &flockwork_P_varying_rates_neighbor_affinity, "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rate and varying P. Rewiring neighbors are chosen according to a neighbor affinity value. Returns time points and concurrent edge changes.",
             py::arg("E"),
             py::arg("N"),

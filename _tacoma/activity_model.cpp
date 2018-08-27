@@ -54,8 +54,11 @@ edge_changes
                  const bool   verbose
         )
 {
-    assert((rho>0.0) and (rho <1.0));
-    assert(omega > 0.0);
+    if ((rho<=0.0) or (rho>=1.0))
+        throw domain_error("rho has to be 0 < rho < 1.");
+    if (omega <= 0.0)
+        throw domain_error("omega has to be omega > 0");
+
 
     double omega_minus = omega / rho;
     double omega_plus = omega / (1.0 - rho);
@@ -151,9 +154,7 @@ edge_changes
                 uniform_int_distribution < size_t > random_neighbor(0,k[reacting_node]-1);
 
                 auto it = G[reacting_node].begin();
-
-                for(size_t i = 0; i < random_neighbor(generator); i++)
-                    ++it;
+                advance(it, random_neighbor(generator));
 
                 size_t reacting_neighbor = *it;
 
@@ -266,6 +267,156 @@ edge_changes
                     cout << "  c_k[" << node << "] = " << complementary_k[node] << endl;
                 }
             }
+
+        }
+    }
+
+    edge_changes result;
+
+    result.t = time;
+    result.tmax = t_run_total;
+    result.t0 = t_initial;
+    result.edges_initial = edges_initial;
+    result.edges_out = edges_out;
+    result.edges_in = edges_in;
+    result.N = N;
+
+    return result;
+}
+
+edge_changes
+     activity_model_inefficient(
+                 const size_t N,       //number of nodes
+                 const double rho,       //probability to reconnect after cutting
+                 const double omega,
+                 const double t_run_total,
+                 const size_t seed,
+                 const bool   verbose
+        )
+{
+    if ((rho<=0.0) or (rho>=1.0))
+        throw domain_error("rho has to be 0 < rho < 1.");
+    if (omega <= 0.0)
+        throw domain_error("omega has to be omega > 0");
+
+    double omega_minus = omega / rho;
+    double omega_plus = omega / (1.0 - rho);
+
+    if (verbose)
+    {
+        cout << "omega = " << omega << endl;
+        cout << "rho = " << rho << endl;
+        cout << "omega+ = " << omega_plus << endl;
+        cout << "omega- = " << omega_minus << endl;
+    }
+
+    //initialize random generators
+    mt19937_64 generator;
+    seed_engine(generator,seed);
+    uniform_real_distribution<double> uni_distribution(0.,1.);
+
+    set < pair < size_t, size_t > > active_edges;
+    set < pair < size_t, size_t > > inactive_edges;
+    vector < vector < pair <size_t,size_t> > > edges_out;
+    vector < vector < pair <size_t,size_t> > > edges_in;
+    vector < double > time;
+    vector < pair < size_t, size_t > > edges_initial;
+
+    for(size_t node=0; node<N-1; node++)
+    {
+        for(size_t neigh=node+1; neigh<N; neigh++)
+        {
+            if ( uni_distribution(generator) < rho )
+            {
+                active_edges.insert(make_pair(node, neigh));
+                edges_initial.push_back(make_pair(node, neigh));
+            }
+            else
+                inactive_edges.insert(make_pair(node, neigh));
+        }
+    }
+    
+
+    double t_initial = 0.0;
+    double t = t_initial;
+
+    size_t edges_on = edges_initial.size();
+    size_t m_max = (N * (N-1)) / 2;
+
+    while (t < t_run_total)
+    {
+        //calculate rates
+        vector <double> rates;
+        rates.push_back(active_edges.size() * omega_minus);
+        rates.push_back(inactive_edges.size() * omega_plus);
+
+        double tau;
+        size_t event;
+        get_gillespie_tau_and_event(rates, tau, event, generator, uni_distribution);
+
+        if (verbose)
+        {
+            cout << "=========================" << endl;
+            for(auto const &rate: rates)
+                cout << "rate = " << rate << endl;
+            cout << "tau = " << tau << endl;
+            cout << "event = " << event << endl;
+            cout << endl;
+        }
+
+        t += tau;
+
+        if (t<t_run_total)
+        {
+            vector < pair < size_t, size_t > > e_out;
+            vector < pair < size_t, size_t > > e_in;
+
+            if (event==0)
+            {
+                // find a turned on edge and turn it off.
+                uniform_int_distribution < size_t > random_edge(0,active_edges.size()-1);
+                size_t edge_id = random_edge(generator);
+
+                auto it = active_edges.begin();
+                advance(it,edge_id);
+
+                pair < size_t, size_t > reacting_edge = *it;
+
+                if (verbose)
+                    cout << "found reacting edge (" <<  reacting_edge.first << " " << reacting_edge.second << endl;
+
+                // add this edge to edges going out
+                e_out.push_back(reacting_edge);
+                inactive_edges.insert(reacting_edge);
+                active_edges.erase(reacting_edge);
+            }
+            else if (event == 1)
+            {
+                // find a turned on edge and turn it off.
+                uniform_int_distribution < size_t > random_edge(0,inactive_edges.size()-1);
+                size_t edge_id = random_edge(generator);
+
+                auto it = inactive_edges.begin();
+                advance(it,edge_id);
+
+                pair < size_t, size_t > reacting_edge = *it;
+
+                if (verbose)
+                    cout << "found reacting edge (" <<  reacting_edge.first << " " << reacting_edge.second << endl;
+
+                // add this edge to edges going out
+                e_in.push_back(reacting_edge);
+                active_edges.insert(reacting_edge);
+                inactive_edges.erase(reacting_edge);
+            }
+            else
+            {
+                throw length_error("There was an event chosen other than on or off, this should not happen.");
+            }
+
+            edges_out.push_back(e_out);
+            edges_in.push_back(e_in);
+            time.push_back(t);
 
         }
     }

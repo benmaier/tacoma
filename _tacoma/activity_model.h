@@ -56,4 +56,14 @@ edge_changes
                  const size_t seed = 0,
                  const bool   verbose = false
         );
+
+edge_changes
+     activity_model_inefficient(
+                 const size_t N,       //number of nodes
+                 const double rho,       //probability to reconnect after cutting
+                 const double omega,
+                 const double t_run_total,
+                 const size_t seed = 0,
+                 const bool   verbose = false
+        );
 #endif
