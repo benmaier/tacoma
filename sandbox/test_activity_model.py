@@ -11,7 +11,7 @@ m = N*(N-1)/2
 
 tau = 4
 omega = 1.0/tau
-t_run_total = 100
+t_run_total = 10000
 
 temporal_network = activity_model(N,rho,omega,t_run_total,seed=1)
 
@@ -20,8 +20,11 @@ print("errors in generated temporal network =",tc.verify(temporal_network))
 fig, ax = pl.subplots(1,3,figsize=(10,3))
 
 t1, k_ = tc.mean_degree(temporal_network)
+
+k_mean = tc.time_average(t1, k_)
+print(k_mean)
 ax[0].plot(t1,k_,label='simulation')
-ax[0].plot(t1[[0,-1]],[tc.time_average(t1, k_)]*2,'--',lw=3,label='temporal average')
+ax[0].plot(t1[[0,-1]],[k_mean]*2,'--',lw=3,label='temporal average')
 ax[0].plot(t1[[0,-1]],[k]*2,'-',lw=2,label='demanded')
 
 t, C = tc.number_of_discovered_edges(temporal_network)
