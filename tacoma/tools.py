@@ -5,6 +5,12 @@ import numpy as np
 
 import tacoma as tc
 
+from _tacoma import edge_changes as ec
+from _tacoma import edge_lists as el
+from _tacoma import edge_lists_with_histograms as el_h
+from _tacoma import edge_changes_with_histograms as ec_h
+
+
 from scipy.optimize import curve_fit
 from scipy.stats import lognorm
 
@@ -266,8 +272,27 @@ def rescale_time(temporal_network, new_t0, new_tmax):
     return temporal_network
 
 def number_of_discovered_edges(temporal_network):
-    result = tc.get_edge_trajectories(temporal_network)
-    traj = result.trajectories
+    """Get the total number of discovered unique edges C(t), i.e. the contact coverage.
+    
+    Parameters
+    ==========
+    temporal_network : :mod:`edge_lists` or :mod:`edge_changes` or :obj:`list` of :mod:`edge_trajectory_entry`
+
+    Returns
+    =======
+    t : numpy.ndarray
+        Time points at which new edges have been discovered
+    C : numpy.ndarray
+        total number of edges discovered up to time t.
+    """
+
+    if type(temporal_network) in [ ec, el, el_h, ec_h ]:
+        result = tc.get_edge_trajectories(temporal_network)
+        traj = result.trajectories
+    elif type(temporal_network) == list and type(temporal_network[0]) == tc.edge_trajectory_entry:
+        traj = temporal_network
+    else:
+        raise ValueError("Unknown type for temporal network:", type(temporal_network))
 
     t = []
     count = []
@@ -284,6 +309,58 @@ def number_of_discovered_edges(temporal_network):
             t.append(t0)
 
     return np.array(t), np.array(count,dtype=float)
+
+def get_edge_probability_and_rate(temporal_network,tmax=None,t0=0.0):
+    """For each edge compute the total number of discovered unique edges C(t), i.e. the contact coverage.
+    
+    Parameters
+    ==========
+    temporal_network : :mod:`edge_lists` or :mod:`edge_changes` or :obj:`list` of :mod:`edge_trajectory_entry`
+    tmax : float (default : None)
+        This has to be set if `temporal_network` is a list of :mod:`edge_trajectory_entry`.
+    t0 : float (default : 0)
+
+    Returns
+    =======
+    p : numpy.ndarray
+        The probability to be switched on for each observed edge of the network 
+        (the remaining un-observed edges have probability p = 0).
+    omega : numpy.ndarray
+        The rate with which the observed edges are switched on omega = 1/(1/tau+ + 1/tau-)
+        (the remaining un-observed edges have rate omega = 0).
+    """
+
+    if type(temporal_network) in [ ec, el, el_h, ec_h ]:
+        result = tc.get_edge_trajectories(temporal_network)
+        traj = result.trajectories
+        tmax = temporal_network.tmax
+        if type(temporal_network) in [ ec, ec_h ]:
+            t0 = temporal_network.t0
+        else:
+            t0 = temporal_network.t[0]
+        
+    elif type(temporal_network) == list and type(temporal_network[0]) == tc.edge_trajectory_entry:
+        traj = temporal_network
+        if tmax is None:
+            raise ValueError("Please provide tmax and t0 if the temporal network is a list of tacoma.edge_trajectory_entry")
+    else:
+        raise ValueError("Unknown type for temporal network:", type(temporal_network))
+
+    T = tmax - t0
+
+    connection_probability = np.empty(len(traj))
+    activity_rate = np.empty(len(traj))
+
+    for iedge, entry in enumerate(traj):
+
+        t_on = 0.0
+        for interval in entry.time_pairs:
+            t_on += interval[1] - interval[0]
+
+        activity_rate[iedge] = len(entry.time_pairs) / T
+        connection_probability[iedge] = t_on / T
+
+    return connection_probability, activity_rate
 
 def get_reduced_time(x, intervals_to_discard_for_fit):
 
