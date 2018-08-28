@@ -13,6 +13,12 @@ from _tacoma import edge_changes_with_histograms as ec_h
 
 from scipy.optimize import curve_fit
 from scipy.stats import lognorm
+from scipy.special import gamma as Gamma
+from scipy.stats import weibull_min
+
+from scipy.integrate import quad
+
+from lmfit import minimize, Parameters
 
 def complete_graph(N):
     """Get a single fram which consists of a complete network.
@@ -382,6 +388,7 @@ def fit_number_of_discovered_edges(N, time, edge_count, intervals_to_discard_for
 
     fac = N*(N-1)/2.
 
+
     if kind == 'gamma':
         fit = lambda x, alpha, scale: fac * (1 - (scale/(scale + get_reduced_time(x, intervals_to_discard_for_fit)) )**alpha)
         popt, pcov = curve_fit(fit, time, edge_count,[0.5,10.0],maxfev=10000)
@@ -404,6 +411,60 @@ def fit_number_of_discovered_edges(N, time, edge_count, intervals_to_discard_for
     elif kind == 'delta':
         fit = lambda x, scale: fac * (1 - np.exp(-scale * get_reduced_time(x, intervals_to_discard_for_fit)))
         popt, pcov = curve_fit(fit, time, edge_count,[0.5],maxfev=10000)
+    elif kind == 'power-law':
+        def fit(x,alpha, xmin,xmax,time_is_reduced = False):
+            #print(alpha, xmin, xmax)
+            A = (1-alpha) / (xmax**(1-alpha) - xmin**(1-alpha))
+            if time_is_reduced:
+                t = x
+            else:
+                t = get_reduced_time(x, intervals_to_discard_for_fit)
+            x_ = np.logspace(np.math.log10(xmin),np.math.log10(xmax),100)
+
+            #observable = x_[None,:]**(-alpha)*np.exp(-t[:,None]*x_[None,:])
+            #print(observable.shape)
+            #M = np.trapz(observable, x = x_[None,:], axis=0,)
+            #print(M.shape)
+            M = np.array([ np.trapz(x_**(-alpha)*np.exp(-t_*x_), x = x_) for t_ in t])
+            #M = np.array([ quad(lambda x: A * x**(-alpha)*np.exp(-t_*x), xmin,xmax)[0] for t_ in t ])
+            return fac * (1-M)
+
+        def residual(params, x, time_is_reduced=True):
+            alpha, xmin, xmax = params['alpha'].value, params['xmin'].value, params['xmax'].value
+            #print(alpha, xmin, xmax)
+            return fit(x, alpha, xmin, xmax,time_is_reduced) - edge_count
+        reduced_time = get_reduced_time(time, intervals_to_discard_for_fit)
+
+        params = Parameters()
+        params.add('alpha',value = 1.0, min=1e-16)
+        params.add('xmin',value = 1e-5, min=1e-16)
+        params.add('xmax',value = 10, min=1e-16)
+        out = minimize(residual, params, args = (reduced_time,))
+
+        popt = (out.params['alpha'].value, out.params['xmin'].value, out.params['xmax'].value)
+
+        #print(help(out))
+        #print(out.pretty_print())
+
+        # TODO: once lmfit is fixed, this has to change to out.covar
+        pcov = np.zeros(len(popt))
+
+        #popt, pcov = curve_fit(fit, time, edge_count,[1,1e-10,10],maxfev=10000)
+#    elif kind == 'weibull':
+#        #def fit(x, k, omega_c):
+#        #    nmax = 18
+#        #    moments = np.array([ omega_c**n * Gamma(1+n/k) for n in range(nmax+1) ] )
+#        #    def M(t_,nmax):
+#        #        return np.sum(np.array([ t_**n * moments[n] / np.math.factorial(n) for n in range(nmax+1)]), axis=0)
+#        #        
+#        #    return fac * (1-M(-t,nmax))
+#        def fit(t_, k, omega_c):
+#            eps = 1e-16
+#            integrand = lambda x, t : weibull_min(k,scale=omega_c).pdf(x) * np.exp(-t*x)
+#            t = get_reduced_time(t_, intervals_to_discard_for_fit)
+#            return np.array([quad(integrand,eps,np.inf,args=(t_,)) for this_t in t])
+#
+#        popt, pcov = curve_fit(fit, time, edge_count,[0.5, 0.01],maxfev=10000)
 #    elif kind == 'lognormal':
 #
 #
