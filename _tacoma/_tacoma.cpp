@@ -48,6 +48,7 @@
 #include "social_trajectories.h"
 #include "verify_formats.h"
 #include "SIS.h"
+#include "SIS_node_based.h"
 #include "SIR.h"
 #include "SI.h"
 #include "SIRS.h"
@@ -475,12 +476,24 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_SIS_on_edge_changes",&gillespie_on_edge_changes<SIS>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIS.",
+    m.def("gillespie_node_based_SIS_on_edge_changes",&gillespie_on_edge_changes<SIS_NB>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIS.",
             py::arg("edge_changes"),
             py::arg("SIS"),
             py::arg("verbose") = false
             );
 
+    m.def("gillespie_node_based_SIS_on_edge_lists",&gillespie_on_edge_lists<SIS_NB>,"Perform a Gillespie SIS simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SIS.",
+            py::arg("edge_lists"),
+            py::arg("SIS"),
+            py::arg("is_static") = false,
+            py::arg("verbose") = false
+            );
+
+    m.def("gillespie_SIS_on_edge_changes",&gillespie_on_edge_changes<SIS>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIS.",
+            py::arg("edge_changes"),
+            py::arg("SIS"),
+            py::arg("verbose") = false
+            );
     m.def("gillespie_SI_on_edge_lists",&gillespie_on_edge_lists<SI>,"Perform a Gillespie SI simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SI.",
             py::arg("edge_lists"),
             py::arg("SI"),
@@ -727,6 +740,53 @@ PYBIND11_MODULE(_tacoma, m) {
                    )pbdoc")
         .def_readwrite("SI", &SIS::SI, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("I", &SIS::I, "A list containing the number of recovered at time :math:`t`.");
+
+    py::class_<SIS_NB>(m,"SIS_NB","Base class for the simulation of an SIS compartmental infection model on a temporal network using an SI-Graph for keeping track of SI-edges. Pass this to :mod:`gillespie_SIS` to simulate and retrieve the simulation results.")
+        .def(py::init<size_t,double,double,double,size_t,size_t,bool,size_t,bool>(),
+                py::arg("N"),
+                py::arg("t_simulation"),
+                py::arg("infection_rate"),
+                py::arg("recovery_rate"),
+                py::arg("number_of_initially_infected") = 1, 
+                py::arg("number_of_initially_vaccinated") = 0, 
+                py::arg("prevent_disease_extinction") = false,
+                py::arg("seed") = 0,
+                py::arg("verbose") = false,
+                R"pbdoc(
+                    Parameters
+                    ----------
+                    N : int
+                        Number of nodes in the temporal network.
+                    t_simulation : float
+                        Maximum time for the simulation to run. Can possibly be greater than the maximum time of the temporal
+                        network in which case the temporal network is looped.
+                    infection_rate : float
+                        Infection rate per :math:`SI`-link (expected number of reaction events :math:`SI\rightarrow II`
+                        for a single :math:`SI`-link per dimension of time).
+                    recovery_rate : float
+                        Recovery rate per infected (expected number of reaction events :math:`I\rightarrow S`
+                        for a single infected node per dimension of time).
+                    number_of_initially_infected : int, default = 1
+                        Number of nodes which will be in the infected compartment at :math:`t = t_0`. Note that the default
+                        value 1 is not an ideal initial value as fluctuations may lead to a quick end of the simulation
+                        skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
+                    number_of_initially_vaccinated : int, default = 0
+                        Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    prevent_disease_extinction : bool, default: False
+                        If this is `True`, the recovery of the last infected node will always be prevented.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc"
+            )
+        .def_readwrite("time", &SIS_NB::time, "A list containing the time points at which one or more of the observables changed.")
+    .def_readwrite("R0", &SIS_NB::R0, R"pbdoc(
+                   A list containing the basic reproduction number defined as :math:`R_0(t) = \eta\left\langle k \right\rangle(t) / \rho`
+                   where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
+                   )pbdoc")
+        .def_readwrite("SI", &SIS_NB::SI, "A list containing the number of infected at time :math:`t`.")
+        .def_readwrite("I", &SIS_NB::I, "A list containing the number of recovered at time :math:`t`.");
 
     py::class_<SI>(m,"SI","Base class for the simulation of an SI compartmental infection model on a temporal network. Pass this to :mod:`gillespie_SI` to simulate and retrieve the simulation results.")
         .def(py::init<size_t,double,double,size_t,size_t,size_t,bool>(),

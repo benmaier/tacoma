@@ -5,7 +5,7 @@ import setuptools
 from setuptools.command.build_ext import build_ext
 import os, sys
 
-__version__ = '0.0.25'
+__version__ = '0.0.26'
 
 class get_pybind_include(object):
     """Helper class to determine the pybind11 include path
@@ -37,6 +37,7 @@ ext_modules = [
             '_tacoma/flockwork_parameter_estimation.cpp', 
             '_tacoma/conversion.cpp', 
             '_tacoma/SIS.cpp', 
+            '_tacoma/SIS_node_based.cpp', 
             '_tacoma/SIR.cpp',             
             '_tacoma/SIRS.cpp',
             '_tacoma/SI.cpp', 
@@ -118,6 +119,7 @@ setup(
             'numpy',
             'scipy',
             'python-louvain',
+            'lmfit',
             ],
     include_package_data = True,
     cmdclass = {'build_ext': BuildExt},

@@ -255,6 +255,35 @@ def gillespie_SIS(temporal_network,*args,**kwargs):
 
     return result
     
+def gillespie_node_based_SIS(temporal_network,*args,**kwargs):
+    """Simulates a node-based SIS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
+
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    SIS : :mod:`SIS_NB`
+        An initialized node-based SIS object.
+    verbose: bool, optional
+        Be chatty.
+
+    Returns
+    -------
+    None
+        But the observables are saved in the :mod:`SIS` object.
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == ec:
+        result = _tc.gillespie_node_based_SIS_on_edge_changes(temporal_network,*args,**kwargs)
+    elif type(temporal_network) == el:
+        result = _tc.gillespie_node_based_SIS_on_edge_lists(temporal_network,*args,**kwargs)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+
+    return result
+    
 def gillespie_SI(temporal_network,*args,**kwargs):
     """Simulates an SI process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
