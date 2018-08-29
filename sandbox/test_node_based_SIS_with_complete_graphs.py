@@ -42,7 +42,7 @@ for ieta,eta in enumerate(etas):
         L_sis = tc.SIS(L.N, 100, eta, rho,number_of_initially_infected = 25,seed=seed)
         tc.gillespie_SIS_on_edge_lists(L,L_sis)
         end = time.time()
-        #print "tacoma needed", end-start, "seconds"
+        print("edge based needed", end-start, "seconds")
 
         t = np.array(L_sis.time)
         dt = t[1:] - t[:-1]
@@ -52,19 +52,16 @@ for ieta,eta in enumerate(etas):
             I_mean = 0
 
         start = time.time()
-        result = gill.SIS_Poisson_homogeneous(L.N,L.edges,eta,rho,100,seed=seed,initial_number_of_infected=25,verbose=False)
+        L_sis = tc.SIS_NB(L.N, 100, eta, rho,number_of_initially_infected = 25,seed=seed)
+        tc.gillespie_node_based_SIS_on_edge_lists(L,L_sis)
         end = time.time()
-        #print "dynGillEpi needed", end-start, "seconds"
+        print("node based needed", end-start, "seconds")
 
-        I_2_mean = np.mean(np.array(result.I[0][:-1],dtype=float))
-        I_2_mean = result.I[0][-1]
-        if result.I[0][-1] == 0:
-            I_2_mean = 0
-
-        t = np.array(result.true_t)
+        t = np.array(L_sis.time)
         dt = t[1:] - t[:-1]
-        I_2_mean = np.array(dt).dot(result.true_I[:-1])/sum(dt)
-        if result.I[0][-1] == 0:
+        I_2_mean = np.array(dt).dot(L_sis.I[:-1])/sum(dt)
+
+        if L_sis.I[-1] == 0:
             I_2_mean = 0
 
 
