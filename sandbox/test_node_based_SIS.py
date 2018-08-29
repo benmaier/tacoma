@@ -20,7 +20,7 @@ fwP_ec = tc.flockwork_P_varying_rates(E,N,P,t_run_total,rewiring_rate,tmax,seed=
 fwP_el = tc.convert(fwP_ec)
 
 start = time.time()
-SIS = tc.SIS_NB(N,t_run_total*2,infection_rate,recovery_rate,N//2,seed = seed,verbose=True)
+SIS = tc.node_based_SIS(N,t_run_total*2,infection_rate,recovery_rate,N//2,seed = seed,verbose=True)
 tc.gillespie_node_based_SIS(fwP_ec,SIS,verbose=True)
 end = time.time()
 
@@ -29,7 +29,7 @@ print("node-based simulation on edge_changes took", end-start,"seconds")
 pl.plot(SIS.time, SIS.I)
 
 start = time.time()
-SIS = tc.SIS_NB(N,t_run_total*2,infection_rate,recovery_rate,N//2,seed = seed)
+SIS = tc.node_based_SIS(N,t_run_total*2,infection_rate,recovery_rate,N//2,seed = seed)
 tc.gillespie_node_based_SIS(fwP_el,SIS)
 end = time.time()
 

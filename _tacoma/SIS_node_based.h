@@ -44,7 +44,7 @@
 
 using namespace std;
 
-class SIS_NB
+class node_based_SIS
 {
     public:
         size_t N;
@@ -65,7 +65,7 @@ class SIS_NB
         vector < size_t > SI;
         vector < size_t > I;
 
-        SIS_NB(
+        node_based_SIS(
             size_t _N,
             double _t_simulation,
             double _infection_rate,

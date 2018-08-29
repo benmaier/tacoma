@@ -64,7 +64,7 @@ namespace py = pybind11;
 PYBIND11_MODULE(_tacoma, m) {
     //TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks and simulate Gillespie processes on them.
     m.doc() = R"pbdoc(
-        TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks and simulate Gillespie processes on them.
+        C++ core of TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks and simulate Gillespie processes on them.
 
         .. currentmodule:: _tacoma
 
@@ -476,13 +476,13 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_node_based_SIS_on_edge_changes",&gillespie_on_edge_changes<SIS_NB>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIS.",
+    m.def("gillespie_node_based_SIS_on_edge_changes",&gillespie_on_edge_changes<node_based_SIS>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIS.",
             py::arg("edge_changes"),
             py::arg("SIS"),
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_node_based_SIS_on_edge_lists",&gillespie_on_edge_lists<SIS_NB>,"Perform a Gillespie SIS simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SIS.",
+    m.def("gillespie_node_based_SIS_on_edge_lists",&gillespie_on_edge_lists<node_based_SIS>,"Perform a Gillespie SIS simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SIS.",
             py::arg("edge_lists"),
             py::arg("SIS"),
             py::arg("is_static") = false,
@@ -741,7 +741,7 @@ PYBIND11_MODULE(_tacoma, m) {
         .def_readwrite("SI", &SIS::SI, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("I", &SIS::I, "A list containing the number of recovered at time :math:`t`.");
 
-    py::class_<SIS_NB>(m,"SIS_NB","Base class for the simulation of an SIS compartmental infection model on a temporal network using an SI-Graph for keeping track of SI-edges. Pass this to :mod:`gillespie_SIS` to simulate and retrieve the simulation results.")
+    py::class_<node_based_SIS>(m,"node_based_SIS",R"pbdoc(Base class for the simulation of an SIS compartmental infection model on a temporal network using an SI-Graph for keeping track of SI-edges (meaning this is a node-based algorithm). Pass this to :mod:`gillespie_node_based_SIS` to simulate and retrieve the simulation results.)pbdoc")
         .def(py::init<size_t,double,double,double,size_t,size_t,bool,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
@@ -780,13 +780,13 @@ PYBIND11_MODULE(_tacoma, m) {
                         Be talkative.
                 )pbdoc"
             )
-        .def_readwrite("time", &SIS_NB::time, "A list containing the time points at which one or more of the observables changed.")
-    .def_readwrite("R0", &SIS_NB::R0, R"pbdoc(
+        .def_readwrite("time", &node_based_SIS::time, "A list containing the time points at which one or more of the observables changed.")
+    .def_readwrite("R0", &node_based_SIS::R0, R"pbdoc(
                    A list containing the basic reproduction number defined as :math:`R_0(t) = \eta\left\langle k \right\rangle(t) / \rho`
                    where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
                    )pbdoc")
-        .def_readwrite("SI", &SIS_NB::SI, "A list containing the number of infected at time :math:`t`.")
-        .def_readwrite("I", &SIS_NB::I, "A list containing the number of recovered at time :math:`t`.");
+        .def_readwrite("SI", &node_based_SIS::SI, "A list containing the number of infected at time :math:`t`.")
+        .def_readwrite("I", &node_based_SIS::I, "A list containing the number of recovered at time :math:`t`.");
 
     py::class_<SI>(m,"SI","Base class for the simulation of an SI compartmental infection model on a temporal network. Pass this to :mod:`gillespie_SI` to simulate and retrieve the simulation results.")
         .def(py::init<size_t,double,double,size_t,size_t,size_t,bool>(),

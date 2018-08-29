@@ -52,7 +52,7 @@ for ieta,eta in enumerate(etas):
             I_mean = 0
 
         start = time.time()
-        L_sis = tc.SIS_NB(L.N, 100, eta, rho,number_of_initially_infected = 25,seed=seed)
+        L_sis = tc.node_based_SIS(L.N, 100, eta, rho,number_of_initially_infected = 25,seed=seed)
         tc.gillespie_node_based_SIS_on_edge_lists(L,L_sis)
         end = time.time()
         print("node based needed", end-start, "seconds")

@@ -26,9 +26,9 @@
 #include "SIS_node_based.h"
 
 using namespace std;
-//namespace SIS_NB = SIS_NB;
+//namespace node_based_SIS = node_based_SIS;
 
-void SIS_NB::update_network(
+void node_based_SIS::update_network(
                     vector < set < size_t > > &_G,
                     double t
                     )
@@ -71,7 +71,7 @@ void SIS_NB::update_network(
     update_observables(t);
 }
 
-void SIS_NB::update_network(
+void node_based_SIS::update_network(
                     vector < set < size_t > > &_G,
                     vector < pair < size_t, size_t > > &edges_in,
                     vector < pair < size_t, size_t > > &edges_out,
@@ -131,7 +131,7 @@ void SIS_NB::update_network(
     update_observables(t);
 }
 
-void SIS_NB::get_rates_and_Lambda(
+void node_based_SIS::get_rates_and_Lambda(
                     vector < double > &_rates,
                     double &_Lambda
                   )
@@ -150,7 +150,7 @@ void SIS_NB::get_rates_and_Lambda(
     _Lambda = accumulate(rates.begin(),rates.end(),0.0);
 }
 
-void SIS_NB::make_event(
+void node_based_SIS::make_event(
                 size_t const &event,
                 double t
                )
@@ -160,12 +160,12 @@ void SIS_NB::make_event(
     else if (event == 1)
         recovery_event();
     else
-        throw length_error("SIS_NB: chose event larger than rate vector which should not happen.");
+        throw length_error("node_based_SIS: chose event larger than rate vector which should not happen.");
 
     update_observables(t);
 }
 
-void SIS_NB::infection_event()
+void node_based_SIS::infection_event()
 {
     // choose random infected
     uniform_real_distribution < double > random_uni(0.0,1.0);
@@ -206,7 +206,7 @@ void SIS_NB::infection_event()
 
 }
 
-void SIS_NB::recovery_event()
+void node_based_SIS::recovery_event()
 {
     if ((prevent_disease_extinction) and (infected.size() == 1))
         return ;
@@ -241,7 +241,7 @@ void SIS_NB::recovery_event()
         }
 }
 
-void SIS_NB::update_observables(
+void node_based_SIS::update_observables(
                 double t
                )
 {
