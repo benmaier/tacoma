@@ -67,4 +67,30 @@ edge_changes
                  const bool   use_random_rewiring,
                  const size_t seed
         );
+
+edge_changes
+     flockwork_alpha_beta_varying_rates_for_each_node_with_neighbor_affinity(
+                 vector < pair < size_t, size_t > > &E, //edgelist
+                 const size_t N,       //number of nodes
+                 vector < pair < double, vector < double > > > &reconnection_rates,
+                 vector < vector < double > > &disconnection_rates,
+                 vector < pair < vector < size_t >, vector < double > > > &neighbor_affinity,
+                 const double t_run_total,
+                 const double tmax,
+                 const bool   use_random_rewiring,
+                 const size_t seed
+        );
+
+edge_changes
+     flockwork_alpha_beta_varying_rates_with_neighbor_affinity(
+                 vector < pair < size_t, size_t > > &E, //initial edgelist
+                 const size_t N,       //number of nodes
+                 vector < pair < double, double > > &reconnection_rate,      
+                 vector < double > &disconnection_rate,
+                 vector < pair < vector < size_t >, vector < double > > > &neighbor_affinity,
+                 const double t_run_total,
+                 const double tmax,
+                 const bool   use_random_rewiring,
+                 const size_t seed
+        );
 #endif

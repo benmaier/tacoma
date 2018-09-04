@@ -243,6 +243,79 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
     return make_pair(edges_out,edges_in);
 }
 
+pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
+    rewire_P_without_SI_checking_single_node_neighbor_affinity(
+                 size_t i,
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 vector < pair < vector < size_t >, vector < double > > > &neighbor_affinity,
+                 mt19937_64 & generator, 
+                 uniform_real_distribution<double> & distribution
+            )
+{
+    //choose second node
+    size_t N = G.size();
+
+
+    bool do_rewiring = neighbor_affinity[i].second.size() > 0 && (distribution(generator) < P);
+    size_t j;
+
+    if (do_rewiring)
+    {
+        size_t neighbor_index = arg_choose_from_vector(neighbor_affinity[i].second, generator, distribution);
+        j = neighbor_affinity[i].first[neighbor_index];
+    }
+
+    //cout << "found pair (" << i << ", " << j << ")" << endl;
+
+
+    vector < pair < size_t, size_t > > edges_out;
+    vector < pair < size_t, size_t > > edges_in;
+
+    //check if new neighbor is actually an old neighbor
+    //and if this is the case return an empty event
+    if ( do_rewiring and (G[i]->find(j) != G[i]->end()) )
+    {
+        return make_pair(edges_out,edges_in);
+    }
+
+    //loop through the neighbors of i
+    for(auto neigh_i : *G[i] )
+    {
+        //and erase the link to i
+        G[neigh_i]->erase(i);
+        
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_i);
+        edges_out.push_back( current_edge );
+    } 
+
+    //erase the links from the perspective of i
+    G[i]->clear();
+
+    if ( do_rewiring )
+    {
+        //loop through the neighbors of j
+        for(auto neigh_j : *G[j] ) 
+        {
+            G[ neigh_j ]->insert( i );
+            G[ i ]->insert( neigh_j );
+
+            pair < size_t, size_t > current_edge = get_sorted_pair(i,neigh_j);
+            edges_in.push_back( current_edge );
+        }
+
+        //add j as neighbor and count additional edge
+        G[ j ]->insert( i );
+        G[ i ]->insert( j );
+
+        pair < size_t, size_t > current_edge = get_sorted_pair(i,j);
+        edges_in.push_back( current_edge );
+    }
+
+    return make_pair(edges_out,edges_in);
+}
+
+
 
 pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
     rewire_P(

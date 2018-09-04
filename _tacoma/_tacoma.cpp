@@ -88,14 +88,17 @@ PYBIND11_MODULE(_tacoma, m) {
             SIS
             SIR
             SIRS
+            node_based_SIS
 
         Analysis classes
-        ---------------
+        ----------------
 
         .. autosummary::
             :toctree: _generate
-
-            SI
+        
+            edge_lists_with_histograms
+            edge_changes_with_histograms
+            group_sizes_and_durations
 
         Helper classes
         --------------
@@ -109,7 +112,7 @@ PYBIND11_MODULE(_tacoma, m) {
     )pbdoc";
     //m.attr("__name__") = "tacoma.core";
     
-    m.def("flockwork_P_varying_rates", &flockwork_P_varying_rates, "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rate and varying P. Returns time points and concurrent edge changes.",
+    m.def("flockwork_P_varying_rates", &flockwork_P_varying_rates, "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rate and varying reconnection probability P. Returns time points and concurrent edge changes.",
             py::arg("E"),
             py::arg("N"),
             py::arg("P"),
@@ -120,7 +123,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("seed") = 0
          );
 
-    m.def("flockwork_P_varying_rates_for_each_node", &flockwork_P_varying_rates_for_each_node, 
+    m.def("flockwork_P_varying_rates_for_each_node", &flockwork_P_varying_rates_for_each_node,
             "Simulate a flockwork P-model given an initial state as an edge list with varying rewiring rates and varying P (varying both over time and for each node). Returns time points and concurrent edge changes.",
             py::arg("E"),
             py::arg("N"),
@@ -177,6 +180,18 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("seed") = 0
          );
 
+    m.def("flockwork_alpha_beta_varying_rates_with_neighbor_affinity", &flockwork_alpha_beta_varying_rates_with_neighbor_affinity, "Simulate a flockwork alpha-beta-model given an initial state as an edge list with varying reconnection rate alpha and varying disconnection rate beta. Choose neighbors of reacting nodes according to a weighted static network. Returns time points and concurrent edge changes.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("reconnection_rate"),
+            py::arg("disconnection_rate"),
+            py::arg("neighbor_affinity"),
+            py::arg("t_run_total"),
+            py::arg("tmax"),
+            py::arg("use_random_rewiring") = false,
+            py::arg("seed") = 0
+         );
+
     m.def("flockwork_alpha_beta_varying_rates_for_each_node", &flockwork_alpha_beta_varying_rates_for_each_node, 
             "Simulate a flockwork alpha-beta-model given an initial state as an edge list with varying reconnection rate alpha and varying disconnection rate beta (varying both over time and for each node). Returns time points and concurrent edge changes.",
             py::arg("E"),
@@ -189,7 +204,20 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("seed") = 0
          );
 
-    m.def("equilibrate_flockwork_Q", &equilibrate_edgelist_seed, "Equilibrates a flockwork given an initial state as an edge list. Returns new edge list.",
+    m.def("flockwork_alpha_beta_varying_rates_for_each_node_with_neighbor_affinity", &flockwork_alpha_beta_varying_rates_for_each_node_with_neighbor_affinity, 
+            "Simulate a flockwork alpha-beta-model given an initial state as an edge list with varying reconnection rate alpha and varying disconnection rate beta (varying both over time and for each node). Choose neighbors of reacting nodes according to a weighted static network. Returns an instance of edge_changes.",
+            py::arg("E"),
+            py::arg("N"),
+            py::arg("reconnection_rates"),
+            py::arg("disconnection_rates"),
+            py::arg("neighbor_affinity"),
+            py::arg("t_run_total"),
+            py::arg("tmax"),
+            py::arg("use_random_rewiring") = false,
+            py::arg("seed") = 0
+         );
+
+    m.def("equilibrate_flockwork_Q", &equilibrate_edgelist_seed, "Equilibrates a flockwork Q-model given an initial state as an edge list. Returns new edge list.",
             py::arg("E"),
             py::arg("N"),
             py::arg("Q"),
@@ -207,7 +235,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("use_Q_as_P") = true
             );
 
-    m.def("simulate_flockwork_Q", &simulate_flockwork, "Simulates a flockwork given an initial state as an edge list. Returns new edge list.",
+    m.def("simulate_flockwork_Q", &simulate_flockwork, "Simulates a flockwork Q-model given an initial state as an edge list. Returns new edge list.",
             py::arg("E"),
             py::arg("N"),
             py::arg("Q"),
@@ -230,31 +258,31 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("num_timesteps")
             );
 
-    m.def("measure_group_sizes_and_durations_for_edge_lists", &measure_group_sizes_and_durations, "Get a temporal network as a list of edge lists, list of times and number of nodes N and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
+    m.def("measure_group_sizes_and_durations_for_edge_lists", &measure_group_sizes_and_durations, "Provide an instance of tacoma.edge_lists and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
             py::arg("edge_lists"),
             py::arg("ignore_size_histograms") = false,
             py::arg("verbose") = false
          );
 
-    m.def("measure_group_sizes_and_durations_for_edge_changes", &measure_group_sizes_and_durations_for_edge_changes, "Get a temporal network as a list of edge lists, list of times and number of nodes N and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
+    m.def("measure_group_sizes_and_durations_for_edge_changes", &measure_group_sizes_and_durations_for_edge_changes, "Provide an instance of tacoma.edge_lists and return a list of contact durations, a list of group size histograms and a list of durations lists, one for each group size.",
             py::arg("edge_changes"),
             py::arg("ignore_size_histogram_differences") = false,
             py::arg("verbose") = false
          );
 
-    m.def("mean_degree_from_edge_lists", &mean_degree_from_edge_lists, "Get a list of pairs, where the first entry is a time point and the second entry is the mean degree of the current state, given an `edge_lists` instance.",
+    m.def("mean_degree_from_edge_lists", &mean_degree_from_edge_lists, "Get a list of pairs where the first entry is a time point and the second entry is the mean degree of the current state, given an `edge_lists` instance.",
             py::arg("edge_lists")
          );
 
-    m.def("mean_degree_from_edge_changes", &mean_degree_from_edge_changes, "Get a list of pairs, where the first entry is a time point and the second entry is the mean degree of the current state, given an `edge_changes` instance.",
+    m.def("mean_degree_from_edge_changes", &mean_degree_from_edge_changes, "Get a list of pairs where the first entry is a time point and the second entry is the mean degree of the current state, given an `edge_changes` instance.",
             py::arg("edge_changes")
          );
 
-    m.def("degree_distribution_from_edge_lists", &degree_distribution_from_edge_lists, "Get a list of doubles, where the k-th entry of the list is the time-averaged probability that a node has degree k.",
+    m.def("degree_distribution_from_edge_lists", &degree_distribution_from_edge_lists, "Get a list of doubles where the k-th entry of the list is the time-averaged probability that a node has degree k.",
             py::arg("edge_lists")
          );
 
-    m.def("degree_distribution_from_edge_changes", &degree_distribution_from_edge_changes, "Get a list of doubles, where the k-th entry of the list is the time-averaged probability that a node has degree k.",
+    m.def("degree_distribution_from_edge_changes", &degree_distribution_from_edge_changes, "Get a list of doubles where the k-th entry of the list is the time-averaged probability that a node has degree k.",
             py::arg("edge_changes")
          );
 
@@ -262,7 +290,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("edge_changes")
          );
 
-    m.def("sample_from_edge_lists", &sample_from_edge_lists, "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+    m.def("sample_from_edge_lists", &sample_from_edge_lists, "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step. However, you should use tacoma.bin_from_edge_lists instead.",
             py::arg("edge_lists"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -270,7 +298,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("sample_from_edge_changes", &sample_from_edge_changes, "Get a temporal network as a list of edge lists, given an instance of `edge_changes`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+    m.def("sample_from_edge_changes", &sample_from_edge_changes, "Get a temporal network as a list of edge lists, given an instance of `edge_changes`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step. However, you should use tacoma.bin_from_edge_changes instead.",
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -324,12 +352,12 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("verify_edge_lists", &verify_edge_lists, "For each edge, get all time pairs where the edge existed, given an instance of `edge_lists`.",
+    m.def("verify_edge_lists", &verify_edge_lists, "Verify that the given temporal network is in a valid format. Returns the number of rule violations. Turn on verbose for detailed information on what's wrong.",
             py::arg("edge_lists"),
             py::arg("verbose") = false
          );
 
-    m.def("verify_edge_changes", &verify_edge_changes, "For each edge, get all time pairs where the edge existed, given an instance of `edge_changes`.",
+    m.def("verify_edge_changes", &verify_edge_changes, "Verify that the given temporal network is in a valid format. Returns the number of rule violations. Turn on verbose for detailed information on what's wrong.",
             py::arg("edge_changes"),
             py::arg("verbose") = false
          );
@@ -349,7 +377,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("concatenate_edge_changes", &concatenate_edge_changes, "Convert a list of `edge_changes` to a single instance of `edge_changes`.",
+    m.def("concatenate_edge_changes", &concatenate_edge_changes, "Concatenate a list of `edge_changes` to a single instance of `edge_changes`.",
             py::arg("list_of_edge_changes"),
             py::arg("verbose") = false
          );
@@ -362,7 +390,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("get_flockwork_P_args", &get_flockwork_P_args, "Calculate the rewiring_rate gamma(t) and probability to stay alone P(t) as well as the other important parameters to simulate a flockwork_P model with varying rates.",
+    m.def("get_flockwork_P_args", &get_flockwork_P_args, "Calculate the rewiring_rate $\\gamma(t)$ and probability to reconnect $P(t)$ as well as the other important parameters to simulate a flockwork P-model with varying rates.",
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -375,7 +403,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("get_flockwork_alpha_beta_args", &get_flockwork_alpha_beta_args, "Calculate the reconnection rate alpha(t) and disconnection rate beta(t) as well as the other important parameters to simulate a flockwork_alpha_beta model with varying rates.",
+    m.def("get_flockwork_alpha_beta_args", &get_flockwork_alpha_beta_args, "Calculate the reconnection rate $\\alpha(t)$ and disconnection rate $\\beta(t)$ as well as the other important parameters to simulate a flockwork_alpha_beta model with varying rates.",
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -389,7 +417,7 @@ PYBIND11_MODULE(_tacoma, m) {
          );
 
     m.def("get_flockwork_P_node_parameters_gamma_and_P", get_node_gamma_and_P,
-            R"pbdoc(Calculate the mean node specific activity gamma_i and reconnection probability P_i for each node.)pbdoc",
+            R"pbdoc(Calculate the mean node specific activity $\gamma_i$ and reconnection probability $P_i$ for each node.)pbdoc",
             py::arg("edge_changes"),
             py::arg("gamma"),
             py::arg("P"),
@@ -397,7 +425,7 @@ PYBIND11_MODULE(_tacoma, m) {
         );
 
     m.def("get_flockwork_node_parameters_alpha_and_beta", get_node_alpha_and_beta,
-            R"pbdoc(Calculate the mean node specific reconnection rate factor alpha_i and disconnection rate factor beta_i for each node.)pbdoc",
+            R"pbdoc(Calculate the mean node specific reconnection rate factor $\alpha_i$ and disconnection rate factor $\beta_i$ for each node.)pbdoc",
             py::arg("edge_changes"),
             py::arg("reconnection_rate"),
             py::arg("disconnecton_rate"),
@@ -420,7 +448,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("use_event_rate_method") = true
         );
 
-    m.def("estimate_k_scaling_gradient_descent", &estimate_k_scaling_gradient_descent, "Estimate the scaling of <k> that's necessary to revert the effects of binning using gradient descent",
+    m.def("estimate_k_scaling_gradient_descent", &estimate_k_scaling_gradient_descent, R"pbdoc(Estimate the scaling of $\left\langle k\right\rangle$ that's necessary to revert the effects of binning using gradient descent.)pbdoc",
             py::arg("edge_changes"),
             py::arg("dt_for_inference"),
             py::arg("dt_for_binning"),
@@ -431,7 +459,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = true
         );
 
-    m.def("estimate_k_scaling_gradient_descent_RMSE", &estimate_k_scaling_gradient_descent_RMSE, "Estimate the scaling of <k> that's necessary to revert the effects of binning using gradient descent",
+    m.def("estimate_k_scaling_gradient_descent_RMSE", &estimate_k_scaling_gradient_descent_RMSE, R"pbdoc(Estimate the scaling of $\left\langle k\right\rangle$ that's necessary to revert the effects of binning using gradient descent.)pbdoc",
             py::arg("edge_changes"),
             py::arg("dt_for_inference"),
             py::arg("dt_for_binning"),
@@ -457,7 +485,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("dynamic_RGG", &dynamic_RGG, "Simulate dynamic random geometric graph model.",
+    m.def("dynamic_RGG", &dynamic_RGG, "Simulate a dynamic random geometric graph model.",
             py::arg("N"),
             py::arg("t_run_total"),
             py::arg("step_distance") = 0.0,
@@ -476,6 +504,12 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
             );
 
+    m.def("gillespie_SIS_on_edge_changes",&gillespie_on_edge_changes<SIS>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIS.",
+            py::arg("edge_changes"),
+            py::arg("SIS"),
+            py::arg("verbose") = false
+            );
+
     m.def("gillespie_node_based_SIS_on_edge_changes",&gillespie_on_edge_changes<node_based_SIS>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIS.",
             py::arg("edge_changes"),
             py::arg("SIS"),
@@ -489,11 +523,6 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_SIS_on_edge_changes",&gillespie_on_edge_changes<SIS>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIS.",
-            py::arg("edge_changes"),
-            py::arg("SIS"),
-            py::arg("verbose") = false
-            );
     m.def("gillespie_SI_on_edge_lists",&gillespie_on_edge_lists<SI>,"Perform a Gillespie SI simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SI.",
             py::arg("edge_lists"),
             py::arg("SI"),
@@ -569,46 +598,93 @@ PYBIND11_MODULE(_tacoma, m) {
         .def_readwrite("N", &edge_lists::N, R"pbdoc(Number of nodes)pbdoc")
         .def_readwrite("tmax", &edge_lists::tmax, R"pbdoc(The final time)pbdoc");
 
-    py::class_<edge_lists_with_histograms>(m,"edge_lists_with_histograms",R"pbdoc(
-            Similar to the :mod:`edge_lists` class but with additional analysis results.
-        )pbdoc")
-        .def(py::init<>())
-        .def_readwrite("t", &edge_lists_with_histograms::t, R"pbdoc(
-            An ordered list containing the time points 
-            at which the new edge list becomes active.
+    py::class_<edge_lists_with_histograms>(m,"edge_lists_with_histograms",
+            R"pbdoc(
+                Similar to the :mod:`edge_lists` class but with additional analysis results.
             )pbdoc")
-        .def_readwrite("edges", &edge_lists_with_histograms::edges, R"pbdoc(
-                A list containing the edge list of the network at the correspoding time in `t`
-        )pbdoc")
-        .def_readwrite("size_histograms", &edge_lists_with_histograms::size_histograms)
-        .def_readwrite("group_durations", &edge_lists_with_histograms::group_durations)
-        .def_readwrite("N", &edge_lists_with_histograms::N)
-        .def_readwrite("tmax", &edge_lists_with_histograms::tmax);
-
-    py::class_<edge_changes_with_histograms>(m,"edge_changes_with_histograms")
         .def(py::init<>())
-        .def_readwrite("t", &edge_changes_with_histograms::t)
-        .def_readwrite("edges_in", &edge_changes_with_histograms::edges_in)
-        .def_readwrite("edges_out", &edge_changes_with_histograms::edges_out)
-        .def_readwrite("initial_size_histogram", &edge_changes_with_histograms::initial_size_histogram)
-        .def_readwrite("group_changes", &edge_changes_with_histograms::group_changes)
-        .def_readwrite("final_size_histogram", &edge_changes_with_histograms::final_size_histogram)
-        .def_readwrite("contact_durations", &edge_changes_with_histograms::contact_durations)
-        .def_readwrite("inter_contact_durations", &edge_changes_with_histograms::inter_contact_durations)
-        .def_readwrite("group_durations", &edge_changes_with_histograms::group_durations)
-        .def_readwrite("N", &edge_changes_with_histograms::N)
-        .def_readwrite("t0", &edge_changes_with_histograms::t0)
-        .def_readwrite("tmax", &edge_changes_with_histograms::tmax)
-        .def_readwrite("edges_initial", &edge_changes_with_histograms::edges_initial);
+        .def_readwrite("t", &edge_lists_with_histograms::t, 
+            R"pbdoc(
+                An ordered list containing the time points at which the new edge list becomes active.
+            )pbdoc")
+        .def_readwrite("edges", &edge_lists_with_histograms::edges, 
+            R"pbdoc(
+                A list containing the edge list of the network at the correspoding time in `t`
+            )pbdoc")
+        .def_readwrite("size_histograms", &edge_lists_with_histograms::size_histograms,        
+            R"pbdoc(
+                A list of :obj:`dict` s, one dictionary for each edge list, containing the number of observed groups of size `m` at this time.
+            )pbdoc")
+        .def_readwrite("group_durations", &edge_lists_with_histograms::group_durations,
+            R"pbdoc(
+                A list of :obj:`list` s where the `m`-th entry contains all durations of all observed groups of size `m`.
+            )pbdoc")
+        .def_readwrite("N", &edge_lists_with_histograms::N, "The number of nodes.")
+        .def_readwrite("tmax", &edge_lists_with_histograms::tmax, "The maximum time.");
+
+    py::class_<edge_changes_with_histograms>(m,"edge_changes_with_histograms",
+            R"pbdoc(
+                Similar to the :mod:`edge_changes` class but with additional analysis results.
+            )pbdoc")
+        .def(py::init<>())
+        .def_readwrite("t", &edge_changes_with_histograms::t, R"pbdoc(An ordered list containing the time points at which changes occur.)pbdoc")
+        .def_readwrite("edges_in", &edge_changes_with_histograms::edges_in, R"pbdoc(A list containing the edges coming in to the network at the correspoding time in `t`.)pbdoc")
+        .def_readwrite("edges_out", &edge_changes_with_histograms::edges_out, R"pbdoc(A list containing the edges leaving the network at the correspoding time in `t`.)pbdoc")
+        .def_readwrite("initial_size_histogram", &edge_changes_with_histograms::initial_size_histogram,
+            R"pbdoc(
+                A :obj:`dict` containing group sizes as keys and counts of groups of corresponding sizes as values.
+            )pbdoc")
+        .def_readwrite("group_changes", &edge_changes_with_histograms::group_changes,
+            R"pbdoc(
+                A list :obj:`dict` , one dict for each time step, containing group sizes as keys and change of value to the previous time step as values.
+            )pbdoc")
+        .def_readwrite("final_size_histogram", &edge_changes_with_histograms::final_size_histogram,
+            R"pbdoc(
+                A :obj:`dict` containing group sizes as keys and counts of groups of corresponding sizes as values.
+            )pbdoc")
+        .def_readwrite("contact_durations", &edge_changes_with_histograms::contact_durations,
+            R"pbdoc(
+                A list of :obj:`int` s, each entry is the duration of a single contact (in time steps).
+            )pbdoc")
+        .def_readwrite("inter_contact_durations", &edge_changes_with_histograms::inter_contact_durations,
+            R"pbdoc(
+                A list of :obj:`int` s, each entry is the number of time steps it took a single node to reconnect.
+            )pbdoc")
+        .def_readwrite("group_durations", &edge_changes_with_histograms::group_durations,
+            R"pbdoc(
+                A list of :obj:`list` s, the `m`-th entry contains all durations of all observed groups of size `m`.
+            )pbdoc")
+        .def_readwrite("N", &edge_changes_with_histograms::N,"The number of nodes.")
+        .def_readwrite("t0", &edge_changes_with_histograms::t0,"The initial time.")
+        .def_readwrite("tmax", &edge_changes_with_histograms::tmax, "The final time.")
+        .def_readwrite("edges_initial", &edge_changes_with_histograms::edges_initial, R"pbdoc(A list containing the edges of the network at time `t0`)pbdoc");
 
     py::class_<group_sizes_and_durations>(m,"group_sizes_and_durations")
         .def(py::init<>())
-        .def_readwrite("contact_durations", &group_sizes_and_durations::contact_durations)
-        .def_readwrite("size_histograms", &group_sizes_and_durations::size_histograms)
-        .def_readwrite("size_histogram_differences", &group_sizes_and_durations::size_histogram_differences)
-        .def_readwrite("group_durations", &group_sizes_and_durations::group_durations)
-        .def_readwrite("aggregated_size_histogram", &group_sizes_and_durations::aggregated_size_histogram)
-        .def_readwrite("aggregated_network", &group_sizes_and_durations::aggregated_network);
+        .def_readwrite("contact_durations", &group_sizes_and_durations::contact_durations,
+            R"pbdoc(
+                A list of :obj:`float` s, each entry is the duration of a single contact.
+            )pbdoc")
+        .def_readwrite("size_histograms", &group_sizes_and_durations::size_histograms,
+            R"pbdoc(
+                A list of :obj:`dict` s, one dictionary for each edge list, containing the number of observed groups of size `m` at this time. Has only one entry if an instance of tacoma.edge_changes was provided.
+            )pbdoc")
+        .def_readwrite("size_histogram_differences", &group_sizes_and_durations::size_histogram_differences,
+            R"pbdoc(
+                A list :obj:`dict` , one dict for each time step, containing group sizes as keys and change of value to the previous time step as values.
+            )pbdoc")
+        .def_readwrite("group_durations", &group_sizes_and_durations::group_durations,
+            R"pbdoc(
+                A list of :obj:`list` s, the :math:`m`-th entry contains all durations of all observed groups of size $m$.
+            )pbdoc")
+        .def_readwrite("aggregated_size_histogram", &group_sizes_and_durations::aggregated_size_histogram,
+            R"pbdoc(
+                A list of :obj:`list` s, the :math:`m`-th entry contains the time-averaged number of groups of size :math:`m`, :math:`\overline{N_m}=(1/t_\mathrm{max})\int_0^{t_\mathrm{max}}dt N_m(t)`.
+            )pbdoc")
+        .def_readwrite("aggregated_network", &group_sizes_and_durations::aggregated_network,
+            R"pbdoc(
+                A :obj:`dict` where each (key, value)-pair is an edge and its corresponding total time it was active. 
+            )pbdoc");
 
     py::class_<edge_weight>(m,"edge_weight",R"pbdoc(Helper class for internal usage. Creates `value = 0` when initiated
     such that one can easily use it as a counter in a map without checking whether or not the object exists.)pbdoc")
@@ -682,9 +758,12 @@ PYBIND11_MODULE(_tacoma, m) {
 
         Optionally, dependent on the function which created this object, this object can
         contain edge similarities, which are defined as follows. 
-        Two edges are considered similar when they are connected to the same node at the same time
         Each edge :math:`i`, where
-        :math:`i` is the edge's index in the trajectory list, 
+        :math:`i` is the edge's index in the trajectory list, is considered similar to edge :math:`j`
+        if both are connected to the same node at the same time. Hence, if both :math:`i=(u,v)` and `j=(u,w)` have 
+        node :math:`u` in common, their similarity is 
+        
+        :math:`E_{ij} = \int\limits_0^{t_{\mathrm{max}}}dt\ A_{uv}(t)A_{uw}(t)`
     )pbdoc")
         .def(py::init<>())
         .def_readwrite("trajectories", &edge_trajectories::trajectories, R"pbdoc(Each entry of this list has properties `.edge` containing 

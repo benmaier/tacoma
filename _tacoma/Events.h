@@ -82,6 +82,16 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
             );
 
 pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
+    rewire_P_without_SI_checking_single_node_neighbor_affinity(
+                 size_t i,
+                 vector < set < size_t > * > & G, //Adjacency matrix
+                 double P,       //probability to connect with neighbors of neighbor
+                 vector < pair < vector < size_t >, vector < double > > > &neighbor_affinity,
+                 mt19937_64 & generator, 
+                 uniform_real_distribution<double> & distribution
+            );
+
+pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > > 
     rewire_P_neighbor_affinity(
                  vector < set < size_t > * > & G, //Adjacency matrix
                  double P,       //probability to connect with neighbors of neighbor
