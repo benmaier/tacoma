@@ -415,6 +415,8 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
 
     temporal_network = _get_raw_temporal_network(temporal_network)
 
+    ensure_empty_network = 'ensure_empty_network' in kwargs and kwargs['ensure_empty_network']
+
     if type(temporal_network) == el:
         temporal_network = convert(temporal_network)
 
@@ -432,21 +434,55 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
         beta = np.array(kw['disconnection_rate'])
 
         # compute single node rewiring rate and P factors
-        a_node, b_node = get_flockwork_node_parameters_alpha_and_beta(temporal_network, kw['reconnection_rate'], kw['disconnection_rate'],apply_mean_correction)
+        #print("estimating node specific parameters")
+        a_node, b_node = get_flockwork_node_parameters_alpha_and_beta(temporal_network, 
+                                                                      kw['reconnection_rate'], 
+                                                                      kw['disconnection_rate'],
+                                                                      apply_mean_correction,
+                                                                     )
+        #print("done")
         a_node = np.array(a_node)
         b_node = np.array(b_node)
 
         new_a_node = []
         new_b_node = []
 
+        if ensure_empty_network:
+            m_in, m_out, m = tc.edge_counts(temporal_network)
+            t_m = np.array([temporal_network.t0] + temporal_network.t + [temporal_network.tmax])
+            m = np.array(m)
+
+            last_bin_was_for_emptying = False
+
         # for each time bin
-        for t, a, b in zip(t, alpha, beta):
+        for it, (t_, a, b) in enumerate(zip(t, alpha, beta)):
 
             # multiply activity rates with normed factors s.t. the mean of a and b is conserved
             this_a_node = a_node * a
             this_b_node = b_node * b
 
-            new_a_node.append((t, this_a_node.tolist()))
+            if ensure_empty_network:
+                
+                if it+2 < len(t):
+
+                    # compute the number of total edges in this time bin and the next one
+                    ndx1 = np.where(np.logical_and(t_m >= t[it], t_m < t[it+1]))
+                    ndx2 = np.where(np.logical_and(t_m >= t[it+1], t_m < t[it+2]))
+
+                    m1 = np.sum(m[ndx1])
+                    m2 = np.sum(m[ndx2])
+
+                    # if there's no edges in this and the next time bin, ensure that all edges are removed in here
+                    if m1 == 0 and m2 == 0:
+                        if not last_bin_was_for_emptying:
+                            this_a_node = np.zeros_like(this_a_node)
+                            this_b_node = np.ones_like(this_b_node) * np.log(temporal_network.N) / (t[it+1] - t[it])
+                        last_bin_was_for_emptying = True
+                    else:
+                        last_bin_was_for_emptying = False
+
+
+            new_a_node.append((t_, this_a_node.tolist()))
             new_b_node.append(this_b_node.tolist())
 
         kw['reconnection_rates'] = new_a_node
