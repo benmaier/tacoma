@@ -7,7 +7,7 @@ and simulate Gillespie processes on them. Additionally
 provides some visualization tools.
 """
 
-__version__ = "0.0.20"
+__version__ = "0.0.26"
 
 from _tacoma import *
 

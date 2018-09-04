@@ -30,6 +30,8 @@ SIRS = _tc.SIRS
 
 
 def _get_raw_temporal_network(temporal_network):
+    """Return an instance of `edge_changes` if the temporal network was an instance of 
+    `edge_changes_with_histograms` (return `edge_lists` for `edge_lists_with_histograms`)."""
 
     if type(temporal_network) == ec_h:
         temporal_network = ec(temporal_network)
@@ -40,7 +42,8 @@ def _get_raw_temporal_network(temporal_network):
 
 
 def measure_group_sizes_and_durations(temporal_network,*args,**kwargs):
-    """Measures aggregated group size distribution, group size histogram for each time point, contact durations, inter-contact durations, durations of each group size, and the aggregated social network.
+    """Measures aggregated group size distribution, group size histogram for each time point, 
+    contact durations, inter-contact durations, durations of each group size, and the aggregated social network.
 
     Parameters
     ----------
@@ -55,6 +58,8 @@ def measure_group_sizes_and_durations(temporal_network,*args,**kwargs):
     -------
     :mod:`group_sizes_and_durations`
         The result of the measurements.
+        Note that `inter-contact durations` is just durations of groups of size 1 and hence correspond to the
+        first entry of :mod:`group_sizes_and_durations.group_durations`.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -70,6 +75,24 @@ def measure_group_sizes_and_durations(temporal_network,*args,**kwargs):
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
+
+def aggregated_network(temporal_network,*args,**kwargs):
+    """Measures the static network composed.
+
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+
+    Returns 
+    -------
+    aggregated_network : :obj:`dict` where keys are pairs of ints and values are floats
+        Keys represent edges and values represent the aggregated time spent together (in units
+        of time provided by the temporal network
+        
+    """
+
+    return measure_group_sizes_and_durations(temporal_network,*args,**kwargs).aggregated_network
     
 def degree_distribution(temporal_network,*args,**kwargs):
     """Measures the time-averaged degree distribution.
@@ -81,7 +104,7 @@ def degree_distribution(temporal_network,*args,**kwargs):
 
     Returns 
     -------
-    :obj:`list` of `float`
+    P_k : :obj:`list` of `float`
         A list of N entries where the k-th entry is the time-averaged probability of finding a node with degree k.
     """
 

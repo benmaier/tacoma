@@ -402,10 +402,6 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
         is empty (n_edges = 0) will be an artificially 
         set high gamma with P = 0, such that nodes will
         lose all edges. default : False
-    use_preferential_node_selection : bool, optional
-        this is just plainly copied to 
-        the returned kwargs if `aggregated_network`
-        is not empty. default : False
     verbose: bool, optional
         Be chatty.
 
@@ -503,10 +499,6 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes_randomly(temporal_networ
         is empty (n_edges = 0) will be an artificially 
         set high gamma with P = 0, such that nodes will
         lose all edges. default : False
-    use_preferential_node_selection : bool, optional
-        this is just plainly copied to 
-        the returned kwargs if `aggregated_network`
-        is not empty. default : False
     verbose: bool, optional
         Be chatty.
 
@@ -607,6 +599,9 @@ def estimate_flockwork_alpha_beta_args(temporal_network,*args,**kwargs):
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if 'aggregated_network' in kwargs and (kwargs['aggregated_network'] is None):
+        kwargs['aggregated_network'] = {}
 
     new_kwargs = {}
     with_affinity = 'aggregated_network' in kwargs and len(kwargs['aggregated_network']) > 0
