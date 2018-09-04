@@ -1177,7 +1177,8 @@ pair < vector < double >, vector < double > >
                 edge_changes &ec,
                 vector < pair < double, double > > &alpha,
                 vector < double > &beta,
-                bool apply_mean_correction
+                bool apply_mean_correction,
+                bool verbose
                 )
 {
     // get references to edge_list and time
@@ -1234,6 +1235,9 @@ pair < vector < double >, vector < double > >
     double t_next_ab;
     double t_next_ec;
     double t_next;
+
+    if (verbose)
+        cout << "number of nodes = " << N << endl;
 
     do
     {
@@ -1327,7 +1331,7 @@ pair < vector < double >, vector < double > >
 
         if (t_next_ab <= t_next_ec)
         {
-            // advance gamma and P
+            // advance <alpha> and <beta>
             ++it_a;
             ++it_b;
             ++it_t_ab;
@@ -1351,6 +1355,15 @@ pair < vector < double >, vector < double > >
 
     for (size_t node = 0; node < N; ++node)
     {
+        if (verbose)
+        {
+            cout << "node = " << node << "; " << "M_in = " << M_in[node] << endl;
+            cout << "node = " << node << "; " << "M_out = " << M_out[node] << endl;
+            cout << "node = " << node << "; " << "I_in_1 = " << I_in_1[node] << endl;
+            cout << "node = " << node << "; " << "I_out_1 = " << I_out_1[node] << endl;
+            cout << "node = " << node << "; " << "I_in_2 = " << I_in_2[node] << endl;
+            cout << "node = " << node << "; " << "I_out_2 = " << I_out_2[node] << endl;
+        }
         mean_M_in += M_in[node] / (double) N;
         mean_M_out += M_out[node] / (double) N;
         mean_I_in_1 += I_in_1[node] / (double) N;
@@ -1378,19 +1391,34 @@ pair < vector < double >, vector < double > >
 
         if (not apply_mean_correction)
         {
-            this_a = (M_in[node] - I_in_1[node]) / I_in_2[node];
-            this_b = (M_out[node] - I_out_1[node] - I_out_2[node] - this_a * I_out_1[node]) / I_out_2[node];
+            if (I_in_2[node] == 0.0)
+                this_a = 0.0;
+            else
+                this_a = (M_in[node] - I_in_1[node]) / I_in_2[node];
+
+            if (I_out_2[node] == 0.0)
+                this_b = 0.0;
+            else
+                this_b = (M_out[node] - I_out_1[node] - I_out_2[node] - this_a * I_out_1[node]) / I_out_2[node];
         }
         else
         {
-            this_a = (M_in[node] - mean_alpha * I_in_1[node]) / I_in_2[node];
-            this_b = (M_out[node] - mean_alpha * I_out_1[node] - mean_beta * I_out_2[node] - this_a * I_out_1[node]) / I_out_2[node];
+            if (I_in_2[node] == 0.0)
+                this_a = 0.0;
+            else
+                this_a = (M_in[node] - mean_alpha * I_in_1[node]) / I_in_2[node];
+
+            if (I_out_2[node] == 0.0)
+                this_b = 0.0;
+            else
+                this_b = (M_out[node] - mean_alpha * I_out_1[node] - mean_beta * I_out_2[node] - this_a * I_out_1[node]) / I_out_2[node];
         }
 
-        /*
-        cout << "node " << node << " ; alpha = "<< this_a << endl;
-        cout << "node " << node << " ; beta  = "<< this_b << endl;
-        */
+        if (verbose)
+        {
+            cout << "node " << node << " ; alpha = "<< this_a << endl;
+            cout << "node " << node << " ; beta  = "<< this_b << endl;
+        }
 
         if (this_a < 0.0)
             this_a = 0.0;

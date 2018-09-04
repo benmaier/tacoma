@@ -103,7 +103,8 @@ pair < vector < double >, vector < double > >
                 edge_changes &ec,
                 vector < pair < double, double > > &alpha,
                 vector < double > &beta,
-                bool apply_mean_correction = true
+                bool apply_mean_correction = true,
+                bool verbose = false
                 );
 
 flockwork_alpha_beta_args

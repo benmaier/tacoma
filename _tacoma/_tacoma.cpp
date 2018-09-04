@@ -429,7 +429,8 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("edge_changes"),
             py::arg("reconnection_rate"),
             py::arg("disconnecton_rate"),
-            py::arg("apply_mean_correction") = true
+            py::arg("apply_mean_correction") = true,
+            py::arg("verbose") = false
         );
 
     m.def("get_flockwork_node_rates_alpha_and_beta", get_time_dependent_node_alpha_and_beta,
