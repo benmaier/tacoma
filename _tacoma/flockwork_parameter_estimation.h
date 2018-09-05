@@ -103,6 +103,7 @@ pair < vector < double >, vector < double > >
                 edge_changes &ec,
                 vector < pair < double, double > > &alpha,
                 vector < double > &beta,
+                double k_over_k_real_scaling = 1.0,
                 bool apply_mean_correction = true,
                 bool verbose = false
                 );

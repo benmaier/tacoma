@@ -416,6 +416,9 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     ensure_empty_network = 'ensure_empty_network' in kwargs and kwargs['ensure_empty_network']
+    k_over_k_real_scaling = 1.0
+    if 'k_over_k_real_scaling' in kwargs:
+        k_over_k_real_scaling = kwargs['k_over_k_real_scaling']
 
     if type(temporal_network) == el:
         temporal_network = convert(temporal_network)
@@ -438,6 +441,7 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
         a_node, b_node = get_flockwork_node_parameters_alpha_and_beta(temporal_network, 
                                                                       kw['reconnection_rate'], 
                                                                       kw['disconnection_rate'],
+                                                                      k_over_k_real_scaling,
                                                                       apply_mean_correction,
                                                                      )
         #print("done")

@@ -1177,6 +1177,7 @@ pair < vector < double >, vector < double > >
                 edge_changes &ec,
                 vector < pair < double, double > > &alpha,
                 vector < double > &beta,
+                double k_over_k_real_scaling,
                 bool apply_mean_correction,
                 bool verbose
                 )
@@ -1261,7 +1262,7 @@ pair < vector < double >, vector < double > >
         // compute the integrals up to the next change
 
         double dt = t_next - t;
-        double mean_degree = ((double) number_of_edges) * 2.0 / Nf;
+        double mean_degree = ((double) number_of_edges) * 2.0 / Nf / k_over_k_real_scaling;
 
         auto i_k = k_node.begin();
         auto i_I_out_1 = I_out_1.begin();
@@ -1277,7 +1278,7 @@ pair < vector < double >, vector < double > >
 
         while(i_k != k_node.end())
         {
-            double _k = (double) *i_k;
+            double _k = ((double) *i_k) / k_over_k_real_scaling;
 
             (*i_I_out_1) += _a * _k * dt;
             (*i_I_out_2) += _b * _k * dt;

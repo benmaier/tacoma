@@ -429,6 +429,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("edge_changes"),
             py::arg("reconnection_rate"),
             py::arg("disconnecton_rate"),
+            py::arg("k_over_k_real_scaling") = 1.0,
             py::arg("apply_mean_correction") = true,
             py::arg("verbose") = false
         );
