@@ -1432,6 +1432,13 @@ pair < vector < double >, vector < double > >
 
         Alpha += this_a;
         Beta += this_b;
+
+        if (verbose)
+        {
+            cout << "node " << node << " ; corrected alpha = "<< this_a << endl;
+            cout << "node " << node << " ; corrected beta  = "<< this_b << endl;
+        }
+
     }
 
     Alpha /= (double) N;

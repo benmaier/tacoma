@@ -373,7 +373,7 @@ def estimate_flockwork_P_args(temporal_network,*args,**kwargs):
     return new_kwargs 
 
 def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
-                                                        estimate_for_each_time_bin=True,
+                                                        estimate_for_each_time_bin=False,
                                                         apply_mean_correction=False,*args,**kwargs):
     """Bins an `edge_changes` instance for each `dt` (after each step, respectively,
     if `N_time_steps` was provided) and computes the reconnection rate alpha and disconnection
@@ -415,6 +415,8 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
 
     temporal_network = _get_raw_temporal_network(temporal_network)
 
+    verbose = 'verbose' in kwargs and kwargs['verbose']
+
     ensure_empty_network = 'ensure_empty_network' in kwargs and kwargs['ensure_empty_network']
     k_over_k_real_scaling = 1.0
     if 'k_over_k_real_scaling' in kwargs:
@@ -443,6 +445,7 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
                                                                       kw['disconnection_rate'],
                                                                       k_over_k_real_scaling,
                                                                       apply_mean_correction,
+                                                                      verbose = verbose,
                                                                      )
         #print("done")
         a_node = np.array(a_node)
