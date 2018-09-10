@@ -413,6 +413,7 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("aggregated_network") = map < pair < size_t, size_t >, double >(),
             py::arg("ensure_empty_network") = false,
             py::arg("adjust_last_bin_if_dt_does_not_fit") = false,
+            py::arg("use_integral_method") = false,
             py::arg("verbose") = false
          );
 
@@ -747,9 +748,10 @@ PYBIND11_MODULE(_tacoma, m) {
         A list, for each node contains two lists, one containing the node's 
         neighbors and the second one containing the node affinity between them.)pbdoc")
         .def_readwrite("tmax", &flockwork_alpha_beta_args::tmax, R"pbdoc(The time at which the last value of `P` and the `rewiring_rate` changes (i.e. the maximum time until the parameteres are defined))pbdoc")
-        .def_readwrite("m", &flockwork_alpha_beta_args::m, "The number of edges in the network at this time")
-        .def_readwrite("m_in", &flockwork_alpha_beta_args::m_in, "The number of edges being created in the last time interval")
-        .def_readwrite("m_out", &flockwork_alpha_beta_args::m_out, "The number of edges being deleted in the last time interval")
+        .def_readwrite("M", &flockwork_alpha_beta_args::M, "The integral over number of edges in the last time interval.")
+        .def_readwrite("m", &flockwork_alpha_beta_args::M, "The number of edges in the last time interval.")
+        .def_readwrite("m_in", &flockwork_alpha_beta_args::m_in, "The number of edges being created in the last time interval.")
+        .def_readwrite("m_out", &flockwork_alpha_beta_args::m_out, "The number of edges being deleted in the last time interval.")
         .def_readwrite("new_time", &flockwork_alpha_beta_args::new_time, "The bin edges of the new time bins")
         ;
 

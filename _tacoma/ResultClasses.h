@@ -194,6 +194,7 @@ struct flockwork_alpha_beta_args {
     vector < double > new_time;
     vector < size_t > m_in;
     vector < size_t > m_out;
+    vector < double > M;
     vector < size_t > m;
 
 };

@@ -870,6 +870,7 @@ flockwork_alpha_beta_args
              map < pair < size_t, size_t >, double > &aggregated_network,
              const bool ensure_empty_network,
              const bool adjust_last_bin_if_dt_does_not_fit,
+             const bool use_integral_method,
              const bool verbose
              )
 {
@@ -927,8 +928,12 @@ flockwork_alpha_beta_args
     vector < size_t > m_in;
     vector < size_t > m_out;
     vector < size_t > m;
+    vector < double > M;
 
-    m.push_back( list_of_edge_changes.edges_initial.size() );
+    size_t number_of_edges = list_of_edge_changes.edges_initial.size();
+    m.push_back(number_of_edges);
+
+
     new_time.push_back( t0 );
 
     if (tmax < time.back())
@@ -939,6 +944,8 @@ flockwork_alpha_beta_args
         cout << "starting binning process with dt = " << dt << " and N_time_steps = " << N_time_steps << endl;
     }
 
+    double last_time = t0;
+
     // start at new_time = t0 + dt because t0 was already taken care of
     for(size_t t_i = 1; t_i < N_time_steps; t_i++)
     {
@@ -947,6 +954,7 @@ flockwork_alpha_beta_args
         // initialize the counts for this time bin
         m_in.push_back(0);
         m_out.push_back(0);
+        M.push_back( 0. );
 
         if (verbose)
         {
@@ -983,21 +991,26 @@ flockwork_alpha_beta_args
 
             m_in.back() += it_edges_in->size();
             m_out.back() += it_edges_out->size();
+
+            number_of_edges += (it_edges_in->size() - it_edges_out->size());
+
+            M.back() += (*it_time - last_time) * number_of_edges;
             
+            if (verbose)
+            {
+                cout << "number of edges = " << number_of_edges << endl;
+                cout << "dt = " << (*it_time - last_time) << endl;
+                cout << "M.back() = " << M.back() << endl;
+            }
+
+            last_time = *it_time;
             it_time++;
             it_edges_in++;
             it_edges_out++;
         }
 
-        size_t num_edges = 0;
-
-        for(auto const &neighbors: G)
-            num_edges += neighbors.size();
-
-        num_edges /= 2;
-
-        m.push_back( num_edges );
         new_time.push_back( this_new_time );
+        m.push_back(number_of_edges);
     }
 
     // ============== add the last time frame for looping ================
@@ -1029,9 +1042,12 @@ flockwork_alpha_beta_args
 
     m_in.push_back(incoming_edge_integers.size());
     m_out.push_back(outgoing_edge_integers.size());
+    number_of_edges += (incoming_edge_integers.size() - outgoing_edge_integers.size());
+    M.push_back( (tmax - last_time) * (number_of_edges));
     m.push_back( m.front() );
 
     // ========= now go through the observables and compute the parameters =============
+    auto it_M = M.begin();
     auto it_m = m.begin();
     auto it_m_in = m_in.begin();
     auto it_m_out = m_out.begin();
@@ -1045,6 +1061,7 @@ flockwork_alpha_beta_args
 
     while(it_m_in != m_in.end())
     {
+        double & this_M = *it_M;
         size_t & this_m = *it_m;
         size_t & this_m_in = *it_m_in;
         size_t & this_m_out = *it_m_out;
@@ -1059,7 +1076,7 @@ flockwork_alpha_beta_args
         }
 
 
-        if ( (this_m == 0) and ( this_m_out > 0) )
+        if ( (this_M == 0.0) and ( this_m_out > 0) )
         {
             /* this happens, e.g. in the beginning for cumulated bins. originally,
                the network is a null graph, so no edges can go out.
@@ -1081,14 +1098,22 @@ flockwork_alpha_beta_args
 
         double _m_out = (double) this_m_out;
         double _m_in = (double) this_m_in;
-        double _m = ((double) this_m) / k_over_k_real_scaling;
+        double _M = this_M / k_over_k_real_scaling;
+        double _m = ( (double) this_m ) / k_over_k_real_scaling;
 
-        _a = _m_in / (N+2.0*_m) / dt;
+        double edge_observable;
 
-        if ( (_m_out == 0.0) and (_m == 0.0) )
+        if (use_integral_method)
+            edge_observable = _M;
+        else
+            edge_observable = _m * dt;
+
+        _a = _m_in / (N*dt+2.0*edge_observable);
+
+        if ( (_m_out == 0.0) and (edge_observable == 0.0) )
             _b = 0.0;
         else
-            _b = (_m_out / 2.0 / _m) / dt - _a;
+            _b = (_m_out / 2.0 / edge_observable) - _a;
 
         if (_b < 0.0)
             _b = 0.0;
@@ -1096,8 +1121,8 @@ flockwork_alpha_beta_args
         // if in the beginning of this bin and at the end of this bin
         // there's no edges and we want this to be ensured
         if ( ( ensure_empty_network ) and 
-             ( this_m == 0 ) and 
-             ( *(it_m+1) == 0 ) and
+             ( this_M == 0.0 ) and 
+             ( *(it_M+1) == 0.0 ) and
              ( _a == 0.0 ) and 
              ( _b == 0.0 )
            )
@@ -1126,6 +1151,7 @@ flockwork_alpha_beta_args
         alpha.push_back( make_pair( *it_time, _a ) );
         beta.push_back( _b );
 
+        it_M++; 
         it_m++; 
         it_m_in++;
         it_m_out++; 
@@ -1142,6 +1168,7 @@ flockwork_alpha_beta_args
     fw_args.new_time = new_time;
     fw_args.m_in = m_in;
     fw_args.m_out = m_out;
+    fw_args.M = M;
     fw_args.m = m;
 
     if (aggregated_network.size() > 0)
