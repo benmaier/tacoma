@@ -1400,8 +1400,11 @@ pair < vector < double >, vector < double > >
         mean_I_out_2 += I_out_2[node] / (double) N;
     }
 
+    //double mean_alpha = mean_M_in / ( mean_I_in_1 + mean_I_in_2 );
+    //double mean_beta = mean_M_out / ( mean_I_out_1 + mean_I_out_2 ) - mean_alpha;
     double mean_alpha = mean_M_in / ( mean_I_in_1 + mean_I_in_2 );
-    double mean_beta = mean_M_out / ( mean_I_out_1 + mean_I_out_2 ) - mean_alpha;
+    double mean_beta = (mean_M_out*0.5 - mean_alpha) / mean_I_out_2;
+
 
     for (size_t node = 0; node < N; ++node)
     {
@@ -1663,8 +1666,11 @@ pair < vector < vector < double > >, vector < vector < double > > >
                 mean_I_out_2 += I_out_2[node] / (double) N;
             }
 
+            //double mean_alpha = mean_M_in / ( mean_I_in_1 + mean_I_in_2 );
+            //double mean_beta = mean_M_out / ( mean_I_out_1 + mean_I_out_2 ) - mean_alpha;
             double mean_alpha = mean_M_in / ( mean_I_in_1 + mean_I_in_2 );
-            double mean_beta = mean_M_out / ( mean_I_out_1 + mean_I_out_2 ) - mean_alpha;
+            double mean_beta = (mean_M_out*0.5 - mean_alpha) / mean_I_out_2;
+
 
             if (( mean_I_in_1 + mean_I_in_2 ) == 0.0)
                 mean_alpha = 0.0;
