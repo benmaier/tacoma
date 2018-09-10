@@ -992,10 +992,10 @@ flockwork_alpha_beta_args
             m_in.back() += it_edges_in->size();
             m_out.back() += it_edges_out->size();
 
-            number_of_edges += (it_edges_in->size() - it_edges_out->size());
-
             M.back() += (*it_time - last_time) * number_of_edges;
             
+            number_of_edges += (it_edges_in->size() - it_edges_out->size());
+
             if (verbose)
             {
                 cout << "number of edges = " << number_of_edges << endl;
