@@ -412,8 +412,8 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("beta_scaling") = 1.0,
             py::arg("aggregated_network") = map < pair < size_t, size_t >, double >(),
             py::arg("ensure_empty_network") = false,
-            py::arg("adjust_last_bin_if_dt_does_not_fit") = false,
-            py::arg("use_integral_method") = false,
+            py::arg("adjust_last_bin_if_dt_does_not_fit") = true,
+            py::arg("use_integral_method") = true,
             py::arg("verbose") = false
          );
 
