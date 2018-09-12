@@ -110,6 +110,21 @@ def get_logarithmic_histogram(data,
         return x, y
 
 def group_size_histogram(group_sizes_and_durations):
+    """Returns the mean number of groups of size `g`
+    (mean over both ensemble and time).
+
+    Parameters
+    ==========
+    group_sizes_and_durations : :mod:`group_sizes_and_durations`
+        Result from the function :mod:`measure_group_sizes_and_durations`
+
+    Returns
+    =======
+    g : :obj:`numpy.ndarray` of float
+        Group sizes
+    N : :obj:`numpy.ndarray` of float
+        Mean number of groups of the corresponding size in `g`.
+    """
 
     group_size_histogram = np.array([
                             (size, val)\
@@ -123,7 +138,21 @@ def group_size_histogram(group_sizes_and_durations):
 
 
 def mean_coordination_number(group_sizes_and_durations):
+    """Returns the mean coordination number (mean over both ensemble and time).
+    Following the definition by Zhao, Stehle, Bianconi, Barrat,
+    the coordination number of node `i` is equal to the size of the group
+    it is part of.
 
+    Parameters
+    ==========
+    group_sizes_and_durations : :mod:`group_sizes_and_durations`
+        Result from the function :mod:`measure_group_sizes_and_durations`
+
+    Returns
+    =======
+    mean_coordination_number : float
+        Temporal and ensemble mean of a node's group size.
+    """
 
     m, N_m = group_size_histogram(group_sizes_and_durations)
 
@@ -135,6 +164,19 @@ def mean_coordination_number(group_sizes_and_durations):
 
 
 def mean_number_of_groups(group_sizes_and_durations):
+    """Returns the mean number of groups (mean over both ensemble and time).
+
+    Parameters
+    ==========
+    group_sizes_and_durations : :mod:`group_sizes_and_durations`
+        Result from the function :mod:`measure_group_sizes_and_durations`
+
+    Returns
+    =======
+    mean_number_of_groups : float
+        Temporal and ensemble mean of the total number of groups
+        a network consists of at a certain time.
+    """
 
     m, N_m = group_size_histogram(group_sizes_and_durations)
 
@@ -142,6 +184,20 @@ def mean_number_of_groups(group_sizes_and_durations):
 
 
 def mean_group_size(group_sizes_and_durations):
+    """Returns the mean group size (mean over both ensemble and time).
+
+    Parameters
+    ==========
+    group_sizes_and_durations : :mod:`group_sizes_and_durations`
+        Result from the function :mod:`measure_group_sizes_and_durations`
+
+    Returns
+    =======
+    mean_group_size : float
+        Temporal and ensemble mean of the group size of all groups
+        a network consists of at a certain time.
+    """
+
 
     N = len( group_sizes_and_durations.aggregated_size_histogram) - 1
     c = mean_number_of_groups(group_sizes_and_durations)
@@ -149,6 +205,21 @@ def mean_group_size(group_sizes_and_durations):
     return float(N) / c
 
 def slow_mean_degree(temporal_network):
+    """Returns the mean degree (mean over ensemble) but it takes
+    ages to compute. You should instead use :mod:`mean_degree`.
+
+    Parameters
+    ==========
+    temporal_network : :mod:`edge_lists` or :mod:`edge_changes`
+
+    Returns
+    =======
+    t : float
+        Temporal and ensemble mean of the node degree.
+    mean_degree : float
+        Temporal and ensemble mean of the node degree.
+    """
+
 
     temporal_network = tc._get_raw_temporal_network(temporal_network)
 
@@ -262,6 +333,21 @@ def sample_a_function(x,y,time_points,sample_width=0):
 
 
 def rescale_time(temporal_network, new_t0, new_tmax):
+    """Rescale the time in this temporal network (inplace).
+    
+    Parameters
+    ==========
+    temporal_network : :mod:`edge_lists` or :mod:`edge_changes`
+    new_t0 : float
+        The new value of t0.
+    new_tmax : float
+        The new value of tmax.
+
+    Returns
+    =======
+    temporal_network : :mod:`edge_lists` or :mod:`edge_changes`
+        Same instance as input.
+    """
 
     if hasattr(temporal_network,'t0'):
         this_t0 = temporal_network.t0
