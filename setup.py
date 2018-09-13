@@ -5,7 +5,7 @@ import setuptools
 from setuptools.command.build_ext import build_ext
 import os, sys
 
-__version__ = '0.0.26'
+__version__ = '0.0.27'
 
 class get_pybind_include(object):
     """Helper class to determine the pybind11 include path
@@ -26,6 +26,7 @@ ext_modules = [
         [ 
             '_tacoma/Utilities.cpp', 
             '_tacoma/Events.cpp', 
+            '_tacoma/slice.cpp', 
             '_tacoma/activity_model.cpp',
             '_tacoma/verify_formats.cpp', 
             '_tacoma/measurements.cpp', 

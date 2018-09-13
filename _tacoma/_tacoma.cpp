@@ -57,6 +57,7 @@
 #include "concatenation.h"
 #include "flockwork_parameter_estimation.h"
 #include "activity_model.h"
+#include "slice.h"
 
 using namespace std;
 namespace py = pybind11;
@@ -317,6 +318,20 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
+            py::arg("verbose") = false
+         );
+
+    m.def("slice_edge_lists", &slice_edge_lists, R"pbdoc(Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but only for times new_t0 <= t < new_tmax.)pbdoc",
+            py::arg("edge_lists"),
+            py::arg("new_t0"),
+            py::arg("new_tmax"),
+            py::arg("verbose") = false
+         );
+
+    m.def("slice_edge_changes", &slice_edge_changes, R"pbdoc(Get a temporal network as a list of edge changes, given another instance of `edge_changes`, but only for times new_t0 <= t < new_tmax.)pbdoc",
+            py::arg("edge_changes"),
+            py::arg("new_t0"),
+            py::arg("new_tmax"),
             py::arg("verbose") = false
          );
 

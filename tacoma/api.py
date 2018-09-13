@@ -151,6 +151,38 @@ def bin(temporal_network,*args,**kwargs):
 
     return result
     
+def slice(temporal_network,new_t0,new_tmax,verbose=False):
+    """Get a slice of a temporal network for times new_t0 <= t < new_tmax.
+
+    Parameters
+    ----------
+    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+        An instance of a temporal network.
+    new_t0 : float
+        Where the slice should begin.
+    new_t0 : float
+        Where the slice should end.
+    verbose: bool, optional
+        Be chatty.
+        default : False
+
+    Returns
+    -------
+    :mod:`edge_lists` or :mod:`edge_changes` 
+        Sliced network (type depending on input type).
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == ec:
+        result = _tc.slice_edge_changes(temporal_network,new_t0,new_tmax,verbose)
+    elif type(temporal_network) == el:
+        result = _tc.slice_edge_lists(temporal_network,new_t0,new_tmax,verbose)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+
+    return result
+    
 def sample(temporal_network,*args,**kwargs):
     """Samples a temporal network after each `dt` (after each step, respectively, if `N_time_steps` was provided).
 
