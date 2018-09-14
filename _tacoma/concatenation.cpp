@@ -103,11 +103,6 @@ edge_changes
     set < string > time_units;
     string all_notes = "";
 
-    // TODO: write a procedure that efficiently checks the 
-    // node integer maps and remaps integers which 
-    // point to different node names
-    // map < size_t, string > new_int_to_node;
-
     // iterate through all edge_changes
     while ( ec_it != ec_lists.end() )
     {
@@ -351,10 +346,6 @@ edge_lists
 
     set < string > time_units;
     string all_notes = "";
-
-    // TODO: write a procedure that efficiently checks the 
-    // node integer maps and remaps integers which 
-    // point to different node names
 
     // iterate through all edge_changes
     while ( ec_it != el_lists.end() )
