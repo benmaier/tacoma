@@ -54,8 +54,9 @@ unweighted temporal networks, with a focus on (but not limited to) human face-to
 If you get compiling errors, make sure that [pybind11](https://github.com/pybind/pybind11) is installed.
 
     $ git clone https://github.com/benmaier/tacoma
-    $ pip install pybind11
     $ pip install ./tacoma
+
+Note that a C++11-compiler has to be installed on the system before installing `tacoma`.
 
 ## Examples
 
