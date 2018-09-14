@@ -17,7 +17,7 @@ and visualize it interactively, do the following.
 >>> visualize(temporal_network, frame_dt = 20)
 ```
 
-![visualization example](https://github.com/benmaier/tacoma/raw/master/img/ht09_example.gif)
+![visualization example](https://github.com/benmaier/tacoma/raw/master/img/ht09_extensive_example.gif)
 
 ## What is tacoma?
 
