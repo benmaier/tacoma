@@ -27,7 +27,9 @@ unweighted temporal networks, with a focus on (but not limited to) human face-to
 ### Pros of using tacoma
 
 * networks are natively described in continuous time
-* two main native formats to describe temporal networks (`tc.edge_lists` and `tc.edge_changes`)
+* two main native formats to describe temporal networks (`tc.edge_lists` and `tc.edge_changes`),
+  a third way, a sorted list of `on`-intervals for each list called `tc.edge_trajectories` is
+  available, but algorithms work on the two native formats only
 * the simple portable file-format `.taco` as a standardized way to share temporal network data
   (which is just the data dumped to a `.json`-file, a simple file format readable from a
   variety of languages)
