@@ -114,6 +114,9 @@ setup(
     long_description = '',
     packages = setuptools.find_packages(),
     ext_modules = ext_modules,
+    setup_requires = [
+            'pybind11>=2.0.0'
+            ],
     install_requires = [
             'pybind11>=2.0.0',
             'wget',
