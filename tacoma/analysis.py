@@ -27,7 +27,8 @@ def temporal_network_group_analysis(result,
                                     fit_power_law = False,
                                     ax = None,
                                    ):
-    """Analyze the result of :mod:`tacoma.measure_group_sizes_and_durations`
+    """Analyze the result of 
+    :func:`measure_group_sizes_and_durations`
     and plot it.
 
     Parameters

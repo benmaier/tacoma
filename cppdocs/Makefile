@@ -216,7 +216,14 @@ pseudoxml:
 	@echo
 	@echo "Build finished. The pseudo-XML files are in $(BUILDDIR)/pseudoxml."
 
+rst:
+	sphinx-apidoc -f -o . ..
 
 show:
 	open -n -a "Google Chrome" "http://localhost:1313"
 	cd _build/html && python -m "http.server" 1313 & 
+
+dev:
+	make clean
+	make html
+	python -m "http.server" 1313

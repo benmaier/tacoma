@@ -47,7 +47,7 @@ def measure_group_sizes_and_durations(temporal_network,ignore_size_histogram=Fal
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     ignore_size_histogram : bool, optional
         Don't compute the single time point group size histograms (save time and memory). default : False
@@ -56,10 +56,10 @@ def measure_group_sizes_and_durations(temporal_network,ignore_size_histogram=Fal
 
     Returns 
     -------
-    :mod:`group_sizes_and_durations`
+    :class:`_tacoma.group_sizes_and_durations`
         The result of the measurements.
         Note that `inter-contact durations` is just durations of groups of size 1 and hence correspond to the
-        first entry of :mod:`group_sizes_and_durations.group_durations`.
+        first entry of :class:`_tacoma.group_sizes_and_durations.group_durations`.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -87,7 +87,7 @@ def aggregated_network(temporal_network):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
 
     Returns 
@@ -105,7 +105,7 @@ def degree_distribution(temporal_network):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
 
     Returns 
@@ -130,7 +130,7 @@ def bin(temporal_network, dt=0.0, N_time_steps=0, verbose=False):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     dt : float
         The demanded bin size. default : 0.0
@@ -141,7 +141,7 @@ def bin(temporal_network, dt=0.0, N_time_steps=0, verbose=False):
 
     Returns
     -------
-    :mod:`edge_lists` 
+    :class:`_tacoma.edge_lists` 
         An edge_lists instance with one edge list describing the network as a list of all edges
         that were present in the last time bin.
     """
@@ -162,7 +162,7 @@ def slice(temporal_network,new_t0,new_tmax,verbose=False):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     new_t0 : float
         Where the slice should begin.
@@ -174,7 +174,7 @@ def slice(temporal_network,new_t0,new_tmax,verbose=False):
 
     Returns
     -------
-    :mod:`edge_lists` or :mod:`edge_changes` 
+    :class:`_tacoma.edge_lists` or :class:`_tacoma.edge_changes` 
         Sliced network (type depending on input type).
     """
 
@@ -194,7 +194,7 @@ def sample(temporal_network,dt=0.0,N_time_steps=0,sample_aggregates=False,verbos
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     dt : float
         The demanded bin size. default : 0.0
@@ -210,7 +210,7 @@ def sample(temporal_network,dt=0.0,N_time_steps=0,sample_aggregates=False,verbos
 
     Returns
     -------
-    :mod:`edge_lists` 
+    :class:`_tacoma.edge_lists` 
         An edge_lists instance with one edge list describing the network states after every time bin.
     """
 
@@ -240,7 +240,7 @@ def binned_social_trajectory(temporal_network,node, dt=0.0, N_time_steps =0,verb
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     node : int
         The node for which to compute the social trajectory
@@ -283,7 +283,7 @@ def social_trajectory(temporal_network, node, verbose = False):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     node : int
         The node for which to compute the social trajectory
@@ -292,7 +292,7 @@ def social_trajectory(temporal_network, node, verbose = False):
 
     Returns
     -------
-    :obj:`list` of :mod:`social_trajectory_entry`
+    :obj:`list` of :class:`_tacoma.social_trajectory_entry`
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -312,20 +312,20 @@ def gillespie_SIS(temporal_network,SIS,is_static=False,verbose=False):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
-    SIS : :mod:`SIS`
+    SIS : :class:`_tacoma.SIS`
         An initialized SIS object.
     is_static : bool, default : False
         The algorithm works a bit differently if it knows that the network is actually static.
-        It works only with instances of :mod:`edge_lists`.
+        It works only with instances of :class:`_tacoma.edge_lists`.
     verbose: bool, optional
         Be chatty.
 
     Returns
     -------
     None
-        But the observables are saved in the :mod:`SIS` object.
+        But the observables are saved in the :class:`_tacoma.SIS` object.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -344,20 +344,20 @@ def gillespie_node_based_SIS(temporal_network,SIS,is_static=False,verbose=False)
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
-    SIS : :mod:`SIS_NB`
+    SIS : :class:`_tacoma.SIS_node_based`
         An initialized node-based SIS object.
     is_static : bool, default : False
         The algorithm works a bit differently if it knows that the network is actually static.
-        It works only with instances of :mod:`edge_lists`.
+        It works only with instances of :class:`_tacoma.edge_lists`.
     verbose: bool, optional
         Be chatty.
 
     Returns
     -------
     None
-        But the observables are saved in the :mod:`SIS` object.
+        But the observables are saved in the :class:`_tacoma.SIS` object.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -376,20 +376,20 @@ def gillespie_SI(temporal_network,SI,is_static=False,verbose=False):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
-    SI : :mod:`SI`
+    SI : :class:`_tacoma.SI`
         An initialized SI object.
     is_static : bool, default : False
         The algorithm works a bit differently if it knows that the network is actually static.
-        It works only with instances of :mod:`edge_lists`.
+        It works only with instances of :class:`_tacoma.edge_lists`.
     verbose: bool, optional
         Be chatty.
 
     Returns
     -------
     None
-        But the observables are saved in the :mod:`SI` object.
+        But the observables are saved in the :class:`_tacoma.SI` object.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -409,20 +409,20 @@ def gillespie_SIR(temporal_network,SIR,is_static=False,verbose=False):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
-    SIR : :mod:`SIR`
+    SIR : :class:`_tacoma.SIR`
         An initialized SIR object.
     is_static : bool, default : False
         The algorithm works a bit differently if it knows that the network is actually static.
-        It works only with instances of :mod:`edge_lists`.
+        It works only with instances of :class:`_tacoma.edge_lists`.
     verbose: bool, optional
         Be chatty.
 
     Returns
     -------
     None
-        But the observables are saved in the :mod:`SIR` object.
+        But the observables are saved in the :class:`_tacoma.SIR` object.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -441,20 +441,20 @@ def gillespie_SIRS(temporal_network,SIRS,is_static=False,verbose=False):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
-    SIRS : :mod:`SIRS`
+    SIRS : :class:`_tacoma.SIRS`
         An initialized SIRS object.
     is_static : bool, default : False
         The algorithm works a bit differently if it knows that the network is actually static.
-        It works only with instances of :mod:`edge_lists`.
+        It works only with instances of :class:`_tacoma.edge_lists`.
     verbose: bool, optional
         Be chatty.
 
     Returns
     -------
     None
-        But the observables are saved in the :mod:`SIRS` object.
+        But the observables are saved in the :class:`_tacoma.SIRS` object.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
@@ -472,7 +472,7 @@ def get_edge_trajectories(temporal_network,return_edge_similarities=False,verbos
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     return_edge_similarities : bool, optional
         If this is `True`, return the similarity between edges. default : False
@@ -481,12 +481,12 @@ def get_edge_trajectories(temporal_network,return_edge_similarities=False,verbos
 
     Returns
     -------
-    edge_trajectories.trajectories
+    trajectories : :class:`_tacoma.edge_trajectories.trajectories`
         a list of `edge_trajectory_entry` objects, which contain
         the `.time_pairs` attributes, a list of time pairs (t0, t1)
         for time t0 <= t <= t1 in which the edge existed and `.edge`
         a pair of node integers.
-    edge_trajectories.edge_similarities 
+    similarities : :class:`_tacoma.edge_trajectories.edge_similarities`
         a list of triples ( u, v, similarity ) where
         `u` and `v` refer to the edge indices in
         `edge_trajectories.trajectories` and similarity
@@ -519,7 +519,7 @@ def verify(temporal_network,verbose=False):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     verbose: bool, optional
         If this is `True`, cout all errors that were found. default : False
@@ -542,11 +542,11 @@ def verify(temporal_network,verbose=False):
     return result
 
 def convert(temporal_network,verbose=False):
-    """Converts either an instance of :mod:`edge_changes` to an instance of :mod:`edge_lists` or vice versa.
+    """Converts either an instance of :class:`_tacoma.edge_changes` to an instance of :class:`_tacoma.edge_lists` or vice versa.
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     verbose: bool, optional
         Be chatty.
@@ -568,11 +568,11 @@ def convert(temporal_network,verbose=False):
     return result
 
 def concatenate(list_of_temporal_networks, verbose):
-    """Concatenates a list of either :mod:`edge_changes` or :mod:`edge_lists` to a single instance of :mod:`edge_changes` or :mod:`edge_lists`, respectively.
+    """Concatenates a list of either :class:`_tacoma.edge_changes` or :class:`_tacoma.edge_lists` to a single instance of :class:`_tacoma.edge_changes` or :class:`_tacoma.edge_lists`, respectively.
 
     Parameters
     ----------
-    temporal_network : :obj:`list` of :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :obj:`list` of :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         A list of a temporal networks.
     verbose: bool, optional
         Be chatty.
@@ -600,7 +600,7 @@ def mean_degree(temporal_network):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         A list of a temporal networks.
 
     Returns
@@ -630,7 +630,7 @@ def edge_counts(temporal_network):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         A list of a temporal networks.
 
     Returns

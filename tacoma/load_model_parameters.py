@@ -21,7 +21,7 @@ def load_ht09_dyn_RGG_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.dynamic_RGG`.
+        The `kwargs` to pass to :func:`tacoma.dynamic_RGG`.
     """
 
     fn = os.path.join(path,'ht09_dyn_RGG_params.json')
@@ -34,7 +34,7 @@ def load_ht09_ZSBB_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.ZSBB_model`.
+        The `kwargs` to pass to :func:`tacoma.ZSBB_model`.
     """
 
     fn = os.path.join(path,'ht09_zsbb_params.json')
@@ -57,7 +57,7 @@ def load_ht09_flockwork_params(scaled=False):
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.flockwork_P_varying_rates`.
+        The `kwargs` to pass to :func:`tacoma.flockwork_P_varying_rates`.
     """
 
     if scaled:
@@ -76,7 +76,7 @@ def load_ht09_flockwork_unscaled_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.flockwork_P_varying_rates`.
+        The `kwargs` to pass to :func:`tacoma.flockwork_P_varying_rates`.
     """
 
     return load_ht09_flockwork_params(False)
@@ -89,7 +89,7 @@ def load_ht09_flockwork_scaled_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.flockwork_P_varying_rates`.
+        The `kwargs` to pass to :func:`tacoma.flockwork_P_varying_rates`.
     """
 
     return load_ht09_flockwork_params(True)
@@ -101,7 +101,7 @@ def load_dtu_dyn_RGG_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.dynamic_RGG`.
+        The `kwargs` to pass to :func:`tacoma.dynamic_RGG`.
     """
 
     fn = os.path.join(path,'dtu_dyn_RGG_params.json')
@@ -114,7 +114,7 @@ def load_dtu_ZSBB_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.ZSBB_model`.
+        The `kwargs` to pass to :func:`tacoma.ZSBB_model`.
     """
 
     fn = os.path.join(path,'dtu_zsbb_params.json')
@@ -137,7 +137,7 @@ def load_dtu_flockwork_params(scaled=False):
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.flockwork_P_varying_rates`.
+        The `kwargs` to pass to :func:`tacoma.flockwork_P_varying_rates`.
     """
 
     if scaled:
@@ -155,7 +155,7 @@ def load_dtu_flockwork_unscaled_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.flockwork_P_varying_rates`.
+        The `kwargs` to pass to :func:`tacoma.flockwork_P_varying_rates`.
     """
 
     return load_dtu_flockwork_params(False)
@@ -168,7 +168,7 @@ def load_dtu_flockwork_scaled_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.flockwork_P_varying_rates`.
+        The `kwargs` to pass to :func:`tacoma.flockwork_P_varying_rates`.
     """
 
     return load_dtu_flockwork_params(True)
@@ -181,7 +181,7 @@ def load_hs13_dyn_RGG_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.dynamic_RGG`.
+        The `kwargs` to pass to :func:`tacoma.dynamic_RGG`.
     """
 
     fn = os.path.join(path,'ht09_dyn_RGG_params.json')
@@ -194,7 +194,7 @@ def load_hs13_ZSBB_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.ZSBB_model`.
+        The `kwargs` to pass to :func:`tacoma.ZSBB_model`.
     """
 
     fn = os.path.join(path,'ht09_zsbb_params.json')
@@ -217,7 +217,7 @@ def load_hs13_flockwork_params(scaled=False):
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.flockwork_P_varying_rates`.
+        The `kwargs` to pass to :func:`tacoma.flockwork_P_varying_rates`.
     """
 
     if scaled:
@@ -236,7 +236,7 @@ def load_hs13_flockwork_unscaled_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.flockwork_P_varying_rates`.
+        The `kwargs` to pass to :func:`tacoma.flockwork_P_varying_rates`.
     """
 
     return load_hs13_flockwork_params(False)
@@ -249,7 +249,7 @@ def load_hs13_flockwork_scaled_params():
     Returns
     -------
     :obj:`dict`
-        The `kwargs` to pass to :mod:`tacoma.flockwork_P_varying_rates`.
+        The `kwargs` to pass to :func:`tacoma.flockwork_P_varying_rates`.
     """
 
     return load_hs13_flockwork_params(True)

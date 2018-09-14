@@ -584,7 +584,7 @@ PYBIND11_MODULE(_tacoma, m) {
         .def(py::init<>())
         .def(py::init<const edge_changes_with_histograms &>(),
                 py::arg("edge_changes_with_histograms"),
-                "Initialize from an instance of :mod:`edge_changes_with_histograms`"
+                "Initialize from an instance of :class:`_tacoma.edge_changes_with_histograms`"
             )
         .def("copy_from", &edge_changes::copy_from, R"pbdoc([deprecated] copy the relevant information from an instance of :mod:`edge_changes_with_histograms`)pbdoc")
         .def_readwrite("int_to_node", &edge_changes::int_to_node, R"pbdoc(A dictionary int -> string which keeps the original node names.)pbdoc")
@@ -605,7 +605,7 @@ PYBIND11_MODULE(_tacoma, m) {
         .def(py::init<>())
         .def(py::init<const edge_lists_with_histograms &>(),
                 py::arg("edge_lists_with_histograms"),
-                "Initialize from an instance of :mod:`edge_lists_with_histograms`"
+                "Initialize from an instance of :class:`_tacoma.edge_lists_with_histograms`"
             )
         .def("copy_from", &edge_lists::copy_from, R"pbdoc([deprecated] copy the relevant information from an instance of :mod:`edge_lists_with_histograms`)pbdoc")
         .def_readwrite("int_to_node", &edge_lists::int_to_node, R"pbdoc(A dictionary int -> string which keeps the original node names.)pbdoc")
@@ -618,7 +618,7 @@ PYBIND11_MODULE(_tacoma, m) {
 
     py::class_<edge_lists_with_histograms>(m,"edge_lists_with_histograms",
             R"pbdoc(
-                Similar to the :mod:`edge_lists` class but with additional analysis results.
+                Similar to the :class:`_tacoma.edge_lists` class but with additional analysis results.
             )pbdoc")
         .def(py::init<>())
         .def_readwrite("t", &edge_lists_with_histograms::t, 
@@ -642,7 +642,7 @@ PYBIND11_MODULE(_tacoma, m) {
 
     py::class_<edge_changes_with_histograms>(m,"edge_changes_with_histograms",
             R"pbdoc(
-                Similar to the :mod:`edge_changes` class but with additional analysis results.
+                Similar to the :class:`_tacoma.edge_changes` class but with additional analysis results.
             )pbdoc")
         .def(py::init<>())
         .def_readwrite("t", &edge_changes_with_histograms::t, R"pbdoc(An ordered list containing the time points at which changes occur.)pbdoc")
@@ -709,7 +709,7 @@ PYBIND11_MODULE(_tacoma, m) {
         .def(py::init<>())
         .def_readwrite("value", &edge_weight::value);
 
-    py::class_<social_trajectory_entry>(m,"social_trajectory_entry","Each :mod:`social_trajectory_entry` ")
+    py::class_<social_trajectory_entry>(m,"social_trajectory_entry","Each :class:`_tacoma.social_trajectory_entry` ")
         .def(py::init<>())
         .def_readwrite("hash", &social_trajectory_entry::hash, "A group identifier which has low probability of doubling.")
         .def_readwrite("size", &social_trajectory_entry::size, "Number of nodes within this group.")
@@ -718,7 +718,7 @@ PYBIND11_MODULE(_tacoma, m) {
     py::class_<edge_trajectory_entry>(m,"edge_trajectory_entry",R"pbdoc(
         This is an entry of an edge-based notation of a temporal 
         network. Instead of getting lists of edges
-        ordered in time, a list of :mod:`edge_trajectory_entry` contains, 
+        ordered in time, a list of :class:`_tacoma.edge_trajectory_entry` contains, 
         for each edge, a list of time pairs denoting the times the edge exists.
          )pbdoc")
         .def(py::init<>())
@@ -772,7 +772,7 @@ PYBIND11_MODULE(_tacoma, m) {
 
     py::class_<edge_trajectories>(m,"edge_trajectories",R"pbdoc(
         Instead of getting lists of edges ordered in time, this description 
-        of a temporal network consists of a list of :mod:`edge_trajectory_entry`. Each entry
+        of a temporal network consists of a list of :class:`_tacoma.edge_trajectory_entry`. Each entry
         contains the edge and a list of time pairs denoting the times the edge exists.
 
         Optionally, dependent on the function which created this object, this object can
@@ -792,7 +792,7 @@ PYBIND11_MODULE(_tacoma, m) {
             is their similarity.
         )pbdoc");
 
-    py::class_<SIS>(m,"SIS","Base class for the simulation of an SIS compartmental infection model on a temporal network. Pass this to :mod:`gillespie_SIS` to simulate and retrieve the simulation results.")
+    py::class_<SIS>(m,"SIS","Base class for the simulation of an SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIS` to simulate and retrieve the simulation results.")
         .def(py::init<size_t,double,double,double,size_t,size_t,bool,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
