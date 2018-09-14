@@ -1,0 +1,6 @@
+pybind11==2.2.3
+python-louvain==0.10
+scipy==1.1.0
+wget==3.2
+numpy==1.14.5
+lmfit==0.9.11
