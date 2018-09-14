@@ -41,7 +41,7 @@ def _get_raw_temporal_network(temporal_network):
     return temporal_network 
 
 
-def measure_group_sizes_and_durations(temporal_network,*args,**kwargs):
+def measure_group_sizes_and_durations(temporal_network,ignore_size_histogram=False,verbose=False):
     """Measures aggregated group size distribution, group size histogram for each time point, 
     contact durations, inter-contact durations, durations of each group size, and the aggregated social network.
 
@@ -68,15 +68,21 @@ def measure_group_sizes_and_durations(temporal_network,*args,**kwargs):
         if "ignore_size_histograms" in kwargs:
             val = kwargs.pop("ignore_size_histograms")
             kwargs["ignore_size_histogram_differences"] = val
-        result = _tc.measure_group_sizes_and_durations_for_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.measure_group_sizes_and_durations_for_edge_changes(temporal_network,
+                                                                        ignore_size_histogram,
+                                                                        verbose,
+                                                                        )
     elif type(temporal_network) == el:
-        result = _tc.measure_group_sizes_and_durations_for_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.measure_group_sizes_and_durations_for_edge_lists(temporal_network,
+                                                                        ignore_size_histogram,
+                                                                        verbose,
+                                                                        )
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
 
-def aggregated_network(temporal_network,*args,**kwargs):
+def aggregated_network(temporal_network):
     """Measures the static network composed.
 
     Parameters
@@ -92,9 +98,9 @@ def aggregated_network(temporal_network,*args,**kwargs):
         
     """
 
-    return measure_group_sizes_and_durations(temporal_network,*args,**kwargs).aggregated_network
+    return measure_group_sizes_and_durations(temporal_network).aggregated_network
     
-def degree_distribution(temporal_network,*args,**kwargs):
+def degree_distribution(temporal_network):
     """Measures the time-averaged degree distribution.
 
     Parameters
@@ -111,15 +117,15 @@ def degree_distribution(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.degree_distribution_from_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.degree_distribution_from_edge_changes(temporal_network)
     elif type(temporal_network) == el:
-        result = _tc.degree_distribution_from_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.degree_distribution_from_edge_lists(temporal_network)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
 
-def bin(temporal_network,*args,**kwargs):
+def bin(temporal_network, dt=0.0, N_time_steps=0, verbose=False):
     """Bins a temporal network for each `dt` (after each step, respectively, if `N_time_steps` was provided).
 
     Parameters
@@ -143,9 +149,9 @@ def bin(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.bin_from_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.bin_from_edge_changes(temporal_network, dt, N_time_steps, verbose)
     elif type(temporal_network) == el:
-        result = _tc.bin_from_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.bin_from_edge_lists(temporal_network, dt, N_time_steps, verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
@@ -183,7 +189,7 @@ def slice(temporal_network,new_t0,new_tmax,verbose=False):
 
     return result
     
-def sample(temporal_network,*args,**kwargs):
+def sample(temporal_network,dt=0.0,N_time_steps=0,sample_aggregates=False,verbose=False):
     """Samples a temporal network after each `dt` (after each step, respectively, if `N_time_steps` was provided).
 
     Parameters
@@ -211,15 +217,25 @@ def sample(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.sample_from_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.sample_from_edge_changes(temporal_network,
+                                              dt,
+                                              N_time_steps,
+                                              sample_aggregates,
+                                              verbose,
+                                             )
     elif type(temporal_network) == el:
-        result = _tc.sample_from_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.sample_from_edge_lists(temporal_network,
+                                              dt,
+                                              N_time_steps,
+                                              sample_aggregates,
+                                              verbose,
+                                             )
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
     
-def binned_social_trajectory(temporal_network,*args,**kwargs):
+def binned_social_trajectory(temporal_network,node, dt=0.0, N_time_steps =0,verbose=False):
     """Computes the binned social trajectory of node `node` in `temporal_network`, i.e. the groups it was part of and pairs of times (t0, t1) when it was part of a certain group. In this case, binning makes it easier to, e.g. see the days where a group was active.
 
     Parameters
@@ -244,15 +260,25 @@ def binned_social_trajectory(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.binned_social_trajectory_from_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.binned_social_trajectory_from_edge_changes(temporal_network,
+                                                                node,
+                                                                dt,
+                                                                N_time_steps,
+                                                                verbose
+                                                               )
     elif type(temporal_network) == el:
-        result = _tc.binned_social_trajectory_from_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.binned_social_trajectory_from_edge_lists(temporal_network,
+                                                                node,
+                                                                dt,
+                                                                N_time_steps,
+                                                                verbose
+                                                               )
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
     
-def social_trajectory(temporal_network,*args,**kwargs):
+def social_trajectory(temporal_network, node, verbose = False):
     """Computes the social trajectory of node `node` in `temporal_network`, i.e. the groups it was part of and pairs of times (t0, t1) when it was part of a certain group.
 
     Parameters
@@ -272,16 +298,16 @@ def social_trajectory(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.social_trajectory_from_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.social_trajectory_from_edge_changes(temporal_network,node,verbose)
     elif type(temporal_network) == el:
-        result = _tc.social_trajectory_from_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.social_trajectory_from_edge_lists(temporal_network,node,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
     
 
-def gillespie_SIS(temporal_network,*args,**kwargs):
+def gillespie_SIS(temporal_network,SIS,verbose=False):
     """Simulates an SIS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
     Parameters
@@ -302,15 +328,15 @@ def gillespie_SIS(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.gillespie_SIS_on_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.gillespie_SIS_on_edge_changes(temporal_network,SIS,verbose)
     elif type(temporal_network) == el:
-        result = _tc.gillespie_SIS_on_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.gillespie_SIS_on_edge_lists(temporal_network,SIS,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
     
-def gillespie_node_based_SIS(temporal_network,*args,**kwargs):
+def gillespie_node_based_SIS(temporal_network,SIS,verbose=False):
     """Simulates a node-based SIS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
     Parameters
@@ -331,15 +357,15 @@ def gillespie_node_based_SIS(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.gillespie_node_based_SIS_on_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.gillespie_node_based_SIS_on_edge_changes(temporal_network,SIS,verbose)
     elif type(temporal_network) == el:
-        result = _tc.gillespie_node_based_SIS_on_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.gillespie_node_based_SIS_on_edge_lists(temporal_network,SIS,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
     
-def gillespie_SI(temporal_network,*args,**kwargs):
+def gillespie_SI(temporal_network,SI,verbose):
     """Simulates an SI process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
     Parameters
@@ -360,16 +386,16 @@ def gillespie_SI(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.gillespie_SI_on_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.gillespie_SI_on_edge_changes(temporal_network,SI,verbose)
     elif type(temporal_network) == el:
-        result = _tc.gillespie_SI_on_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.gillespie_SI_on_edge_lists(temporal_network,SI,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
     
 
-def gillespie_SIR(temporal_network,*args,**kwargs):
+def gillespie_SIR(temporal_network,SIR,verbose):
     """Simulates an SIR process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
     Parameters
@@ -390,15 +416,15 @@ def gillespie_SIR(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.gillespie_SIR_on_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.gillespie_SIR_on_edge_changes(temporal_network,SIR,verbose)
     elif type(temporal_network) == el:
-        result = _tc.gillespie_SIR_on_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.gillespie_SIR_on_edge_lists(temporal_network,SIR,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
     
-def gillespie_SIRS(temporal_network,*args,**kwargs):
+def gillespie_SIRS(temporal_network,SIRS,verbose):
     """Simulates an SIRS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
     Parameters
@@ -419,14 +445,14 @@ def gillespie_SIRS(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.gillespie_SIRS_on_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.gillespie_SIRS_on_edge_changes(temporal_network,SIRS,verbose)
     elif type(temporal_network) == el:
-        result = _tc.gillespie_SIRS_on_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.gillespie_SIRS_on_edge_lists(temporal_network,SIRS,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
 
-def get_edge_trajectories(temporal_network,*args,**kwargs):
+def get_edge_trajectories(temporal_network,return_edge_similarities=False,verbose=False):
     """Computes the time intervals in which each edge existed.
 
     Parameters
@@ -459,15 +485,20 @@ def get_edge_trajectories(temporal_network,*args,**kwargs):
            kwargs['return_edge_similarities']:
             raise ValueError('Please convert to `edge_lists` first as the edge similarity algorithm is only implemented for `edge_lists`')
 
-        result = _tc.edge_trajectories_from_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.edge_trajectories_from_edge_changes(temporal_network,return_edge_similarities,verbose)
     elif type(temporal_network) == el:
-        result = _tc.edge_trajectories_from_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.edge_trajectories_from_edge_lists(temporal_network,return_edge_similarities)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
+    if return_edge_similarities:
+        return result.trajectories, result.edge_similarities
+    else:
+        return result.trajectories
+
     return result
 
-def verify(temporal_network,*args,**kwargs):
+def verify(temporal_network,verbose=False):
     """Checks wether the temporal network is compliant with the demanded formats for analyses. Writes remarks on violations to stdout.
 
     Parameters
@@ -475,7 +506,7 @@ def verify(temporal_network,*args,**kwargs):
     temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
         An instance of a temporal network.
     verbose: bool, optional
-        Be chatty.
+        If this is `True`, cout all errors that were found. default : False
 
     Returns
     -------
@@ -486,15 +517,15 @@ def verify(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.verify_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.verify_edge_changes(temporal_network,verbose)
     elif type(temporal_network) == el:
-        result = _tc.verify_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.verify_edge_lists(temporal_network,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
 
-def convert(temporal_network,*args,**kwargs):
+def convert(temporal_network,verbose=False):
     """Converts either an instance of :mod:`edge_changes` to an instance of :mod:`edge_lists` or vice versa.
 
     Parameters
@@ -512,15 +543,15 @@ def convert(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.convert_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.convert_edge_changes(temporal_network, verbose=False)
     elif type(temporal_network) == el:
-        result = _tc.convert_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.convert_edge_lists(temporal_network, verbose=False)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
 
-def concatenate(list_of_temporal_networks,*args,**kwargs):
+def concatenate(list_of_temporal_networks, verbose):
     """Concatenates a list of either :mod:`edge_changes` or :mod:`edge_lists` to a single instance of :mod:`edge_changes` or :mod:`edge_lists`, respectively.
 
     Parameters
@@ -540,15 +571,15 @@ def concatenate(list_of_temporal_networks,*args,**kwargs):
     _t = list_of_temporal_networks[0]
 
     if type(_t) == ec:
-        result = _tc.concatenate_edge_changes(list_of_temporal_networks,*args,**kwargs)
+        result = _tc.concatenate_edge_changes(list_of_temporal_networks, verbose)
     elif type(_t) == el:
-        result = _tc.concatenate_edge_lists(list_of_temporal_networks,*args,**kwargs)
+        result = _tc.concatenate_edge_lists(list_of_temporal_networks, verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(_t)))
 
     return result
 
-def mean_degree(temporal_network,*args,**kwargs):
+def mean_degree(temporal_network):
     """Computes the time dependent mean degree of the temporal network.
 
     Parameters
@@ -567,9 +598,9 @@ def mean_degree(temporal_network,*args,**kwargs):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.mean_degree_from_edge_changes(temporal_network,*args,**kwargs)
+        result = _tc.mean_degree_from_edge_changes(temporal_network)
     elif type(temporal_network) == el:
-        result = _tc.mean_degree_from_edge_lists(temporal_network,*args,**kwargs)
+        result = _tc.mean_degree_from_edge_lists(temporal_network)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 

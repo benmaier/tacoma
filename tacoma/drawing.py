@@ -160,8 +160,7 @@ def edge_activity_plot(temporal_network,
                        fit_color = None,
                        return_fit_params = False,
                        ):
-    result = tc.get_edge_trajectories(temporal_network)
-    traj = result.trajectories
+    traj = tc.get_edge_trajectories(temporal_network)
     return draw_edges(
                        traj,
                        time_normalization_factor = time_normalization_factor,
@@ -175,9 +174,9 @@ def edge_activity_plot(temporal_network,
                        return_fit_params = return_fit_params,
                      )
 
-def get_edge_order(edge_traj,threshold=0.):
+def get_edge_order(edge_traj, edge_sim, threshold=0.):
 
-    G = get_edge_graph(edge_traj,threshold = 0.)
+    G = get_edge_graph(edge_traj, edge_sim, threshold = 0.)
 
     partition = community.best_partition(G)
     N_comm = max([v for v in partition.values()]) + 1
@@ -196,12 +195,12 @@ def get_edge_order(edge_traj,threshold=0.):
     return order
 
 
-def get_edge_graph(edge_traj,threshold = 0.):
+def get_edge_graph(edge_traj, edge_sim, threshold = 0.):
 
-    N_edges = len(edge_traj.trajectories)
+    N_edges = len(edge_traj)
     G = nx.Graph()
     G.add_nodes_from(range(N_edges))
-    G.add_edges_from([ (u,v) for u,v,val in edge_traj.edge_similarities if val > threshold])
+    G.add_edges_from([ (u,v) for u,v,val in edge_sim if val > threshold])
 
     return G
 
@@ -233,10 +232,9 @@ if __name__ == "__main__":
     #draw_rows(FBIN)
 
     start = time.time()
-    result = tc.get_edge_trajectories(FBIN)
+    traj, similarities = tc.get_edge_trajectories(FBIN, return_edge_similarities=True)
     end = time.time()
-    traj = result.trajectories
-    print(result.edge_similarities)
+    print(similarities)
 
     print("needed ", end-start, "seconds")
     draw_edges(traj,fit=True)
@@ -244,7 +242,6 @@ if __name__ == "__main__":
     start = time.time()
     result = tc.get_edge_trajectories(F)
     end = time.time()
-    traj = result.trajectories
     print("needed ", end-start, "seconds")
     draw_edges(traj)
 

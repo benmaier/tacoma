@@ -488,7 +488,7 @@ def write_edge_trajectory_coordinates(temporal_network, filename, filter_for_dur
         Write to this file.
     """
 
-    traj = tc.get_edge_trajectories(temporal_network).trajectories
+    traj = tc.get_edge_trajectories(temporal_network)
 
     try:
         t0 = temporal_network.t[0]
