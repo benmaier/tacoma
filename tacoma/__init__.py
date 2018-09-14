@@ -18,4 +18,5 @@ from .api import _get_raw_temporal_network
 from .api import *
 from .data_io import *
 from .tools import *
-from .load_model_parameters import *
+
+# from .load_model_parameters import *
