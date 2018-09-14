@@ -30,7 +30,7 @@ for iR0,R0 in enumerate(R0s):
         eta = R0*rho/k
 
         start1 = time.time()
-        sirs = tc.SIRS(N,200,eta,rho,becoming_susceptible_rate=1.0,number_of_initially_infected=I0)
+        sirs = tc.SIRS(N,200.,eta,rho,waning_immunity_rate=1.0,number_of_initially_infected=I0)
 
         tc.gillespie_SIRS(compl,sirs,is_static=True)
         end1 = time.time()
@@ -54,7 +54,7 @@ for iR0,R0 in enumerate(R0s):
 
         r, tr = sirs2.get_r_of_t()
         i, ti = sirs2.get_i_of_t()
-        R_gillepi_s[iR0,meas] = r[-1]*N
+        R_gillepi_s[iR0, meas] = r[-1]*N
 
         ax[iR0].plot(tr,r*N,'-',c='b',alpha=0.1,lw=1)
         ax[iR0].plot(ti,i*N,'-',c='c',alpha=0.1,lw=1)

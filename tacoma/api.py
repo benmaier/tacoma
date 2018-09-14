@@ -307,7 +307,7 @@ def social_trajectory(temporal_network, node, verbose = False):
     return result
     
 
-def gillespie_SIS(temporal_network,SIS,verbose=False):
+def gillespie_SIS(temporal_network,SIS,is_static=False,verbose=False):
     """Simulates an SIS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
     Parameters
@@ -316,6 +316,9 @@ def gillespie_SIS(temporal_network,SIS,verbose=False):
         An instance of a temporal network.
     SIS : :mod:`SIS`
         An initialized SIS object.
+    is_static : bool, default : False
+        The algorithm works a bit differently if it knows that the network is actually static.
+        It works only with instances of :mod:`edge_lists`.
     verbose: bool, optional
         Be chatty.
 
@@ -330,13 +333,13 @@ def gillespie_SIS(temporal_network,SIS,verbose=False):
     if type(temporal_network) == ec:
         result = _tc.gillespie_SIS_on_edge_changes(temporal_network,SIS,verbose)
     elif type(temporal_network) == el:
-        result = _tc.gillespie_SIS_on_edge_lists(temporal_network,SIS,verbose)
+        result = _tc.gillespie_SIS_on_edge_lists(temporal_network,SIS,is_static,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
     
-def gillespie_node_based_SIS(temporal_network,SIS,verbose=False):
+def gillespie_node_based_SIS(temporal_network,SIS,is_static=False,verbose=False):
     """Simulates a node-based SIS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
     Parameters
@@ -345,6 +348,9 @@ def gillespie_node_based_SIS(temporal_network,SIS,verbose=False):
         An instance of a temporal network.
     SIS : :mod:`SIS_NB`
         An initialized node-based SIS object.
+    is_static : bool, default : False
+        The algorithm works a bit differently if it knows that the network is actually static.
+        It works only with instances of :mod:`edge_lists`.
     verbose: bool, optional
         Be chatty.
 
@@ -359,13 +365,13 @@ def gillespie_node_based_SIS(temporal_network,SIS,verbose=False):
     if type(temporal_network) == ec:
         result = _tc.gillespie_node_based_SIS_on_edge_changes(temporal_network,SIS,verbose)
     elif type(temporal_network) == el:
-        result = _tc.gillespie_node_based_SIS_on_edge_lists(temporal_network,SIS,verbose)
+        result = _tc.gillespie_node_based_SIS_on_edge_lists(temporal_network,SIS,is_static,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
     
-def gillespie_SI(temporal_network,SI,verbose):
+def gillespie_SI(temporal_network,SI,is_static=False,verbose=False):
     """Simulates an SI process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
     Parameters
@@ -374,6 +380,9 @@ def gillespie_SI(temporal_network,SI,verbose):
         An instance of a temporal network.
     SI : :mod:`SI`
         An initialized SI object.
+    is_static : bool, default : False
+        The algorithm works a bit differently if it knows that the network is actually static.
+        It works only with instances of :mod:`edge_lists`.
     verbose: bool, optional
         Be chatty.
 
@@ -388,14 +397,14 @@ def gillespie_SI(temporal_network,SI,verbose):
     if type(temporal_network) == ec:
         result = _tc.gillespie_SI_on_edge_changes(temporal_network,SI,verbose)
     elif type(temporal_network) == el:
-        result = _tc.gillespie_SI_on_edge_lists(temporal_network,SI,verbose)
+        result = _tc.gillespie_SI_on_edge_lists(temporal_network,SI,is_static,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
     
 
-def gillespie_SIR(temporal_network,SIR,verbose):
+def gillespie_SIR(temporal_network,SIR,is_static=False,verbose=False):
     """Simulates an SIR process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
     Parameters
@@ -404,6 +413,9 @@ def gillespie_SIR(temporal_network,SIR,verbose):
         An instance of a temporal network.
     SIR : :mod:`SIR`
         An initialized SIR object.
+    is_static : bool, default : False
+        The algorithm works a bit differently if it knows that the network is actually static.
+        It works only with instances of :mod:`edge_lists`.
     verbose: bool, optional
         Be chatty.
 
@@ -418,13 +430,13 @@ def gillespie_SIR(temporal_network,SIR,verbose):
     if type(temporal_network) == ec:
         result = _tc.gillespie_SIR_on_edge_changes(temporal_network,SIR,verbose)
     elif type(temporal_network) == el:
-        result = _tc.gillespie_SIR_on_edge_lists(temporal_network,SIR,verbose)
+        result = _tc.gillespie_SIR_on_edge_lists(temporal_network,SIR,is_static,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return result
     
-def gillespie_SIRS(temporal_network,SIRS,verbose):
+def gillespie_SIRS(temporal_network,SIRS,is_static=False,verbose=False):
     """Simulates an SIRS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
 
     Parameters
@@ -433,6 +445,9 @@ def gillespie_SIRS(temporal_network,SIRS,verbose):
         An instance of a temporal network.
     SIRS : :mod:`SIRS`
         An initialized SIRS object.
+    is_static : bool, default : False
+        The algorithm works a bit differently if it knows that the network is actually static.
+        It works only with instances of :mod:`edge_lists`.
     verbose: bool, optional
         Be chatty.
 
@@ -447,7 +462,7 @@ def gillespie_SIRS(temporal_network,SIRS,verbose):
     if type(temporal_network) == ec:
         result = _tc.gillespie_SIRS_on_edge_changes(temporal_network,SIRS,verbose)
     elif type(temporal_network) == el:
-        result = _tc.gillespie_SIRS_on_edge_lists(temporal_network,SIRS,verbose)
+        result = _tc.gillespie_SIRS_on_edge_lists(temporal_network,SIRS,is_static,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
