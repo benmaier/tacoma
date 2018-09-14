@@ -41,7 +41,7 @@ unweighted temporal networks, with a focus on (but not limited to) human face-to
   (mean degree, degree distribution, group size distribution, group life time distributions, etc.)
 * fast algorithms due to C++-core (_fast_ as in _faster than pure Python_)
 * relatively fast and easy to compile since it only depends on the C++11-stdlib 
-  and [https://github.com/pybind/pybind11](pybind11) without the large overhead of `Boost`
+  and [pybind11](https://github.com/pybind/pybind11) without the large overhead of `Boost`
 
 ### Cons of using tacoma
 
@@ -50,7 +50,7 @@ unweighted temporal networks, with a focus on (but not limited to) human face-to
 
 ## Install
 
-If you get compiling errors, make sure that [https://github.com/pybind/pybind11](pybind11) is installed.
+If you get compiling errors, make sure that [pybind11](https://github.com/pybind/pybind11) is installed.
 
     $ git clone https://github.com/benmaier/tacoma
     $ pip install pybind11
