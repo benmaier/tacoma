@@ -122,7 +122,6 @@ setup(
             'wget',
             'numpy',
             'scipy',
-            'python-louvain',
             'lmfit',
             ],
     include_package_data = True,

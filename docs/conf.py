@@ -15,6 +15,22 @@
 import sys
 import os
 
+from mock import Mock as MagicMock
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+            return Mock()
+
+MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'matplotlib.collections',
+                'lmfit', 'networkx', 'community', 
+                'scipy.optimize', 'scipy.stats', 'scipy.special', 'scipy.integrate',
+                'numpy.polynomial', 'numpy.polynomial.polynomial', 'wget',
+                'lmfit',
+               ]
+
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.

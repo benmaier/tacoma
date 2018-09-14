@@ -58,6 +58,17 @@ If you get compiling errors, make sure that [pybind11](https://github.com/pybind
 
 Note that a C++11-compiler has to be installed on the system before installing `tacoma`.
 
+## Packages not installed during installing
+
+The following packages are not installed during installation with `pip` since they're only required
+for drawing and drawing is not essential. If you want to use `tacoma.drawing`, please install
+
+    matplotlib
+    networkx
+    python-louvain (community)
+
+
+
 ## Examples
 
 Check out the [sandbox directory](https://github.com/benmaier/tacoma/tree/master/sandbox]).
@@ -88,3 +99,4 @@ visualize(temporal_network, frame_dt = 0.05)
 ```
 
 ![visualization example](https://github.com/benmaier/tacoma/raw/master/img/tacoma_example.gif)
+
