@@ -27,7 +27,7 @@ temporal_network.edges_out = [
 visualize(temporal_network, frame_dt = 0.05)
 ```
 
-![visualization example](https://raw.github.com/benmaier/tacoma/master/img/tacoma_example.gif)
+![visualization example](https://github.com/benmaier/tacoma/raw/master/img/tacoma_example.gif)
 
 ## Install
 
