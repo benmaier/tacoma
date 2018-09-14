@@ -4,7 +4,7 @@ print("===== edge_lists => edge_lists =====")
 
 L = tc.edge_lists()
 
-L.N = 3
+L.N = 4
 L.t = [0.0,1.0,2.0]
 L.tmax = 3.0
 L.edges = [ 
@@ -44,7 +44,7 @@ print("===== edge_changes => edge_changes =====")
 
 C = tc.edge_changes()
 
-C.N = 3
+C.N = 4
 C.edges_initial = [ (0,1) ]
 C.t0 = 1.0
 C.tmax = 3.0
