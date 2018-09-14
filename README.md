@@ -4,14 +4,12 @@ TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal 
 
 ## Quick example
 
-```ipython
-In [1]: import tacoma as tc
-
-In [2]: from tacoma.interactive import visualize
-
-In [3]: temporal_network = tc.download_and_convert_sociopatterns_hypertext_2009()
+```python
+>>> import tacoma as tc
+>>> from tacoma.interactive import visualize
+>>> temporal_network = tc.download_and_convert_sociopatterns_hypertext_2009()
 100% [..............................................................................] 67463 / 67463
-In [4]: visualize(temporal_network, frame_dt = 20)
+>>> visualize(temporal_network, frame_dt = 20)
 ```
 
 ![visualization example](https://github.com/benmaier/tacoma/raw/master/img/ht09_example.gif)
