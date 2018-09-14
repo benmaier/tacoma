@@ -466,16 +466,17 @@ def get_edge_trajectories(temporal_network,return_edge_similarities=False,verbos
 
     Returns
     -------
-    :mod:`edge_trajectories`
-        edge_trajectories.trajectories -- a list of `edge_trajectory_entry` objects, which contain
-                                          the `.time_pairs` attributes, a list of time pairs (t0, t1)
-                                          for time t0 <= t <= t1 in which the edge existed and `.edge`
-                                          a pair of node integers.
-        edge_trajectories.edge_similarities -- a list of triples ( u, v, similarity ) where
-                                               `u` and `v` refer to the edge indices in
-                                               `edge_trajectories.trajectories` and similarity
-                                               is the integrated time both edges were switched on
-                                               while being connected to the same node.
+    edge_trajectories.trajectories
+        a list of `edge_trajectory_entry` objects, which contain
+        the `.time_pairs` attributes, a list of time pairs (t0, t1)
+        for time t0 <= t <= t1 in which the edge existed and `.edge`
+        a pair of node integers.
+    edge_trajectories.edge_similarities 
+        a list of triples ( u, v, similarity ) where
+        `u` and `v` refer to the edge indices in
+        `edge_trajectories.trajectories` and similarity
+        is the integrated time both edges were switched on
+        while being connected to the same node.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
