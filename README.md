@@ -60,7 +60,7 @@ If you get compiling errors, make sure that [pybind11](https://github.com/pybind
 
 Check out the [sandbox directory](https://github.com/benmaier/tacoma/tree/master/sandbox]).
 
-Here is an example for the temporal network-format `tc.edge_changes`.
+Here is an example for the temporal network format `tc.edge_changes`.
 
 ```python
 import tacoma as tc
