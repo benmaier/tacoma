@@ -820,6 +820,13 @@ edge_trajectories
     traj.trajectories = trajectories;
     traj.edge_similarities = sim;
 
+    traj.N = list_of_edge_changes.N;
+    traj.t0 = list_of_edge_changes.t0;
+    traj.tmax = list_of_edge_changes.tmax;
+    traj.time_unit = list_of_edge_changes.time_unit;
+    traj.notes = list_of_edge_changes.notes;
+    traj.int_to_node = list_of_edge_changes.int_to_node;
+
     return traj;
     
 }
@@ -985,6 +992,13 @@ edge_trajectories
     
     traj.trajectories = these_edge_trajectories;
     traj.edge_similarities = sim;
+
+    traj.N = list_of_edge_lists.N;
+    traj.t0 = list_of_edge_lists.t[0];
+    traj.tmax = list_of_edge_lists.tmax;
+    traj.time_unit = list_of_edge_lists.time_unit;
+    traj.notes = list_of_edge_lists.notes;
+    traj.int_to_node = list_of_edge_lists.int_to_node;
 
     return traj;
     

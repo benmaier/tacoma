@@ -790,7 +790,14 @@ PYBIND11_MODULE(_tacoma, m) {
         .def_readwrite("edge_similarities", &edge_trajectories::edge_similarities, R"pbdoc(
             Each entry of this list is a triple (i, j, w), where `i` is the `i`-th edge in `trajectories` (similarly for `j`) and `w`
             is their similarity.
-        )pbdoc");
+        )pbdoc")
+        .def_readwrite("int_to_node", &edge_trajectories::int_to_node, R"pbdoc(A dictionary int -> string which keeps the original node names.)pbdoc")
+        .def_readwrite("time_unit", &edge_trajectories::time_unit, R"pbdoc(A string containing the unit of time for this network.)pbdoc")
+        .def_readwrite("notes", &edge_trajectories::notes, R"pbdoc(A string containing additional notes for this network.)pbdoc")
+        .def_readwrite("N", &edge_trajectories::N, R"pbdoc(Number of nodes)pbdoc")
+        .def_readwrite("t0", &edge_trajectories::t0, R"pbdoc(The initial time)pbdoc")
+        .def_readwrite("tmax", &edge_trajectories::tmax, R"pbdoc(The final time)pbdoc")
+        ;
 
     py::class_<SIS>(m,"SIS","Base class for the simulation of an SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIS` to simulate and retrieve the simulation results.")
         .def(py::init<size_t,double,double,double,size_t,size_t,bool,size_t,bool>(),

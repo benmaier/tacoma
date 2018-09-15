@@ -168,6 +168,12 @@ struct edge_trajectory_entry {
 struct edge_trajectories {
     vector < edge_trajectory_entry > trajectories;
     vector < tuple < size_t, size_t, double > > edge_similarities;
+    size_t N;
+    double t0;
+    double tmax;
+    map < size_t, string > int_to_node;
+    string time_unit;
+    string notes;
 };
 
 struct flockwork_args {
