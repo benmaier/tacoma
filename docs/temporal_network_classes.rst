@@ -2,7 +2,7 @@ Temporal network classes
 ========================
 
 Undirected and unweighted temporal networks are composed of :math:`N` nodes
-and up to :math:`m_{\mathrm{max}}=N(N+1)/2` edges, where each edge :math:`(i,j)` can be
+and up to :math:`m_{\mathrm{max}}=N(N-1)/2` edges, where each edge :math:`(i,j)` can be
 described as a series of events where the edge is either switched on 
 or switched off. One way of expressing that is to define the temporal
 adjacency matrix
@@ -14,8 +14,21 @@ adjacency matrix
 
 In `tacoma`, we will interpret temporal networks as if they were recorded in an experiment.
 We expect that over the course of time :math:`t_0\leq t < t_\mathrm{max}` in which we
-record activity, we will encounter :math:`N` nodes from the node set 
-:math:`V={0,1,\dots,N-1}` (nodes posses an integer label).
+recorded activity, we encountered :math:`N` nodes from the node set 
+:math:`V=\{0,1,\dots,N-1\}` (nodes posses an integer label). However, nodes do not need
+to be active (i.e. connected to other nodes) during the time of the experiment to be considered
+in the node set.
+
+.. figure:: img/example_temporal_network.png
+    :alt: A temporal network and how it was recorded in an experiment
+
+    A temporal network and how it was recorded in an experiment. We additionally 
+    assume to know that the network consists of :math:`N=8` nodes.
+    Edges existed before
+    we started measuring. An edge is considered to be "on" when it exists, shown as
+    a grey bar in this figure. Each time an edge is switched "on" or switched "off",
+    respectively, the network structure changed and this event is recorded. Here,
+    the experiment ends before the edge :math:`(i,j)` is switched off.
 
 The experiment begins at time :math:`t_0`, where the network consists of an 
 edge set :math:`E_0 \subseteq \{i,j: V\times V, i<j\}`. Then, each time the network
@@ -45,9 +58,39 @@ It has the following attributes.
   network after the change which occured at the corresponding time in :math:`t`. 
   The 0-th entry contains the edge list of the beginning of the experiment :math:`t_0`
 - :math:`t_\mathrm{max}` : The time at which the experiment ended.
+- `time_unit` : A string containing the unit of time used for the recording.
+- `notes` : Additional notes concerning the experiment.
+- `int_to_node` : A dictionary mapping the node integers
+  to string descriptors. This map can be empty. The map is supposed to be one-to-one.
 
-Additionally, 
+The network described in the figure above would be recorded as 
 
+.. code:: python
+
+    N = 8
+    t = [ 0.0, 1.0, 1.5, 3.0, 4.0, 7.0, 7.31 ]
+    tmax = 8.1
+    edges = [
+                [ (0, 1), (1, 7) ],
+                [ (0, 1) ],
+                [ (0, 1), (1, 7) ],
+                [ (2, 5), (1, 7) ],
+                [ (2, 5) ],
+                [ (0, 1), (2, 5) ],
+                [ (0, 1) ]
+            ]
+    time_unit = 's'
+    notes = 'This experiment was conducted as a test.'
+    int_to_node	= {
+                    0 : 'Alice',
+                    1 : 'Bob',
+                    2 : 'Clara',
+                    4 : 'Darren',
+                    5 : 'Elle',
+                    5 : 'Felicitas',
+                    6 : 'George',
+                    7 : 'Harriett',
+                  }
 
 Edge changes
 ~~~~~~~~~~~~
@@ -59,12 +102,56 @@ It has the following attributes.
 
 - :math:`N` : The total number of nodes.
 - :math:`t_0` : The time of the beginning of the experimen.
-- `edges_initial` : The edge list of the beginning of the experiment at :math:`t_0`.
 - :math:`t` : A vector of length :math:`N_e`, each time corresponding to a change in the network.
 - :math:`t_\mathrm{max}` : The time at which the experiment ended.
+- `edges_initial` : The edge list of the beginning of the experiment at :math:`t_0`.
+- `edges_in` : A list containing :math:`N_e` entries. Each entry is a list of integer
+  tuples, describing the edges being created during this event.
+- `edges_out` : A list containing :math:`N_e` entries. Each entry is a list of integer
+  tuples, describing the edges being switched off  during this event.
+- `time_unit` : A string containing the unit of time used for the recording.
+- `notes` : Additional notes concerning the experiment.
+- `int_to_node` : A dictionary mapping the node integers
+  to string descriptors. This map can be empty. The map is supposed to be one-to-one.
 
-Additionally, 
+.. code:: python
 
+    import tacoma as tc
+    
+    tn = tc.edge_changes()
+    tn.N = 8
+    tn.t0 = 0.0
+    tn.t = [ 1.0, 1.5, 3.0, 4.0, 7.0, 7.31 ]
+    tn.tmax = 8.1
+    tn.edges_initial = [ (0, 1), (1, 7) ]
+    tn.edges_in = [
+                    [], 
+                    [ (1, 7) ],
+                    [ (2, 5) ], 
+                    [], 
+                    [ (0, 1) ],
+                    []
+                  ]
+    tn.edges_out = [   
+                    [ (1, 7) ], 
+                    [], 
+                    [ (0, 1) ], 
+                    [ (1, 7) ], 
+                    [], 
+                    [ (2, 5) ]
+                   ]
+    tn.time_unit = 's'
+    tn.notes = 'This experiment was conducted as a test.'
+    tn.int_to_node	= {
+                        0 : 'Alice',
+                        1 : 'Bob',
+                        2 : 'Clara',
+                        4 : 'Darren',
+                        5 : 'Elle',
+                        5 : 'Felicitas',
+                        6 : 'George',
+                        7 : 'Harriett',
+                      }
 
 Edge trajectories
 ~~~~~~~~~~~~~~~~~
