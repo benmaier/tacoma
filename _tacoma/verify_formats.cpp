@@ -30,6 +30,50 @@
 
 using namespace std;
 
+void check_int_to_node(
+        const size_t &N,
+        const map < size_t, string > &int_to_node, 
+        size_t &error_count 
+        )
+{
+
+    if (int_to_node.size() > 0)
+    {
+        if (int_to_node.size() != N)
+        {
+            cout << "int_to_node-dictionary does not contain entries for all nodes." << endl;
+            ++error_count;
+        }
+
+        set < string > all_descriptors;
+        for(auto const & entry: int_to_node)
+        {
+            size_t const &node_int = entry.first;
+            string const &s = entry.second;
+
+            if(node_int > N-1)
+            {
+                cout << "node integer " << node_int << " is out of range." << endl;
+                ++error_count;
+            }
+
+            if (all_descriptors.find(s) != all_descriptors.end())
+            {
+                cout << "int_to_node-dictionary is not one-to-one, " << node_int << " : " << s 
+                     << " is a duplicate." << endl;
+                ++error_count;
+
+            }
+            else
+            {
+                all_descriptors.insert(s);
+            }
+        }
+    }
+    
+
+}
+
 //vector < edge_trajectory_entry >
 size_t
     verify_edge_changes(
@@ -351,6 +395,8 @@ size_t
         last_time = t;
     }
 
+    check_int_to_node(N, list_of_edge_changes.int_to_node, error_count);
+
     return error_count;
 }
 
@@ -455,6 +501,8 @@ size_t
         it_time++;
         t_count++;
     }
+
+    check_int_to_node(N, list_of_edge_lists.int_to_node, error_count);
 
     return error_count;
 }

@@ -10,13 +10,14 @@ L.edges = [
             [ (1,2) ],
         ]
 
-tc.verify(L)
+L.int_to_node = { 0: '1', 1: '1' }
+print("number of errors =", tc.verify(L))
 
 print() 
 
 C = tc.edge_changes()
 
-C.N = 2
+C.N = 3
 C.t0 = 0
 C.t = [0.2,0.1]
 C.tmax = 0.05
@@ -27,5 +28,7 @@ C.edges_initial = [
 C.edges_in = [ [(2,3), (0,0), (2,3)],[(1,0),(0,1)] ]
 C.edges_out = [ [(0,0), (1,0), (1,0)],[(1,0),(0,1) ] ]
 
+C.int_to_node = { 0: '1', 1: '1' }
 
-tc.verify(C)
+
+print("number of errors =", tc.verify(C))

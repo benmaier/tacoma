@@ -54,6 +54,11 @@ bool is_unique_vector(
     return s.size() == v.size();
 }
 
+void check_int_to_node(
+        const size_t &N,
+        const map < size_t, string > &int_to_node, 
+        size_t &error_count 
+        );
 size_t
     verify_edge_lists(
         edge_lists &list_of_edge_lists,
