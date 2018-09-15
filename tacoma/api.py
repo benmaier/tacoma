@@ -204,6 +204,7 @@ def sample(temporal_network,dt=0.0,N_time_steps=0,sample_aggregates=False,verbos
         If this is True, the following happens. If an edge is active during a time bin,
         it will appear in the final graph at the end of this time bin. It will then exist
         until the ende of the coming time bin. (This is different from the binning procedure). 
+        This does not seem to make very much sense so maybe just don't use it.
         default : False
     verbose: bool, optional
         Be chatty.
@@ -211,7 +212,8 @@ def sample(temporal_network,dt=0.0,N_time_steps=0,sample_aggregates=False,verbos
     Returns
     -------
     :class:`_tacoma.edge_lists` 
-        An edge_lists instance with one edge list describing the network states after every time bin.
+        An edge_lists instance with one edge list describing the network states after each
+        discrete time step.
     """
 
     temporal_network = _get_raw_temporal_network(temporal_network)
