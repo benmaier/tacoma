@@ -51,6 +51,7 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 	rm -rf _generate/*
+	rm -rf reference/_generate/*
 
 .PHONY: html
 html:

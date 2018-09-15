@@ -27,8 +27,8 @@ in the node set.
     Edges existed before
     we started measuring. An edge is considered to be "on" when it exists, shown as
     a grey bar in this figure. Each time an edge is switched "on" or switched "off",
-    respectively, the network structure changed and this event is recorded. Here,
-    the experiment ends before the edge :math:`(i,j)` is switched off.
+    respectively, the network structure changes and hence this event is recorded. Here,
+    the experiment ends before the edge :math:`(0,1)` is switched off.
 
 The experiment begins at time :math:`t_0`, where the network consists of an 
 edge set :math:`E_0 \subseteq \{i,j: V\times V, i<j\}`. Then, each time the network
@@ -56,7 +56,7 @@ It has the following attributes.
   experiment :math:`t_0`
 - `edges` : A vector of length :math:`N_e+1` where each entry contains an edge list, describing the 
   network after the change which occured at the corresponding time in :math:`t`. 
-  The 0-th entry contains the edge list of the beginning of the experiment :math:`t_0`
+  The 0-th entry contains the edge list of the beginning of the experiment at :math:`t_0`
 - :math:`t_\mathrm{max}` : The time at which the experiment ended.
 - `time_unit` : A string containing the unit of time used for the recording.
 - `notes` : Additional notes concerning the experiment.
@@ -67,41 +67,43 @@ The network described in the figure above would be recorded as
 
 .. code:: python
 
-    N = 8
-    t = [ 0.0, 1.0, 1.5, 3.0, 4.0, 7.0, 7.31 ]
-    tmax = 8.1
-    edges = [
-                [ (0, 1), (1, 7) ],
-                [ (0, 1) ],
-                [ (0, 1), (1, 7) ],
-                [ (2, 5), (1, 7) ],
-                [ (2, 5) ],
-                [ (0, 1), (2, 5) ],
-                [ (0, 1) ]
-            ]
-    time_unit = 's'
-    notes = 'This experiment was conducted as a test.'
-    int_to_node	= {
-                    0 : 'Alice',
-                    1 : 'Bob',
-                    2 : 'Clara',
-                    4 : 'Darren',
-                    5 : 'Elle',
-                    5 : 'Felicitas',
-                    6 : 'George',
-                    7 : 'Harriett',
-                  }
+    import tacoma as tc
+
+    tn = tc.edge_lists()
+    tn.N = 8
+    tn.t = [ 0.0, 1.0, 1.5, 3.0, 4.0, 7.0, 7.31 ]
+    tn.tmax = 8.1
+    tn.edges = [
+                   [ (0, 1), (1, 7) ],
+                   [ (0, 1) ],
+                   [ (0, 1), (1, 7) ],
+                   [ (2, 5), (1, 7) ],
+                   [ (2, 5) ],
+                   [ (0, 1), (2, 5) ],
+                   [ (0, 1) ]
+               ]
+    tn.time_unit = 's'
+    tn.notes = 'This experiment was conducted as a test.'
+    tn.int_to_node = {
+                       0 : 'Alice',
+                       1 : 'Bob',
+                       2 : 'Clara',
+                       4 : 'Darren',
+                       5 : 'Elle',
+                       5 : 'Felicitas',
+                       6 : 'George',
+                       7 : 'Harriett',
+                     }
 
 Edge changes
 ~~~~~~~~~~~~
-
 
 The class :class:`_tacoma.edge_changes` consists of a collection of both edges being created
 and edges being deleted.
 It has the following attributes.
 
 - :math:`N` : The total number of nodes.
-- :math:`t_0` : The time of the beginning of the experimen.
+- :math:`t_0` : The time of the beginning of the experiment.
 - :math:`t` : A vector of length :math:`N_e`, each time corresponding to a change in the network.
 - :math:`t_\mathrm{max}` : The time at which the experiment ended.
 - `edges_initial` : The edge list of the beginning of the experiment at :math:`t_0`.
@@ -113,6 +115,8 @@ It has the following attributes.
 - `notes` : Additional notes concerning the experiment.
 - `int_to_node` : A dictionary mapping the node integers
   to string descriptors. This map can be empty. The map is supposed to be one-to-one.
+
+The network described in the figure above would be recorded as 
 
 .. code:: python
 
@@ -142,7 +146,7 @@ It has the following attributes.
                    ]
     tn.time_unit = 's'
     tn.notes = 'This experiment was conducted as a test.'
-    tn.int_to_node	= {
+    tn.int_to_node = {
                         0 : 'Alice',
                         1 : 'Bob',
                         2 : 'Clara',
@@ -151,9 +155,61 @@ It has the following attributes.
                         5 : 'Felicitas',
                         6 : 'George',
                         7 : 'Harriett',
-                      }
+                     }
 
 Edge trajectories
 ~~~~~~~~~~~~~~~~~
 
+The class :class:`_tacoma.edge_trajectories` consists of a collection of 
+:class:`_tacoma.edge_trajectory_enry`, one for each edge in the network
+which was active at least once during the experiment. 
+Each of those entries has attribute ``.edge`` containing the edge it is attributed to.
+The second attribute of each
+entry, ``.time_pairs`` is a list of pairs of doubles, each pair representing
+a time interval in which the edge was active.
 
+It has the following attributes.
+
+- :math:`N` : The total number of nodes.
+- :math:`t_0` : The time of the beginning of the experiment.
+- :math:`t_\mathrm{max}` : The time at which the experiment ended.
+- `trajectories` : A list of :class:`_tacoma.edge_trajectory_enry`, as described above.
+- `time_unit` : A string containing the unit of time used for the recording.
+- `notes` : Additional notes concerning the experiment.
+- `int_to_node` : A dictionary mapping the node integers
+  to string descriptors. This map can be empty. The map is supposed to be one-to-one.
+- `edge_similarities` (Optional) : A dictionary of Tuple[Int, Int] -> double containing
+  the similarities of two edges. The integers in the pairs correspond to the index of the edges
+  in `trajectories`. This dictionary is computed when :class:`_tacoma.edge_trajectories`
+  is generated from a conversion using :func:`tacoma.api.get_edge_trajectories` 
+  with ``return_edge_similarity = True``.
+
+The network described in the figure above would be recorded as 
+
+.. code:: python
+
+    import tacoma as tc
+
+    traj = tc.edge_trajectories()
+    entry = tc.edge_trajectory_entry
+
+    traj.N = 8
+    traj.t0 = 0.0
+    traj.tmax = 8.1
+    traj.trajectories = [
+                            entry( (0,1), [(0., 3.), (7.0, 8.1)] ),
+                            entry( (2,5), [(3., 7.31)] ),
+                            entry( (1,7), [(0., 1.), (1.5, 4.0)] ),
+                        ]
+    traj.time_unit = 's'
+    traj.notes = 'This experiment was conducted as a test.'
+    traj.int_to_node = {
+                         0 : 'Alice',
+                         1 : 'Bob',
+                         2 : 'Clara',
+                         4 : 'Darren',
+                         5 : 'Elle',
+                         5 : 'Felicitas',
+                         6 : 'George',
+                         7 : 'Harriett',
+                       }

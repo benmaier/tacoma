@@ -3,7 +3,7 @@ import tacoma as tc
 temporal_network = tc.edge_lists()
 
 temporal_network.N = 8
-temporal_network.t = [ 0., 1., 1.5, 3., 4., 7., 7.31, 8.1 ]
+temporal_network.t = [ 0., 1., 1.5, 3., 4., 7., 7.31 ]
 temporal_network.tmax = 8.1
 temporal_network.edges = [
                             [ (0, 1), (1, 7) ],
