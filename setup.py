@@ -5,6 +5,7 @@ import setuptools
 from setuptools.command.build_ext import build_ext
 import os, sys
 
+# get __version__, __author__, and __email__
 exec(open("./tacoma/metadata.py").read())
 
 class get_pybind_include(object):
@@ -107,10 +108,10 @@ class BuildExt(build_ext):
 setup(
     name = 'tacoma',
     version = __version__,
-    author = 'Benjamin F. Maier',
-    author_email = 'bfmaier@physik.hu-berlin.de',
+    author = __author__,
+    author_email = __email__,
     url = 'https://github.com/benmaier/tacoma',
-    license = 'MIT',
+    license = __license__,
     description = 'A package to both analyze real-world temporal networks as well as to simulate a variety of temporal network models and spreading processes on them. Analyze contact durations, group sizes, group durations, social trajectories, aggregated social network, etc.',
     long_description = '',
     packages = setuptools.find_packages(),
