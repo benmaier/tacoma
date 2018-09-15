@@ -15,6 +15,8 @@ Temporal contact modeling and analysis
    :caption: Temporal networks
 
    temporal_network_classes
+   verification_and_conversion 
+   manipulating_temporal_networks
 
 .. toctree::
    :maxdepth: 2

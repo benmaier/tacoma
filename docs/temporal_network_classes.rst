@@ -213,3 +213,24 @@ The network described in the figure above would be recorded as
                          6 : 'George',
                          7 : 'Harriett',
                        }
+
+Which class to use
+~~~~~~~~~~~~~~~~~~
+
+Each of the classes above has its specific use cases. Since most algorithms rely on
+the actual order of network-changing events, the main classes in tacoma are 
+:class:`_tacoma.edge_lists` and :class:`_tacoma.edge_changes`, meaning that 
+almost all of the algorithms in this package are specifically implemented for both,
+but not for :class:`_tacoma.edge_trajectories`.
+
+:class:`_tacoma.edge_lists` is to prefer if you just want to sample an edge list at
+a specific time. For :class:`_tacoma.edge_changes`, you would have to start at the
+beginning of the network, then fast forward to that time to obtain an edge list. Edge 
+lists are often easier to deal with, however, if the inter-event times are rather small
+and the network is not sparse, two consecutive edge lists might be overlapping strongly.
+Hence, edge changes are often faster to deal with and need less memory. Furthermore,
+Algorithms which explicitly rely on edge changes, as e.g. dynamic Gillespie algorithms
+are natively faster on :class:`_tacoma.edge_changes`.
+
+:class:`_tacoma.edge_trajectories` is preffered for drawing an 
+:func:`tacoma.drawing.edge_activity_plot` or to estimate edge-activity rates.
