@@ -23,11 +23,12 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef __SOC_TRAJ_H__
-#define __SOC_TRAJ_H__
+#ifndef __EDGE_TRAJ_H__
+#define __EDGE_TRAJ_H__
 
 #include "Utilities.h"
 #include "ResultClasses.h"
+#include "social_trajectories.h"
 
 #include <iostream>
 #include <algorithm>
@@ -45,51 +46,27 @@
 
 using namespace std;
 
-size_t get_group_integer(
-            size_t const & N,
-            set < size_t > const &component,
-            map < size_t, size_t > &hash_to_int,
-            size_t &this_hash
-        );
+struct event_map_entry {
+    vector < pair < size_t, size_t > > edges_in;
+    vector < pair < size_t, size_t > > edges_out;
+};
 
-vector < set < size_t > >
-     binned_social_trajectory_from_edge_lists(
-             edge_lists &list_of_edge_lists,
-             size_t node,
-             double dt = 0.0,
-             size_t N_time_steps = 0,
-             const bool verbose = false
-        );
-
-vector < set < size_t > >
-     binned_social_trajectory_from_edge_changes(
-             edge_changes &list_of_edge_changes,
-             size_t node,
-             double dt = 0.0,
-             size_t N_time_steps = 0,
-             const bool verbose = false
-        );
-
-vector < social_trajectory_entry >
-     social_trajectory_from_edge_changes(
-            edge_changes &list_of_edge_changes,
-            size_t node,
-            const bool verbose
-        );
-
-vector < social_trajectory_entry >
-     social_trajectory_from_edge_lists(
+edge_trajectories
+        edge_trajectories_from_edge_lists(
             edge_lists &list_of_edge_lists,
-            size_t node,
-            const bool verbose
+            const bool return_edge_similarities = false,
+            const bool verbose = false
         );
 
-size_t hash_edge(const pair < size_t, size_t > &p, const size_t &N);
-
-size_t get_edge_integer(
-            const size_t &N,
-            pair < size_t, size_t > const &edge,
-            map < size_t, size_t > &hash_to_int
+edge_trajectories
+        edge_trajectories_from_edge_changes(
+            edge_changes &list_of_edge_changes,
+            const bool return_edge_similarities = false,
+            const bool verbose = false
         );
 
+edge_changes
+    edge_trajectories_to_edge_changes(
+                edge_trajectories &traj
+            );
 #endif

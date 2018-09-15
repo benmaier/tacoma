@@ -31,6 +31,7 @@ ext_modules = [
             '_tacoma/verify_formats.cpp', 
             '_tacoma/measurements.cpp', 
             '_tacoma/social_trajectories.cpp', 
+            '_tacoma/edge_trajectories.cpp', 
             '_tacoma/concatenation.cpp', 
             '_tacoma/FW_P_varying.cpp', 
             '_tacoma/FW_P_varying_alpha_beta.cpp', 

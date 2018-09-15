@@ -46,6 +46,7 @@
 #include "measurements.h"
 #include "resampling.h"
 #include "social_trajectories.h"
+#include "edge_trajectories.h"
 #include "verify_formats.h"
 #include "SIS.h"
 #include "SIS_node_based.h"
@@ -307,28 +308,32 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("bin_from_edge_lists", &bin_from_edge_lists, "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but binned for every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. This does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+    m.def("bin_from_edge_lists", &bin_from_edge_lists,
+            "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but binned for every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. This does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
             py::arg("edge_lists"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
             py::arg("verbose") = false
          );
 
-    m.def("bin_from_edge_changes", &bin_from_edge_changes, "Get a temporal network as a list of edge lists, given an instance of `edge_changes`, but binned every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. This does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+    m.def("bin_from_edge_changes", &bin_from_edge_changes, 
+            "Get a temporal network as a list of edge lists, given an instance of `edge_changes`, but binned every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. This does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
             py::arg("verbose") = false
          );
 
-    m.def("slice_edge_lists", &slice_edge_lists, R"pbdoc(Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but only for times new_t0 <= t < new_tmax.)pbdoc",
+    m.def("slice_edge_lists", &slice_edge_lists, 
+            R"pbdoc(Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but only for times new_t0 <= t < new_tmax.)pbdoc",
             py::arg("edge_lists"),
             py::arg("new_t0"),
             py::arg("new_tmax"),
             py::arg("verbose") = false
          );
 
-    m.def("slice_edge_changes", &slice_edge_changes, R"pbdoc(Get a temporal network as a list of edge changes, given another instance of `edge_changes`, but only for times new_t0 <= t < new_tmax.)pbdoc",
+    m.def("slice_edge_changes", &slice_edge_changes, 
+            R"pbdoc(Get a temporal network as a list of edge changes, given another instance of `edge_changes`, but only for times new_t0 <= t < new_tmax.)pbdoc",
             py::arg("edge_changes"),
             py::arg("new_t0"),
             py::arg("new_tmax"),
@@ -367,37 +372,49 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("verify_edge_lists", &verify_edge_lists, "Verify that the given temporal network is in a valid format. Returns the number of rule violations. Turn on verbose for detailed information on what's wrong.",
+    m.def("convert_edge_trajectories_to_edge_changes", &edge_trajectories_to_edge_changes,
+            R"pbdoc(Convert a :class:`_tacoma.edge_trajectories` instance to an instance of :class:`_tacoma.edge_changes`.)pbdoc",
+            py::arg("traj")
+         );
+
+    m.def("verify_edge_lists", &verify_edge_lists,
+            "Verify that the given temporal network is in a valid format. Returns the number of rule violations. Turn on verbose for detailed information on what's wrong.",
             py::arg("edge_lists"),
             py::arg("verbose") = false
          );
 
-    m.def("verify_edge_changes", &verify_edge_changes, "Verify that the given temporal network is in a valid format. Returns the number of rule violations. Turn on verbose for detailed information on what's wrong.",
+    m.def("verify_edge_changes", &verify_edge_changes,
+            "Verify that the given temporal network is in a valid format. Returns the number of rule violations. Turn on verbose for detailed information on what's wrong.",
             py::arg("edge_changes"),
             py::arg("verbose") = false
          );
 
-    m.def("convert_edge_lists", &convert_edge_lists, "Convert an instance of `edge_lists` to an instance of `edge_changes`.",
+    m.def("convert_edge_lists", &convert_edge_lists, 
+            "Convert an instance of `edge_lists` to an instance of `edge_changes`.",
             py::arg("edge_lists"),
             py::arg("verbose") = false
          );
 
-    m.def("convert_edge_changes", &convert_edge_changes, "Convert an instance of `edge_changes` to an instance of `edge_lists`.",
+    m.def("convert_edge_changes", &convert_edge_changes, 
+            "Convert an instance of `edge_changes` to an instance of `edge_lists`.",
             py::arg("edge_changes"),
             py::arg("verbose") = false
          );
 
-    m.def("concatenate_edge_lists", &concatenate_edge_lists, "Concatenate a list of `edge_lists` to a single instance of `edge_lists`.",
+    m.def("concatenate_edge_lists", &concatenate_edge_lists,
+            "Concatenate a list of `edge_lists` to a single instance of `edge_lists`.",
             py::arg("list_of_edge_lists"),
             py::arg("verbose") = false
          );
 
-    m.def("concatenate_edge_changes", &concatenate_edge_changes, "Concatenate a list of `edge_changes` to a single instance of `edge_changes`.",
+    m.def("concatenate_edge_changes", &concatenate_edge_changes, 
+            "Concatenate a list of `edge_changes` to a single instance of `edge_changes`.",
             py::arg("list_of_edge_changes"),
             py::arg("verbose") = false
          );
 
-    m.def("binned_social_trajectory_from_edge_lists", &binned_social_trajectory_from_edge_lists, "Get a social trajectory of a node, given an instance of `edge_lists`, binned every dt (list of group indices this node was part of in [t,t+dt) ).",
+    m.def("binned_social_trajectory_from_edge_lists", &binned_social_trajectory_from_edge_lists, 
+            "Get a social trajectory of a node, given an instance of `edge_lists`, binned every dt (list of group indices this node was part of in [t,t+dt) ).",
             py::arg("edge_lists"),
             py::arg("node"),
             py::arg("dt") = 0.0,
@@ -405,7 +422,8 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("get_flockwork_P_args", &get_flockwork_P_args, "Calculate the rewiring_rate $\\gamma(t)$ and probability to reconnect $P(t)$ as well as the other important parameters to simulate a flockwork P-model with varying rates.",
+    m.def("get_flockwork_P_args", &get_flockwork_P_args,
+            "Calculate the rewiring_rate $\\gamma(t)$ and probability to reconnect $P(t)$ as well as the other important parameters to simulate a flockwork P-model with varying rates.",
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -418,7 +436,8 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("get_flockwork_alpha_beta_args", &get_flockwork_alpha_beta_args, "Calculate the reconnection rate $\\alpha(t)$ and disconnection rate $\\beta(t)$ as well as the other important parameters to simulate a flockwork_alpha_beta model with varying rates.",
+    m.def("get_flockwork_alpha_beta_args", &get_flockwork_alpha_beta_args,
+            "Calculate the reconnection rate $\\alpha(t)$ and disconnection rate $\\beta(t)$ as well as the other important parameters to simulate a flockwork_alpha_beta model with varying rates.",
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
