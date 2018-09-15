@@ -13,7 +13,13 @@ submodule, please make sure `matplotlib` is installed.
 from math import log10
 
 import numpy as np
-import matplotlib.pyplot as pl
+
+try:
+    import matplotlib.pyplot as pl
+except ImportError as e:
+    print("\033[1m tacoma does not install `matplotlib` as a dependency. Please install it manually. \033[0m")
+    raise e
+
 
 from tacoma import marker_sequence
 from tacoma import color_sequence

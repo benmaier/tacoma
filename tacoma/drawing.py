@@ -1,19 +1,47 @@
+"""
+This module contains functions for drawing temporal networks
+in different ways. It depends on three packages not being installed
+during installation with ``pip``, which are
+
+- matplotlib
+- networkx
+- python-louvain
+
+If you want to use this module, please install the dependencies
+listed above.
+"""
 from __future__ import print_function
-import matplotlib.pyplot as pl
-from matplotlib.collections import LineCollection
-import networkx as nx
+
+try:
+    import matplotlib.pyplot as pl
+    from matplotlib.collections import LineCollection
+except ImportError as e:
+    print("\033[1m tacoma does not install `matplotlib` as a dependency. Please install it manually. \033[0m")
+    raise e
+
+try:
+    import networkx as nx
+except ImportError as e:
+    print("\033[1m tacoma does not install `networkx` as a dependency. Please install it manually. \033[0m")
+    raise e
+
+try:
+    import community
+except ImportError as e:
+    print("\033[1m tacoma does not install `python-louvain`, neccessary for `community`,  as a dependency. Please install it manually. \033[0m")
+    raise e
+
 import numpy as np
 
 from scipy.optimize import curve_fit
 
 import tacoma as tc
 
-import community
 
 _layout_function = 'graphviz'
 
 def draw_edge_lists(L):
-    """this draws a force-directed layout for each snapshot of a temporal network and hence should be used with caution"""
+    """This draws a force-directed layout for each snapshot of a temporal network given in :mod:`_tacoma.edge_lists` format and hence should be used with caution."""
     from rocsNWL.drawing import draw
     from rocsNWL.drawing import get_pos
 
@@ -36,6 +64,38 @@ def draw_edge_lists(L):
         draw(G,pos=pos,ax=ax[i],layout_function=_layout_function)
 
 def fit_function(x, alpha, scale, fac, intervals_to_discard_for_fit ):
+    """
+    A fit function for the number of uniquely observed edges over
+    time, following the assumption that edge activity rates follow a gamma
+    distribution.
+
+    .. math::
+        f(x) = \\frac{\\lambda^\\alpha}{\Gamma(\\lambda)} x^{\\alpha-1}\\exp(-\\lambda x)
+
+    The fit function is
+
+    .. math::
+        y(x) = \\phi\\times \\left[ 1 - \\left(\\frac{\\lambda}{\\lambda+x}\\right)^\\alpha\\right]
+
+    Parameters
+    ----------
+    x : numpy.ndarray
+        Data on the x-axis, typically time
+    alpha : float
+        exponent in gamma distribution, has to be alpha > 0
+    scale : float
+        scale :math:`\\lambda` in gamma distribution, has to be scale > 0
+    fac : float
+        prefactor, typically :math:`\\phi=N(N-1)/2`.
+    intervals_to_discard_for_fit : list of tuple of float
+        a list of time intervals which have to be discarded for the fit
+
+    Returns
+    -------
+
+    y : numpy.ndarray
+        value of the function
+    """
 
     x_ = x.copy()
 
@@ -70,6 +130,42 @@ def draw_edges(traj,
                fit_color = 'k',
                return_fit_params = False,
                ):
+    """
+    Draw edges according to an edge activity plot.
+
+    Parameters
+    ----------
+    traj : list of :class:`_tacoma.edge_trajectory_entry`
+        The result of :func:`tacoma.api.get_edge_trajectories`.
+    time_normalization_factor, float, default : 1.0
+        Rescale time by this factor.
+    time_unit : str, default : None
+        Unit of time to put on the axis.
+    ax : matplotlib.Axes, default : None
+        Axis to draw an, will create new one if none provided.
+    fit : bool, default : False
+        Fit a curve to the number of uniquely observed edges.
+    edge_order : list of int, default : None
+        Reorder the edges according to this list before drawing.
+    color : a matplotlib color, default : None
+        Color in which to draw the edges in
+    intervals_to_discard_for_fit : list of tuple of float
+        a list of time intervals which have to be discarded for the fit
+    fit_color : a matplotlib color, default : 'k'
+        color in which to draw the fit in
+    return_fit_params : bool, default : False
+        Switch this on if you want to obtain the fit parameters.
+
+    Returns
+    -------
+    fig : matplotlib.Figure
+        If an axes was provided, this is `None`.
+    ax : matplotlib.Axes
+        The axes the plot was drawn on.
+    popt : tuple of float
+        Fit parameters, will only be returned if return_fit_params is `True`.
+    """
+
 
     if ax is None:
         fig, ax = pl.subplots(1,1)
@@ -160,6 +256,43 @@ def edge_activity_plot(temporal_network,
                        fit_color = None,
                        return_fit_params = False,
                        ):
+    """
+    Draw an edge activity plot for the given temporal network.
+    This is a wrapper for :func:`tacoma.drawing.draw_edges`.
+
+    Parameters
+    ----------
+    temporal_network : :class:`_tacoma.edge_lists` or :class:`_tacoma.edge_changes`.
+        A temporal network.
+    time_normalization_factor, float, default : 1.0
+        Rescale time by this factor.
+    time_unit : str, default : None
+        Unit of time to put on the axis.
+    ax : matplotlib.Axes, default : None
+        Axis to draw an, will create new one if none provided.
+    fit : bool, default : False
+        Fit a curve to the number of uniquely observed edges.
+    edge_order : list of int, default : None
+        Reorder the edges according to this list before drawing.
+    color : a matplotlib color, default : None
+        Color in which to draw the edges in
+    intervals_to_discard_for_fit : list of tuple of float
+        a list of time intervals which have to be discarded for the fit
+    fit_color : a matplotlib color, default : 'k'
+        color in which to draw the fit in
+    return_fit_params : bool, default : False
+        Switch this on if you want to obtain the fit parameters.
+
+    Returns
+    -------
+    fig : matplotlib.Figure
+        If an axes was provided, this is `None`.
+    ax : matplotlib.Axes
+        The axes the plot was drawn on.
+    popt : tuple of float
+        Fit parameters, will only be returned if `return_fit_params` is `True`.
+    """
+
     traj = tc.get_edge_trajectories(temporal_network)
     return draw_edges(
                        traj,
@@ -175,6 +308,9 @@ def edge_activity_plot(temporal_network,
                      )
 
 def get_edge_order(edge_traj, edge_sim, threshold=0.):
+    """
+    Create an edge order by 
+    """
 
     G = get_edge_graph(edge_traj, edge_sim, threshold = 0.)
 

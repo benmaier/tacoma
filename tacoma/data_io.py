@@ -1,5 +1,5 @@
 """
-This module provides routines to load and write temporal networks to the taco fileformat
+This module provides routines to load and write temporal networks to the taco fileformat.
 """
 from __future__ import print_function
 
@@ -158,11 +158,15 @@ def download_and_convert_sociopatterns_hypertext_2009(url="http://www.sociopatte
     -------
     edge_lists : :mod:`edge_lists`
         The temporal network of the 'Hypertext 2009 dynamic contact network'.
+
+    Notes
+    -----
     
     If you use this data, please cite
 
-    L. Isella et al.,  What's in a crowd? Analysis of face-to-face behavioral networks, 
-    Journal of Theoretical Biology 271, 166 (2011).
+    ::
+        L. Isella et al.,  What's in a crowd? Analysis of face-to-face behavioral networks, 
+        Journal of Theoretical Biology 271, 166 (2011).
     """
 
     # get directory name for download
@@ -281,12 +285,16 @@ def download_and_convert_sociopatterns_high_school_2013(url="http://www.sociopat
     -------
     edge_lists : :mod:`edge_lists`
         The temporal network of the 'High school 2013 dynamic contact network'.
+
+    Notes
+    -----
     
     If you use this data, please cite
 
-    R. Mastrandrea, J. Fournet, A. Barrat,
-    Contact patterns in a high school: a comparison between data collected using wearable sensors, contact diaries and friendship surveys.
-    PLoS ONE 10(9): e0136497 (2015)
+    ::
+        R. Mastrandrea, J. Fournet, A. Barrat,
+        Contact patterns in a high school: a comparison between data collected using wearable sensors, contact diaries and friendship surveys.
+        PLoS ONE 10(9): e0136497 (2015)
     """
 
     # get directory name for download
@@ -418,7 +426,7 @@ def load_fwP_args(filename):
     
 
 def load_sociopatterns_hypertext_2009(filename="~/.tacoma/ht09.taco"):
-    """Once :mod:`download_sociopatterns_hypertext_2009` was called,
+    """Once :func:`tacoma.data_io.download_sociopatterns_hypertext_2009` was called,
     use this function to retrieve an :mod:`edge_lists` instance
     of the conference data set 'Hypertext 2009 dynamic contact network'
     (from the SocioPatterns project).
@@ -435,8 +443,9 @@ def load_sociopatterns_hypertext_2009(filename="~/.tacoma/ht09.taco"):
     
     If you use this data, please cite
 
-    L. Isella et al.,  What's in a crowd? Analysis of face-to-face behavioral networks, 
-    Journal of Theoretical Biology 271, 166 (2011).
+    ::
+        L. Isella et al.,  What's in a crowd? Analysis of face-to-face behavioral networks, 
+        Journal of Theoretical Biology 271, 166 (2011).
     """
 
     filename = os.path.abspath(os.path.expanduser(filename))
@@ -447,7 +456,7 @@ def load_sociopatterns_hypertext_2009(filename="~/.tacoma/ht09.taco"):
     return load_json_taco(filename)
 
 def load_sociopatterns_high_school_2013(filename="~/.tacoma/hs13.taco"):
-    """Once :mod:`download_sociopatterns_high_school_2013` was called,
+    """Once :func:`tacoma.data_io.download_sociopatterns_high_school_2013` was called,
     use this function to retrieve an :mod:`edge_lists` instance
     of the conference data set 'High school 2013 dynamic contact network'
     (from the SocioPatterns project).
@@ -462,11 +471,14 @@ def load_sociopatterns_high_school_2013(filename="~/.tacoma/hs13.taco"):
     edge_lists : :mod:`edge_lists`
         The temporal network of the 'High school 2013 dynamic contact network'.
     
+    Notes
+    -----
     If you use this data, please cite
 
-    R. Mastrandrea, J. Fournet, A. Barrat,
-    Contact patterns in a high school: a comparison between data collected using wearable sensors, contact diaries and friendship surveys.
-    PLoS ONE 10(9): e0136497 (2015)
+    ::
+        R. Mastrandrea, J. Fournet, A. Barrat,
+        Contact patterns in a high school: a comparison between data collected using wearable sensors, contact diaries and friendship surveys.
+        PLoS ONE 10(9): e0136497 (2015)
     """
 
     filename = os.path.abspath(os.path.expanduser(filename))
