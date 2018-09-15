@@ -29,8 +29,8 @@ temporal_network.int_to_node = {
 
 C = tc.convert(temporal_network)
 
-traj = tc.edge_trajectories_from_edge_changes(C)
-C2 = tc.convert_edge_trajectories_to_edge_changes(traj)
+traj = tc.convert_to_edge_trajectories(C)
+C2 = tc.convert_edge_trajectories(traj)
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)

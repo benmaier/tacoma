@@ -466,13 +466,66 @@ def gillespie_SIRS(temporal_network,SIRS,is_static=False,verbose=False):
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
-
-def get_edge_trajectories(temporal_network,return_edge_similarities=False,verbose=False):
-    """Computes the time intervals in which each edge existed.
+def convert_to_edge_trajectories(temporal_network,return_edge_similarities=False,verbose=False):
+    """Converts a temporal network to an instance of :class:`_tacoma.edge_trajectories`.
 
     Parameters
     ----------
     temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
+        An instance of a temporal network.
+    return_edge_similarities : bool, optional
+        If this is `True`, compute the similarity between edges, too. default : False
+    verbose: bool, optional
+        Be chatty.
+
+    Returns
+    -------
+    traj : :class:`_tacoma.edge_trajectories`
+        The converted temporal network.
+    """
+
+    temporal_network = _get_raw_temporal_network(temporal_network)
+
+    if type(temporal_network) == ec:
+        if return_edge_similarities:
+            raise ValueError('Please convert to `edge_lists` first as the edge similarity algorithm is only implemented for `edge_lists`')
+
+        result = _tc.edge_trajectories_from_edge_changes(temporal_network,return_edge_similarities,verbose)
+    elif type(temporal_network) == el:
+        result = _tc.edge_trajectories_from_edge_lists(temporal_network,return_edge_similarities)
+    else:
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+
+    return result
+
+def convert_edge_trajectories(traj):
+    """
+    Convert an instance of :class:`_tacoma.edge_trajectories`
+    to an instance of :class:`_tacoma.edge_changes`. Note that there's
+    no method to convert to :class:`_tacoma.edge_lists` directly.
+
+    Parameters
+    ----------
+    traj : :class:`_tacoma.edge_trajectories`
+        The temporal network which has to be converted.
+
+    Returns
+    -------
+    temporal_network : :class:`_tacoma.edge_changes`
+        The converted temporal network.
+    """
+
+    return _tc.convert_edge_trajectories_to_edge_changes(traj)
+
+
+def get_edge_trajectories(temporal_network,return_edge_similarities=False,verbose=False):
+    """
+    Computes a list of time intervals in which each edge existed and optionally the
+    similarity between edges.
+
+    Parameters
+    ----------
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, :class:`_tacoma.edge_lists_with_histograms` or :class:`_tacoma.edge_trajectories`
         An instance of a temporal network.
     return_edge_similarities : bool, optional
         If this is `True`, return the similarity between edges. default : False
@@ -494,18 +547,10 @@ def get_edge_trajectories(temporal_network,return_edge_similarities=False,verbos
         while being connected to the same node.
     """
 
-    temporal_network = _get_raw_temporal_network(temporal_network)
-
-    if type(temporal_network) == ec:
-        if 'return_edge_similarities' in kwargs and\
-           kwargs['return_edge_similarities']:
-            raise ValueError('Please convert to `edge_lists` first as the edge similarity algorithm is only implemented for `edge_lists`')
-
-        result = _tc.edge_trajectories_from_edge_changes(temporal_network,return_edge_similarities,verbose)
-    elif type(temporal_network) == el:
-        result = _tc.edge_trajectories_from_edge_lists(temporal_network,return_edge_similarities)
+    if type(temporal_network) == edge_trajectories:
+        result = temporal_network
     else:
-        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
+        result = convert_to_edge_trajectories(temporal_network,return_edge_similarities,verbose)
 
     if return_edge_similarities:
         return result.trajectories, result.edge_similarities
