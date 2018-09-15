@@ -741,6 +741,14 @@ PYBIND11_MODULE(_tacoma, m) {
         for each edge, a list of time pairs denoting the times the edge exists.
          )pbdoc")
         .def(py::init<>())
+        .def(py::init< 
+                        const pair < size_t, size_t > &, 
+                        const vector < pair < double, double > > &
+                     >(),
+                py::arg("edge"),
+                py::arg("time_pairs"),
+                "Initialize from a pair of ints and a list of pairs of doubles."
+            )
         .def_readwrite("edge", &edge_trajectory_entry::edge, R"pbdoc(Tuple[int, int] containing the nodes belonging to this edge.)pbdoc")
         .def_readwrite("time_pairs", &edge_trajectory_entry::time_pairs, R"pbdoc(
             List[Tuple[double, double]] 

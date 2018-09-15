@@ -97,7 +97,7 @@ struct edge_changes
         N = other.N;
         t0 = other.t0;
         tmax = other.tmax;
-    }
+    };
 };
 
 struct edge_lists_with_histograms
@@ -132,7 +132,7 @@ struct edge_lists
         t = other.t;
         N = other.N;
         tmax = other.tmax;
-    }
+    };
 };
 
 struct group_sizes_and_durations
@@ -163,6 +163,14 @@ struct edge_trajectory_entry {
     vector < pair < double, double > > time_pairs;
     double last_time_active;
     bool is_active;
+
+    edge_trajectory_entry(){};
+    edge_trajectory_entry(const pair < size_t, size_t > &_edge,
+                          const vector < pair < double, double > > &_time_pairs)
+    {
+        edge = _edge;
+        time_pairs = _time_pairs;
+    };
 };
 
 struct edge_trajectories {
