@@ -32,32 +32,33 @@ Why should I use tacoma?
 Pros
 ~~~~
 
--  networks are natively described in continuous time
--  two main native formats to describe temporal networks
-   (:class:`_tacoma.edge_lists` and :class:`_tacoma.edge_changes`), a third way, a sorted
-   list of ``on``-intervals for each edge called
-   ``tc.edge_trajectories`` is available, but algorithms work on the two
-   native formats only
--  the simple portable file-format ``.taco`` as a standardized way to
-   share temporal network data (which is just the data dumped to a
-   ``.json``-file, a simple file format readable from a variety of
-   languages)
--  easy functions to produce surrogate temporal networks from four
-   different models
--  easy way to simulate Gillespie (here, epidemic spreading) processes
-   on temporal networks
--  easy framework to develop new Gillespie-simulations algorithms on
-   temporal networks
--  multiple and simple ways to interactively visualize temporal networks
--  simple functions to manipulate temporal networks (slice, concatenate,
-   rescale time, sample, bin, convert)
--  simple functions to analyze structural and statistical properties of
-   temporal networks (mean degree, degree distribution, group size
-   distribution, group life time distributions, etc.)
--  fast algorithms due to C++-core (*fast* as in *faster than pure
-   Python*)
--  relatively fast and easy to compile since it only depends on the
-   C++11-stdlib and `pybind11`_ without the large overhead of ``Boost``
+- networks are natively described in continuous time (which includes a description in
+  discrete time)
+- two main native formats to describe temporal networks
+  (:class:`_tacoma.edge_lists` and :class:`_tacoma.edge_changes`), a third way, a sorted
+  list of ``on``-intervals for each edge called
+  ``tc.edge_trajectories`` is available, but algorithms work on the two
+  native formats only
+- the simple portable file-format ``.taco`` as a standardized way to
+  share temporal network data (which is just the data dumped to a
+  ``.json``-file, a simple file format readable from a variety of
+  languages)
+- easy functions to produce surrogate temporal networks from four
+  different models
+- easy way to simulate Gillespie (here, epidemic spreading) processes
+  on temporal networks
+- easy framework to develop new Gillespie-simulations algorithms on
+  temporal networks
+- multiple and simple ways to interactively visualize temporal networks
+- simple functions to manipulate temporal networks (slice, concatenate,
+  rescale time, sample, bin, convert)
+- simple functions to analyze structural and statistical properties of
+  temporal networks (mean degree, degree distribution, group size
+  distribution, group life time distributions, etc.)
+- fast algorithms due to C++-core (*fast* as in *faster than pure
+  Python*)
+- relatively fast and easy to compile since it only depends on the
+  C++11-stdlib and `pybind11`_ without the large overhead of ``Boost``
 
 Cons
 ~~~~

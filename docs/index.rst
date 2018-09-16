@@ -14,10 +14,10 @@ Temporal contact modeling and analysis
    :maxdepth: 2
    :caption: Temporal networks
 
-   temporal_network_classes
-   verification_and_conversion 
-   manipulating_temporal_networks
-   remeasurements
+   temporal_networks/temporal_network_classes
+   temporal_networks/verification_and_conversion 
+   temporal_networks/manipulating_temporal_networks
+   temporal_networks/binning_and_sampling
 
 .. toctree::
    :maxdepth: 2
@@ -28,6 +28,7 @@ Temporal contact modeling and analysis
    reference/tacoma_analysis
    reference/tacoma_tools
    reference/tacoma_drawing
+   reference/tacoma_interactive
    reference/tacoma_data_io
    reference/tacoma_model_conversions
    reference/tacoma_flockwork

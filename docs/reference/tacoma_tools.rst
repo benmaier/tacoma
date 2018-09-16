@@ -1,5 +1,5 @@
-Tool module
------------
+Tools module
+------------
 
 .. automodule:: tacoma.tools
     :members:
