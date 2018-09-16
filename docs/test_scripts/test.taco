@@ -1,0 +1,1 @@
+{"type":"edge_lists","t":[0.0,1.0,1.5,3.0,4.0,7.0,7.31],"tmax":8.1,"N":8,"edges":[[[0,1],[1,7]],[[0,1]],[[0,1],[1,7]],[[2,5],[1,7]],[[2,5]],[[0,1],[2,5]],[[0,1]]],"int_to_node":{"0":"Alice","1":"Bob","2":"Clara","3":"Darren","4":"Elle","5":"Felicitas","6":"George","7":"Harriett"},"notes":"This experiment was conducted as a test.","time_unit":"s"}

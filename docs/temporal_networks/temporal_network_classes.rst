@@ -1,3 +1,5 @@
+.. _temp_network_classes:
+
 Temporal network classes
 ========================
 
@@ -44,6 +46,8 @@ at :math:`t_\mathrm{max}`.
 There's three data structures implemented in this package, all of which capture the situation
 described above in different ways and are useful in different situations.
 
+.. _el_explanation:
+
 Edge lists
 ~~~~~~~~~~
 
@@ -88,12 +92,14 @@ The network described in the figure above would be recorded as
                        0 : 'Alice',
                        1 : 'Bob',
                        2 : 'Clara',
-                       4 : 'Darren',
-                       5 : 'Elle',
+                       3 : 'Darren',
+                       4 : 'Elle',
                        5 : 'Felicitas',
                        6 : 'George',
                        7 : 'Harriett',
                      }
+
+.. _ec_explanation:
 
 Edge changes
 ~~~~~~~~~~~~
@@ -150,8 +156,8 @@ The network described in the figure above would be recorded as
                         0 : 'Alice',
                         1 : 'Bob',
                         2 : 'Clara',
-                        4 : 'Darren',
-                        5 : 'Elle',
+                        3 : 'Darren',
+                        4 : 'Elle',
                         5 : 'Felicitas',
                         6 : 'George',
                         7 : 'Harriett',
@@ -207,8 +213,8 @@ The network described in the figure above would be recorded as
                          0 : 'Alice',
                          1 : 'Bob',
                          2 : 'Clara',
-                         4 : 'Darren',
-                         5 : 'Elle',
+                         3 : 'Darren',
+                         4 : 'Elle',
                          5 : 'Felicitas',
                          6 : 'George',
                          7 : 'Harriett',

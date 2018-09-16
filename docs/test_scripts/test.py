@@ -20,8 +20,8 @@ temporal_network.int_to_node = {
                 0 : 'Alice',
                 1 : 'Bob',
                 2 : 'Clara',
-                4 : 'Darren',
-                5 : 'Elle',
+                3 : 'Darren',
+                4 : 'Elle',
                 5 : 'Felicitas',
                 6 : 'George',
                 7 : 'Harriett',
@@ -40,3 +40,21 @@ pp.pprint(C.edges_initial)
 pp.pprint(C.edges_in)
 pp.pprint(C.edges_out)
 
+
+tc.write_json_taco(temporal_network, 'test.taco')
+
+import json
+
+with open('test.taco','r') as f:
+    data = json.load(f)
+
+print(data)
+
+tc.write_json_taco(C, 'test.taco')
+
+import json
+
+with open('test.taco','r') as f:
+    data = json.load(f)
+
+print(data)
