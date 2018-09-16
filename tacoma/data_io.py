@@ -65,7 +65,7 @@ def write_json_taco(temporal_network,fp):
         fp = os.path.abspath( os.path.expanduser(fp) )
         fp = open(fp,'w')
 
-    json.dump(this_data,fp)
+    json.dump(this_data,fp, separators=(',',':'))
 
     fp.close()
 
