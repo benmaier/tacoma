@@ -11,7 +11,7 @@ Temporal contact modeling and analysis
    about
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Temporal networks
 
    temporal_networks/temporal_network_classes
@@ -21,14 +21,39 @@ Temporal contact modeling and analysis
    temporal_networks/read_write_and_share
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Visualizations
 
    visualizations/drawing
    visualizations/interactive
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
+   :caption: Structural and temporal analysis
+
+   structural_and_temporal_analysis/degree
+   structural_and_temporal_analysis/group_sizes_and_durations
+   structural_and_temporal_analysis/social_trajectories
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Epidemic Spreading
+
+   epidemic_spreading/gillespie
+   epidemic_spreading/epidemic_classes
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Modeling
+
+   modeling/flockworks
+   modeling/activity_model
+   modeling/dynamic_rgg
+   modeling/zsbb
+
+
+.. toctree::
+   :maxdepth: 3
    :caption: Reference
 
    reference/cpp_core
