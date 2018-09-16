@@ -5,7 +5,7 @@ Storing and sharing data is obviously rather important. Hence we need a file-for
 us to easily read, write and share the data present in :class:`_tacoma.edge_lists` and 
 :class:`_tacoma.edge_changes`.
 
-The status quo --- CSV
+The status quo --- csv
 ----------------------
 
 Typically, data is shared in csv-format (or tsv)
@@ -159,7 +159,7 @@ Reading temporal network data from a taco is as simple as using :func:`tacoma.da
     temporal_network = tc.load_json_taco('temporal_network.taco')
 
 Converting csv to taco
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 As indicated above, converting csv-data to data actually
 usable by algorithms can turn out quite tideous.
@@ -263,6 +263,24 @@ convert it to a taco, taken directly from :mod:`tacoma.data_io`
     # save this edge_lists instance
     with open('ht09.taco','w') as f:
         tc.write_json_taco(el,f)
+
+
+Edge coordinate files
+---------------------
+
+:func:`tacoma.data_io.write_edge_trajectory_coordinates`
+
+
+Loading existing data
+---------------------
+
+:func:`tacoma.data_io.download_and_convert_sociopatterns_high_school_2013`
+
+:func:`tacoma.data_io.download_and_convert_sociopatterns_hypertext_2009`
+
+:func:`tacoma.data_io.load_sociopatterns_high_school_2013`
+
+:func:`tacoma.data_io.load_sociopatterns_hypertext_2009`
 
 
 

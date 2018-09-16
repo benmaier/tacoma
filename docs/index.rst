@@ -22,6 +22,13 @@ Temporal contact modeling and analysis
 
 .. toctree::
    :maxdepth: 2
+   :caption: Visualizations
+
+   visualizations/drawing
+   visualizations/interactive
+
+.. toctree::
+   :maxdepth: 2
    :caption: Reference
 
    reference/cpp_core
