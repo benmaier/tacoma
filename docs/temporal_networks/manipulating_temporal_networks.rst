@@ -20,6 +20,14 @@ We can do
 
 The corresponding function can be found at :class:`tacoma.api.slice`.
 
+Slicing is illustrated below.
+
+.. figure:: img/slice.png
+    :alt: Slicing.
+
+    Slicing is done by cutting out a part of a temporal network,
+    returning a new temporal network.
+
 Concatenating
 ~~~~~~~~~~~~~
 
@@ -42,6 +50,14 @@ by
     - All times :math:`t` of a temporal network will be remapped to have the
       beginning of the experiment at :math:`t_\mathrm{max}` of the predecessing
       network in the list.
+
+Concatenation is illustrated below.
+
+.. figure:: img/concatenate.png
+  :alt: Concatenating
+
+  A new temporal network is constructed by concatenating a list of temporal networks.
+
       
 The corresponding function can be found at :class:`tacoma.api.concatenate`.
 
