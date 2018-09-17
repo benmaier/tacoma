@@ -47,6 +47,7 @@ sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
+    'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
@@ -225,7 +226,7 @@ html_show_sourcelink = True
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = '_tacomadoc'
+htmlhelp_basename = 'tacomadoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -247,7 +248,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, '_tacoma.tex', u'_tacoma Documentation',
+    (master_doc, 'tacoma.tex', u'tacoma Documentation',
      u'Benjamin F. Maier', 'manual'),
 ]
 
@@ -277,7 +278,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, '_tacoma', u'_tacoma Documentation',
+    (master_doc, 'tacoma', u'tacoma Documentation',
      [author], 1)
 ]
 
@@ -291,8 +292,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, '_tacoma', u'_tacoma Documentation',
-     author, '_tacoma', 'One line description of project.',
+    (master_doc, 'tacoma', u'tacoma Documentation',
+     author, __author__, 'One line description of project.',
      'Miscellaneous'),
 ]
 
