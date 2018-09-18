@@ -1,13 +1,20 @@
 Drawing
 =======
 
-The visualization of temporal networks is an area of active reasearch.
+Edge activity plots
+-------------------
+
+The visualization of temporal networks is an area of active research.
 `tacoma`'s contribution is a so-called `edge activity plot`, where
-edges are attributed with an integer id, sorted for their order of
+edges are attributed to an integer id, sorted for their order of
 appearance. Then, each edge is drawn as a bar for the duration of 
-its existence. This is closely related to the representation of
+its existence (active time periods, respectively). 
+This is closely related to the representation of
 a temporal network as a list of active intervals, 
-:class:`_tacoma.edge_trajectories`.
+:class:`_tacoma.edge_trajectories`. The function to draw 
+edge activity plots is :func:`_tacoma.edge_activity_plot`.
+
+Here's some example code
 
 .. code:: python
 
@@ -35,3 +42,10 @@ a temporal network as a list of active intervals,
     :alt: edge activity in hs13
 
     Edge activity in the temporal network Sociopatterns high school 2013.
+
+An edge activity plot is useful since it conveys a lot of information in 
+the data visually. Occurences of longer horizontal bars show that there's likely
+broad contact duration distribution. Vertical bars show that there's increased
+activity during a certain period of time over the whole network.
+Edges from groups tend to be observed for the first time at the same time
+so naturally clusters are observed as recurring broad bars.
