@@ -368,7 +368,7 @@ def number_of_discovered_edges(temporal_network):
     
     Parameters
     ==========
-    temporal_network : :mod:`edge_lists` or :mod:`edge_changes` or :obj:`list` of :mod:`edge_trajectory_entry`
+    temporal_network : :class:`_tacoma.edge_trajectories`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes` or :obj:`list` of :class:`_tacoma.edge_trajectory_entry`
 
     Returns
     =======
@@ -379,10 +379,11 @@ def number_of_discovered_edges(temporal_network):
     """
 
     if type(temporal_network) in [ ec, el, el_h, ec_h ]:
-        result = tc.get_edge_trajectories(temporal_network)
-        traj = result.trajectories
+        traj = tc.get_edge_trajectories(temporal_network)
     elif type(temporal_network) == list and type(temporal_network[0]) == tc.edge_trajectory_entry:
         traj = temporal_network
+    elif type(temporal_network) == edge_trajectories:
+        traj = temporal_network.trajectories
     else:
         raise ValueError("Unknown type for temporal network:", type(temporal_network))
 
