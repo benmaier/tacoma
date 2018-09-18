@@ -30,6 +30,9 @@ from scipy.stats import lognorm
 # ========================================================= ZSBB ==================================================
 
 def ZSBB_mean_coordination_number(b0,lam,N,b1):
+    """
+    Compute the mean coordination number of the ZSBB model.
+    """
 
     s = 0.0
     for n in range(1,N):
@@ -151,7 +154,7 @@ def estimate_flockwork_P_args_for_single_nodes(temporal_network,use_event_rate_m
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     t_run_total : float
         this is just plainly copied to the returned kwargs. If it is set to `None`, t_run_total will be set to `temporal_network.tmax`
@@ -304,7 +307,7 @@ def estimate_flockwork_P_args(temporal_network,*args,**kwargs):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     t_run_total : float
         this is just plainly copied to the returned kwargs. If it is set to `None`, t_run_total will be set to `temporal_network.tmax`
@@ -382,7 +385,7 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     t_run_total : float
         this is just plainly copied to the returned kwargs. If it is set to `None`, t_run_total will be set to `temporal_network.tmax`
@@ -522,7 +525,7 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes_randomly(temporal_networ
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     t_run_total : float
         this is just plainly copied to the returned kwargs. If it is set to `None`, t_run_total will be set to `temporal_network.tmax`
@@ -606,7 +609,7 @@ def estimate_flockwork_alpha_beta_args(temporal_network,*args,**kwargs):
 
     Parameters
     ----------
-    temporal_network : :mod:`edge_changes`, :mod:`edge_lists`, :mod:`edge_changes_with_histograms`, or :mod:`edge_lists_with_histograms`
+    temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
     t_run_total : float
         this is just plainly copied to the returned kwargs. If it is set to `None`, t_run_total will be set to `temporal_network.tmax`
