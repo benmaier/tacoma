@@ -27,4 +27,4 @@ How to extend
 TODO (this chapter is a bit complicated)
 
 
-:: _Vestergaard's and Génois's adaption for temporal networks: https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004579
+.. _Vestergaard's and Génois's adaption for temporal networks: https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004579
