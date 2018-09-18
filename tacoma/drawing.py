@@ -37,10 +37,9 @@ from scipy.optimize import curve_fit
 
 import tacoma as tc
 
-
 _layout_function = 'graphviz'
 
-def draw_edge_lists(L):
+def _draw_edge_lists(L):
     """This draws a force-directed layout for each snapshot of a temporal network given in :mod:`_tacoma.edge_lists` format and hence should be used with caution."""
     from rocsNWL.drawing import draw
     from rocsNWL.drawing import get_pos
@@ -108,13 +107,6 @@ def fit_function(x, alpha, scale, fac, intervals_to_discard_for_fit ):
         x_[x>=t1] -= t1 - t0
         offset += t1 - t0
 
-    #print(x_)
-
-    #pl.figure()
-    #pl.plot(x, x_)
-    #pl.show()
-
-    #return fac * (1.0 - np.exp(-alpha*(x_-x_.min())))
     return fac * (1.0 - (scale/(scale+x_))**(alpha) )
 
     
@@ -142,7 +134,7 @@ def draw_edges(traj,
     time_unit : str, default : None
         Unit of time to put on the axis.
     ax : matplotlib.Axes, default : None
-        Axis to draw an, will create new one if none provided.
+        Axis to draw on, will create new one if none provided.
     fit : bool, default : False
         Fit a curve to the number of uniquely observed edges.
     edge_order : list of int, default : None
@@ -309,11 +301,34 @@ def edge_activity_plot(temporal_network,
 
 def get_edge_order(edge_traj, edge_sim, threshold=0.):
     """
-    Create an edge order by 
+    Create an edge order by performing a Louvain-clustering
+    on the thresholded edge similarity graph.
+
+    Parameters
+    ----------
+    edge_traj : list of :class:`_tacoma.edge_trajectory_entry`
+        Edge trajectories, first result of :func:`tacoma.api.get_edge_trajectories`,
+        or entry ``trajectories` of :class`_tacoma.edge_trajectories`.
+    edge_sim : dict where key is a tuple of int and value is a float 
+        Edge similarities, tuple of int denoting the pair of edges,
+        similarity is in dimension of time.
+        2nd result of :func:`tacoma.api.get_edge_trajectories`,
+        or entry ``edge_similarities`` of :class`_tacoma.edge_trajectories`.
+    threshold : float
+        Ignore similarities below this threshold (minimum time spent together,
+        where spent together refers to edges connected to the same node
+        at the same time).
+
+    Returns
+    -------
+    list of int
+        Edge indices ordered in clusters.
     """
 
+    # get nx graph
     G = get_edge_graph(edge_traj, edge_sim, threshold = 0.)
 
+    # find best partition using Louvain clustering
     partition = community.best_partition(G)
     N_comm = max([v for v in partition.values()]) + 1
 
@@ -332,6 +347,30 @@ def get_edge_order(edge_traj, edge_sim, threshold=0.):
 
 
 def get_edge_graph(edge_traj, edge_sim, threshold = 0.):
+    """
+    Construct a thresholded edge similarity graph.
+
+    Parameters
+    ----------
+    edge_traj : list of :class:`_tacoma.edge_trajectory_entry`
+        Edge trajectories, first result of :func:`tacoma.api.get_edge_trajectories`,
+        or entry ``trajectories` of :class`_tacoma.edge_trajectories`.
+    edge_sim : dict where key is a tuple of int and value is a float 
+        Edge similarities, tuple of int denoting the pair of edges,
+        similarity is in dimension of time.
+        2nd result of :func:`tacoma.api.get_edge_trajectories`,
+        or entry ``edge_similarities`` of :class`_tacoma.edge_trajectories`.
+    threshold : float
+        Ignore similarities below this threshold (minimum time spent together,
+        where spent together refers to edges connected to the same node
+        at the same time).
+
+    Returns
+    -------
+    nx.Graph
+        An undirected, unweighted graph where nodes are edges in the temporal network
+        and edges mean their similarity is above the threshold.
+    """
 
     N_edges = len(edge_traj)
     G = nx.Graph()

@@ -2,7 +2,7 @@
 """
 This module provides functions to analyze and plot
 the results from temporal network analyses, especially
-from the :mod:`tacoma.measure_group_sizes_and_durations`
+from the :func:`tacoma.api.measure_group_sizes_and_durations`
 routine. These functions are not imported by default
 as they require `matplotlib` which cannot be easily installed
 on some systems like compute clusters due to a missing

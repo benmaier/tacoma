@@ -288,11 +288,22 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("edge_changes")
          );
 
-    m.def("get_edge_counts", &get_edge_counts, "Given an instance of `edge_changes`, returns the lists `m_in`, `m_out` and `m`, which count the edge events as well as the edges at the given times. Note that `m` contains one entry more than `m_in` and `m_out` due to the initial edge list.",
+    m.def("get_edge_counts", &get_edge_counts, 
+            R"pbdoc(Given an instance of :class:`_tacoma.edge_changes`, returns the lists
+            `m_in`, `m_out` and `m`, which count the edge events as well as the
+            edges at the given times. Note that `m` contains one entry more
+            than `m_in` and `m_out` due to the initial edge list.)pbdoc",
             py::arg("edge_changes")
          );
 
-    m.def("sample_from_edge_lists", &sample_from_edge_lists, "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step. However, you should use tacoma.bin_from_edge_lists instead.",
+    m.def("sample_from_edge_lists", &sample_from_edge_lists, 
+            R"pbdoc(Get a temporal network as a list of edge lists, given
+            another instance of `edge_lists`, but resampled every dt.
+            Alternatively, provide a number of time steps to divide (tmax-t0)
+            into. if `sample_aggregates` is `True`, this does not sample the
+            network state after each dt, but rather gives a graph of all edges
+            being present in the last time step. However, you should use
+            :func:`_tacoma.bin_from_edge_lists` instead.)pbdoc", 
             py::arg("edge_lists"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -300,7 +311,14 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("sample_from_edge_changes", &sample_from_edge_changes, "Get a temporal network as a list of edge lists, given an instance of `edge_changes`, but resampled every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step. However, you should use tacoma.bin_from_edge_changes instead.",
+    m.def("sample_from_edge_changes", &sample_from_edge_changes, 
+            R"pbdoc(Get a temporal network as a :class:`_tacoma.edge_lists`, 
+            given an instance of :class:`_tacoma.edge_changes`, 
+            but resampled every dt. Alternatively, provide a number of time steps 
+            to divide (tmax-t0) into. if `sample_aggregates` is `True`, this does 
+            not sample the network state after each dt, but rather gives a graph 
+            of all edges being present in the last time step. However, you should 
+            use :func:`_tacoma.bin_from_edge_changes instead`.)pbdoc",
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -309,7 +327,11 @@ PYBIND11_MODULE(_tacoma, m) {
          );
 
     m.def("bin_from_edge_lists", &bin_from_edge_lists,
-            "Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but binned for every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. This does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+            R"pbdoc(Get a temporal network as a list of edge lists, given 
+            another instance of `edge_lists`, but binned for every dt. Alternatively, 
+            provide a number of time steps to divide (tmax-t0) into. This 
+            does not sample the network state after each dt, but rather gives a 
+            graph of all edges being present in the last time step.)pbdoc",
             py::arg("edge_lists"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -317,7 +339,11 @@ PYBIND11_MODULE(_tacoma, m) {
          );
 
     m.def("bin_from_edge_changes", &bin_from_edge_changes, 
-            "Get a temporal network as a list of edge lists, given an instance of `edge_changes`, but binned every dt. Alternatively, provide a number of time steps to divide (tmax-t0) into. This does not sample the network state after each dt, but rather gives a graph of all edges being present in the last time step.",
+            R"pbdoc(Get a temporal network as :class:`_tacoma.edge_lists`, 
+            given an instance of `edge_changes`, but binned every dt. 
+            Alternatively, provide a number of time steps to divide (tmax-t0) into. 
+            This does not sample the network state after each dt, but rather gives a 
+            graph of all edges being present in the last time step.)pbdoc",
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -325,7 +351,9 @@ PYBIND11_MODULE(_tacoma, m) {
          );
 
     m.def("slice_edge_lists", &slice_edge_lists, 
-            R"pbdoc(Get a temporal network as a list of edge lists, given another instance of `edge_lists`, but only for times new_t0 <= t < new_tmax.)pbdoc",
+            R"pbdoc(Get a temporal network as a list of edge lists, 
+            given another instance of :class:`_tacoma.edge_lists`, 
+            but only for times ``new_t0 <= t < new_tmax``.)pbdoc",
             py::arg("edge_lists"),
             py::arg("new_t0"),
             py::arg("new_tmax"),
@@ -333,14 +361,18 @@ PYBIND11_MODULE(_tacoma, m) {
          );
 
     m.def("slice_edge_changes", &slice_edge_changes, 
-            R"pbdoc(Get a temporal network as a list of edge changes, given another instance of `edge_changes`, but only for times new_t0 <= t < new_tmax.)pbdoc",
+            R"pbdoc(Get a temporal network as a list of edge changes, 
+            given another instance of :class:`_tacoma.edge_changes`, 
+            but only for times ``new_t0 <= t < new_tmax``.)pbdoc",
             py::arg("edge_changes"),
             py::arg("new_t0"),
             py::arg("new_tmax"),
             py::arg("verbose") = false
          );
 
-    m.def("binned_social_trajectory_from_edge_changes", &binned_social_trajectory_from_edge_changes, "Get a social trajectory of a node, given an instance of `edge_changes`, binned every dt (list of group indices this node was part of in [t,t+dt) ).",
+    m.def("binned_social_trajectory_from_edge_changes", &binned_social_trajectory_from_edge_changes, 
+            R"pbdoc(Get a social trajectory of a node, binned every dt 
+            (list of group indices this node was part of in :math:`[t,t+\Delta t)` ).)pbdoc",
             py::arg("edge_changes"),
             py::arg("node"),
             py::arg("dt") = 0.0,
@@ -348,73 +380,89 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("social_trajectory_from_edge_changes", &social_trajectory_from_edge_changes, "Get a social trajectory of a node, given an instance of `edge_changes`.",
+    m.def("social_trajectory_from_edge_changes", &social_trajectory_from_edge_changes, 
+            "Get a social trajectory of a node.",
             py::arg("edge_changes"),
             py::arg("node"),
             py::arg("verbose") = false
          );
 
-    m.def("social_trajectory_from_edge_lists", &social_trajectory_from_edge_lists, "Get a social trajectory of a node, given an instance of `edge_lists`.",
+    m.def("social_trajectory_from_edge_lists", &social_trajectory_from_edge_lists,
+            "Get a social trajectory of a node.",
             py::arg("edge_lists"),
             py::arg("node"),
             py::arg("verbose") = false
          );
 
-    m.def("edge_trajectories_from_edge_lists", &edge_trajectories_from_edge_lists, "For each edge, get all time pairs where the edge existed, given an instance of `edge_lists`.",
+    m.def("edge_trajectories_from_edge_lists", &edge_trajectories_from_edge_lists, 
+            "For each edge, get all time pairs where the edge existed.",
             py::arg("edge_lists"),
             py::arg("return_edge_similarities") = false,
             py::arg("verbose") = false
          );
 
-    m.def("edge_trajectories_from_edge_changes", &edge_trajectories_from_edge_changes, "For each edge, get all time pairs where the edge existed, given an instance of `edge_changes`.",
+    m.def("edge_trajectories_from_edge_changes", &edge_trajectories_from_edge_changes, 
+            R"pbdoc(For each edge, get all time pairs where the 
+            edge existed, given an instance of `edge_changes`.)pbdoc",
             py::arg("edge_changes"),
             py::arg("return_edge_similarities") = false,
             py::arg("verbose") = false
          );
 
     m.def("convert_edge_trajectories_to_edge_changes", &edge_trajectories_to_edge_changes,
-            R"pbdoc(Convert a :class:`_tacoma.edge_trajectories` instance to an instance of :class:`_tacoma.edge_changes`.)pbdoc",
+            R"pbdoc(Convert a :class:`_tacoma.edge_trajectories` 
+            instance to an instance of :class:`_tacoma.edge_changes`.)pbdoc",
             py::arg("traj")
          );
 
     m.def("verify_edge_lists", &verify_edge_lists,
-            "Verify that the given temporal network is in a valid format. Returns the number of rule violations. Turn on verbose for detailed information on what's wrong.",
+            R"pbdoc(Verify that the given temporal network is in a valid format. 
+            Returns the number of rule violations and is verbose about
+            what's wrong.)pbdoc",
             py::arg("edge_lists"),
             py::arg("verbose") = false
          );
 
     m.def("verify_edge_changes", &verify_edge_changes,
-            "Verify that the given temporal network is in a valid format. Returns the number of rule violations. Turn on verbose for detailed information on what's wrong.",
+            R"pbdoc(Verify that the given temporal network is in a valid format. 
+            Returns the number of rule violations and is verbose about
+            what's wrong.)pbdoc",
             py::arg("edge_changes"),
             py::arg("verbose") = false
          );
 
     m.def("convert_edge_lists", &convert_edge_lists, 
-            "Convert an instance of `edge_lists` to an instance of `edge_changes`.",
+            R"pbdoc(Convert an instance of :class:`_tacoma.edge_lists` 
+            to an instance of :class:`_tacoma.edge_changes`.)pbdoc",
             py::arg("edge_lists"),
             py::arg("verbose") = false
          );
 
     m.def("convert_edge_changes", &convert_edge_changes, 
-            "Convert an instance of `edge_changes` to an instance of `edge_lists`.",
+            R"pbdoc(Convert an instance of :class:`_tacoma.edge_changes` to an 
+            instance of :class:`_tacoma.edge_lists`.)pbdoc",
             py::arg("edge_changes"),
             py::arg("verbose") = false
          );
 
     m.def("concatenate_edge_lists", &concatenate_edge_lists,
-            "Concatenate a list of `edge_lists` to a single instance of `edge_lists`.",
+            R"pbdoc(Concatenate a list of :class:`_tacoma.edge_lists` to a 
+            single instance of :class:`_tacoma.edge_lists`.)pbdoc",
             py::arg("list_of_edge_lists"),
             py::arg("verbose") = false
          );
 
     m.def("concatenate_edge_changes", &concatenate_edge_changes, 
-            "Concatenate a list of `edge_changes` to a single instance of `edge_changes`.",
+            R"pbdoc(Concatenate a list of :class:`_tacoma.edge_changes` 
+            to a single instance of :class:`_tacoma.edge_changes`.)pbdoc",
             py::arg("list_of_edge_changes"),
             py::arg("verbose") = false
          );
 
     m.def("binned_social_trajectory_from_edge_lists", &binned_social_trajectory_from_edge_lists, 
-            "Get a social trajectory of a node, given an instance of `edge_lists`, binned every dt (list of group indices this node was part of in [t,t+dt) ).",
+            R"pbdoc(Get a social trajectory of a node, given an instance of 
+            :class:`_tacoma.edge_lists`, binned every dt (list of group indices 
+            this node was part of in :math:`[t,t+dt)`).)pbdoc",
             py::arg("edge_lists"),
             py::arg("node"),
             py::arg("dt") = 0.0,
@@ -423,7 +471,9 @@ PYBIND11_MODULE(_tacoma, m) {
          );
 
     m.def("get_flockwork_P_args", &get_flockwork_P_args,
-            "Calculate the rewiring_rate $\\gamma(t)$ and probability to reconnect $P(t)$ as well as the other important parameters to simulate a flockwork P-model with varying rates.",
+            R"pbdoc(Calculate the rewiring_rate :math:`\gamma(t)` and probability to 
+            reconnect :math:`P(t)` as well as the other important parameters to 
+            simulate a flockwork P-model with varying rates.)pbdoc",
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -437,7 +487,9 @@ PYBIND11_MODULE(_tacoma, m) {
          );
 
     m.def("get_flockwork_alpha_beta_args", &get_flockwork_alpha_beta_args,
-            "Calculate the reconnection rate $\\alpha(t)$ and disconnection rate $\\beta(t)$ as well as the other important parameters to simulate a flockwork_alpha_beta model with varying rates.",
+            R"pbdoc(Calculate the reconnection rate :math:`\alpha(t)` and disconnection rate 
+            :math:`\beta(t)` as well as the other important parameters to simulate a 
+            flockwork-alpha-beta-model with varying rates.)pbdoc",
             py::arg("edge_changes"),
             py::arg("dt") = 0.0,
             py::arg("N_time_steps") = 0,
@@ -452,7 +504,8 @@ PYBIND11_MODULE(_tacoma, m) {
          );
 
     m.def("get_flockwork_P_node_parameters_gamma_and_P", get_node_gamma_and_P,
-            R"pbdoc(Calculate the mean node specific activity $\gamma_i$ and reconnection probability $P_i$ for each node.)pbdoc",
+            R"pbdoc(Calculate the mean node specific activity :math:`\gamma_i`
+            and reconnection probability :math:`P_i` for each node.)pbdoc",
             py::arg("edge_changes"),
             py::arg("gamma"),
             py::arg("P"),
@@ -460,7 +513,8 @@ PYBIND11_MODULE(_tacoma, m) {
         );
 
     m.def("get_flockwork_node_parameters_alpha_and_beta", get_node_alpha_and_beta,
-            R"pbdoc(Calculate the mean node specific reconnection rate factor $\alpha_i$ and disconnection rate factor $\beta_i$ for each node.)pbdoc",
+            R"pbdoc(Calculate the mean node specific reconnection rate factor 
+            :math:`\alpha_i` and disconnection rate factor :math`\beta_i` for each node.)pbdoc",
             py::arg("edge_changes"),
             py::arg("reconnection_rate"),
             py::arg("disconnecton_rate"),
@@ -470,7 +524,8 @@ PYBIND11_MODULE(_tacoma, m) {
         );
 
     m.def("get_flockwork_node_rates_alpha_and_beta", get_time_dependent_node_alpha_and_beta,
-            R"pbdoc(Calculate the mean node specific reconnection rate factor alpha_i and disconnection rate factor beta_i for each node.)pbdoc",
+            R"pbdoc(Calculate the mean node specific reconnection rate factor 
+            :math:`\alpha_i` and disconnection rate factor :math:`\beta_i` for each node.)pbdoc",
             py::arg("edge_changes"),
             py::arg("reconnection_rate"),
             py::arg("disconnecton_rate"),
@@ -478,14 +533,17 @@ PYBIND11_MODULE(_tacoma, m) {
         );
 
     m.def("get_flockwork_P_node_parameters_alpha_and_beta_from_gamma_and_P", get_node_gamma_and_P,
-            R"pbdoc(Calculate the mean node specific activity gamma_i and reconnection probability P_i for each node.)pbdoc",
+            R"pbdoc(Calculate the mean node specific activity :math:`\gamma_i` and reconnection
+            probability :math:`P_i` for each node.)pbdoc",
             py::arg("edge_changes"),
             py::arg("gamma"),
             py::arg("P"),
             py::arg("use_event_rate_method") = true
         );
 
-    m.def("estimate_k_scaling_gradient_descent", &estimate_k_scaling_gradient_descent, R"pbdoc(Estimate the scaling of $\left\langle k\right\rangle$ that's necessary to revert the effects of binning using gradient descent.)pbdoc",
+    m.def("estimate_k_scaling_gradient_descent", &estimate_k_scaling_gradient_descent,
+            R"pbdoc(Estimate the scaling of $\left\langle k\right\rangle$ that's 
+            necessary to revert the effects of binning using gradient descent.)pbdoc",
             py::arg("edge_changes"),
             py::arg("dt_for_inference"),
             py::arg("dt_for_binning"),
@@ -496,7 +554,9 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = true
         );
 
-    m.def("estimate_k_scaling_gradient_descent_RMSE", &estimate_k_scaling_gradient_descent_RMSE, R"pbdoc(Estimate the scaling of $\left\langle k\right\rangle$ that's necessary to revert the effects of binning using gradient descent.)pbdoc",
+    m.def("estimate_k_scaling_gradient_descent_RMSE", &estimate_k_scaling_gradient_descent_RMSE, 
+            R"pbdoc(Estimate the scaling of $\left\langle k\right\rangle$ that's 
+            necessary to revert the effects of binning using gradient descent.)pbdoc",
             py::arg("edge_changes"),
             py::arg("dt_for_inference"),
             py::arg("dt_for_binning"),
@@ -507,7 +567,8 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = true
         );
 
-    m.def("ZSBB_model", &ZSBB_model, "Simulate model after Zhao, Stehle, Bianconi, and Barrat.",
+    m.def("ZSBB_model", &ZSBB_model,
+            "Simulate model after Zhao, Stehle, Bianconi, and Barrat.",
             py::arg("E"),
             py::arg("N"),
             py::arg("lambda"),
@@ -522,7 +583,8 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("dynamic_RGG", &dynamic_RGG, "Simulate a dynamic random geometric graph model.",
+    m.def("dynamic_RGG", &dynamic_RGG, 
+            "Simulate a dynamic random geometric graph model.",
             py::arg("N"),
             py::arg("t_run_total"),
             py::arg("step_distance") = 0.0,
@@ -534,66 +596,76 @@ PYBIND11_MODULE(_tacoma, m) {
             py::arg("verbose") = false
          );
 
-    m.def("gillespie_SIS_on_edge_lists",&gillespie_on_edge_lists<SIS>,"Perform a Gillespie SIS simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SIS.",
+    m.def("gillespie_SIS_on_edge_lists",&gillespie_on_edge_lists<SIS>,
+            "Perform a Gillespie SIS simulation on edge lists.",
             py::arg("edge_lists"),
             py::arg("SIS"),
             py::arg("is_static") = false,
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_SIS_on_edge_changes",&gillespie_on_edge_changes<SIS>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIS.",
+    m.def("gillespie_SIS_on_edge_changes",&gillespie_on_edge_changes<SIS>,
+            "Perform a Gillespie SIS simulation on edge changes.",
             py::arg("edge_changes"),
             py::arg("SIS"),
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_node_based_SIS_on_edge_changes",&gillespie_on_edge_changes<node_based_SIS>,"Perform a Gillespie SIS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIS.",
+    m.def("gillespie_node_based_SIS_on_edge_changes",&gillespie_on_edge_changes<node_based_SIS>,
+            "Perform a Gillespie SIS simulation on edge changes.",
             py::arg("edge_changes"),
             py::arg("SIS"),
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_node_based_SIS_on_edge_lists",&gillespie_on_edge_lists<node_based_SIS>,"Perform a Gillespie SIS simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SIS.",
+    m.def("gillespie_node_based_SIS_on_edge_lists",&gillespie_on_edge_lists<node_based_SIS>,
+            "Perform a Gillespie SIS simulation on edge lists.",
             py::arg("edge_lists"),
             py::arg("SIS"),
             py::arg("is_static") = false,
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_SI_on_edge_lists",&gillespie_on_edge_lists<SI>,"Perform a Gillespie SI simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SI.",
+    m.def("gillespie_SI_on_edge_lists",&gillespie_on_edge_lists<SI>,
+            "Perform a Gillespie SI simulation on edge lists.",
             py::arg("edge_lists"),
             py::arg("SI"),
             py::arg("is_static") = false,
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_SI_on_edge_changes",&gillespie_on_edge_changes<SI>,"Perform a Gillespie SI simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SI.",
+    m.def("gillespie_SI_on_edge_changes",&gillespie_on_edge_changes<SI>,
+            "Perform a Gillespie SI simulation on edge changes.",
             py::arg("edge_changes"),
             py::arg("SI"),
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_SIR_on_edge_lists",&gillespie_on_edge_lists<SIR>,"Perform a Gillespie SIR simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SIR.",
+    m.def("gillespie_SIR_on_edge_lists",&gillespie_on_edge_lists<SIR>,
+            "Perform a Gillespie SIR simulation on edge lists.",
             py::arg("edge_lists"),
             py::arg("SIR"),
             py::arg("is_static") = false,
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_SIR_on_edge_changes",&gillespie_on_edge_changes<SIR>,"Perform a Gillespie SIR simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIR.",
+    m.def("gillespie_SIR_on_edge_changes",&gillespie_on_edge_changes<SIR>,
+            "Perform a Gillespie SIR simulation on edge changes.",
             py::arg("edge_changes"),
             py::arg("SIR"),
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_SIRS_on_edge_lists",&gillespie_on_edge_lists<SIRS>,"Perform a Gillespie SIRS simulation on edge lists. Needs an instance of tacoma.edge_lists and an instance of tacoma.SIRS.",
+    m.def("gillespie_SIRS_on_edge_lists",&gillespie_on_edge_lists<SIRS>,
+            "Perform a Gillespie SIRS simulation on edge lists.",
             py::arg("edge_lists"),
             py::arg("SIRS"),
             py::arg("is_static") = false,
             py::arg("verbose") = false
             );
 
-    m.def("gillespie_SIRS_on_edge_changes",&gillespie_on_edge_changes<SIRS>,"Perform a Gillespie SIRS simulation on edge changes. Needs an instance of tacoma.edge_changes and an instance of tacoma.SIRS.",
+    m.def("gillespie_SIRS_on_edge_changes",&gillespie_on_edge_changes<SIRS>,
+            "Perform a Gillespie SIRS simulation on edge changes.",
             py::arg("edge_changes"),
             py::arg("SIRS"),
             py::arg("verbose") = false
@@ -605,7 +677,7 @@ PYBIND11_MODULE(_tacoma, m) {
                 py::arg("edge_changes_with_histograms"),
                 "Initialize from an instance of :class:`_tacoma.edge_changes_with_histograms`"
             )
-        .def("copy_from", &edge_changes::copy_from, R"pbdoc([deprecated] copy the relevant information from an instance of :mod:`edge_changes_with_histograms`)pbdoc")
+        .def("copy_from", &edge_changes::copy_from, R"pbdoc([deprecated] copy the relevant information from an instance of :class:`_tacoma.edge_changes_with_histograms`)pbdoc")
         .def_readwrite("int_to_node", &edge_changes::int_to_node, R"pbdoc(A dictionary int -> string which keeps the original node names.)pbdoc")
         .def_readwrite("time_unit", &edge_changes::time_unit, R"pbdoc(A string containing the unit of time for this network.)pbdoc")
         .def_readwrite("notes", &edge_changes::notes, R"pbdoc(A string containing additional notes for this network.)pbdoc")
@@ -626,7 +698,7 @@ PYBIND11_MODULE(_tacoma, m) {
                 py::arg("edge_lists_with_histograms"),
                 "Initialize from an instance of :class:`_tacoma.edge_lists_with_histograms`"
             )
-        .def("copy_from", &edge_lists::copy_from, R"pbdoc([deprecated] copy the relevant information from an instance of :mod:`edge_lists_with_histograms`)pbdoc")
+        .def("copy_from", &edge_lists::copy_from, R"pbdoc([deprecated] copy the relevant information from an instance of :class:`_tacoma.edge_lists_with_histograms`)pbdoc")
         .def_readwrite("int_to_node", &edge_lists::int_to_node, R"pbdoc(A dictionary int -> string which keeps the original node names.)pbdoc")
         .def_readwrite("time_unit", &edge_lists::time_unit, R"pbdoc(A string containing the unit of time for this network.)pbdoc")
         .def_readwrite("notes", &edge_lists::notes, R"pbdoc(A string containing additional notes for this network.)pbdoc")
@@ -686,7 +758,8 @@ PYBIND11_MODULE(_tacoma, m) {
         .def_readwrite("inter_contact_durations", &edge_changes_with_histograms::inter_contact_durations,
             R"pbdoc(
                 A list of :obj:`int` s, each entry is the number of time steps it took a single node to reconnect.
-            )pbdoc")
+            )pb
+            doc")
         .def_readwrite("group_durations", &edge_changes_with_histograms::group_durations,
             R"pbdoc(
                 A list of :obj:`list` s, the `m`-th entry contains all durations of all observed groups of size `m`.
@@ -708,38 +781,49 @@ PYBIND11_MODULE(_tacoma, m) {
             )pbdoc")
         .def_readwrite("size_histogram_differences", &group_sizes_and_durations::size_histogram_differences,
             R"pbdoc(
-                A list :obj:`dict` , one dict for each time step, containing group sizes as keys and change of value to the previous time step as values.
+                A list :obj:`dict` , one dict for each time step, containing 
+                group sizes as keys and change of value to the previous time step as values.
             )pbdoc")
         .def_readwrite("group_durations", &group_sizes_and_durations::group_durations,
             R"pbdoc(
-                A list of :obj:`list` s, the :math:`m`-th entry contains all durations of all observed groups of size $m$.
+                A list of :obj:`list` s, the :math:`m`-th entry contains 
+                all durations of all observed groups of size $m$.
             )pbdoc")
         .def_readwrite("aggregated_size_histogram", &group_sizes_and_durations::aggregated_size_histogram,
             R"pbdoc(
-                A list of :obj:`list` s, the :math:`m`-th entry contains the time-averaged number of groups of size :math:`m`, :math:`\overline{N_m}=(1/t_\mathrm{max})\int_0^{t_\mathrm{max}}dt N_m(t)`.
+                A list of :obj:`list` s, the :math:`m`-th entry contains 
+                the time-averaged number of groups of size :math:`m`, 
+                :math:`\overline{N_m}=(1/t_\mathrm{max})\int_0^{t_\mathrm{max}}dt N_m(t)`.
             )pbdoc")
         .def_readwrite("aggregated_network", &group_sizes_and_durations::aggregated_network,
             R"pbdoc(
-                A :obj:`dict` where each (key, value)-pair is an edge and its corresponding total time it was active. 
+                A :obj:`dict` where each (key, value)-pair is an edge 
+                and its corresponding total time it was active. 
             )pbdoc");
 
-    py::class_<edge_weight>(m,"edge_weight",R"pbdoc(Helper class for internal usage. Creates `value = 0` when initiated
-    such that one can easily use it as a counter in a map without checking whether or not the object exists.)pbdoc")
+    py::class_<edge_weight>(m,"edge_weight",
+            R"pbdoc(Helper class for internal usage. Creates `value = 0` 
+            when initiated such that one can easily use it as a counter 
+            in a map without checking whether or not the object exists.)pbdoc")
         .def(py::init<>())
         .def_readwrite("value", &edge_weight::value);
 
-    py::class_<social_trajectory_entry>(m,"social_trajectory_entry","Each :class:`_tacoma.social_trajectory_entry` ")
+    py::class_<social_trajectory_entry>(m,"social_trajectory_entry",
+            "Each :class:`_tacoma.social_trajectory_entry` ")
         .def(py::init<>())
-        .def_readwrite("hash", &social_trajectory_entry::hash, "A group identifier which has low probability of doubling.")
-        .def_readwrite("size", &social_trajectory_entry::size, "Number of nodes within this group.")
-        .def_readwrite("time_pairs", &social_trajectory_entry::time_pairs, R"pbdoc(List[Tuple[double, double]] ordered time pairs denoting the time intervals in which the group existed)pbdoc");
+        .def_readwrite("hash", &social_trajectory_entry::hash, 
+                       "A group identifier which has low probability of doubling.")
+        .def_readwrite("size", &social_trajectory_entry::size, 
+                       "Number of nodes within this group.")
+        .def_readwrite("time_pairs", &social_trajectory_entry::time_pairs, 
+                       R"pbdoc(List[Tuple[double, double]] ordered time pairs denoting 
+                       the time intervals in which the group existed)pbdoc");
 
-    py::class_<edge_trajectory_entry>(m,"edge_trajectory_entry",R"pbdoc(
-        This is an entry of an edge-based notation of a temporal 
+    py::class_<edge_trajectory_entry>(m,"edge_trajectory_entry",
+        R"pbdoc(This is an entry of an edge-based notation of a temporal 
         network. Instead of getting lists of edges
         ordered in time, a list of :class:`_tacoma.edge_trajectory_entry` contains, 
-        for each edge, a list of time pairs denoting the times the edge exists.
-         )pbdoc")
+        for each edge, a list of time pairs denoting the times the edge exists.)pbdoc")
         .def(py::init<>())
         .def(py::init< 
                         const pair < size_t, size_t > &, 
@@ -806,24 +890,39 @@ PYBIND11_MODULE(_tacoma, m) {
         contain edge similarities, which are defined as follows. 
         Each edge :math:`i`, where
         :math:`i` is the edge's index in the trajectory list, is considered similar to edge :math:`j`
-        if both are connected to the same node at the same time. Hence, if both :math:`i=(u,v)` and `j=(u,w)` have 
+        if both are connected to the same node at the same time. Hence, if both :math:`i=(u,v)` 
+        and :math:`j=(u,w)` have 
         node :math:`u` in common, their similarity is 
         
-        :math:`E_{ij} = \int\limits_0^{t_{\mathrm{max}}}dt\ A_{uv}(t)A_{uw}(t)`
+        .. math::
+
+            `E_{ij} = \int\limits_0^{t_{\mathrm{max}}}dt\ A_{uv}(t)A_{uw}(t)`
     )pbdoc")
         .def(py::init<>())
-        .def_readwrite("trajectories", &edge_trajectories::trajectories, R"pbdoc(Each entry of this list has properties `.edge` containing 
-            its nodes and `.time_pairs` containing the time intervals when the edge was active.)pbdoc")
-        .def_readwrite("edge_similarities", &edge_trajectories::edge_similarities, R"pbdoc(
-            Each entry of this list is a triple (i, j, w), where `i` is the `i`-th edge in `trajectories` (similarly for `j`) and `w`
-            is their similarity.
-        )pbdoc")
-        .def_readwrite("int_to_node", &edge_trajectories::int_to_node, R"pbdoc(A dictionary int -> string which keeps the original node names.)pbdoc")
-        .def_readwrite("time_unit", &edge_trajectories::time_unit, R"pbdoc(A string containing the unit of time for this network.)pbdoc")
-        .def_readwrite("notes", &edge_trajectories::notes, R"pbdoc(A string containing additional notes for this network.)pbdoc")
-        .def_readwrite("N", &edge_trajectories::N, R"pbdoc(Number of nodes)pbdoc")
-        .def_readwrite("t0", &edge_trajectories::t0, R"pbdoc(The initial time)pbdoc")
-        .def_readwrite("tmax", &edge_trajectories::tmax, R"pbdoc(The final time)pbdoc")
+        .def_readwrite("trajectories", &edge_trajectories::trajectories, 
+                R"pbdoc(Each entry of this list has properties `.edge` containing 
+                its nodes and `.time_pairs` containing the time intervals when
+                the edge was active.)pbdoc")
+        .def_readwrite("edge_similarities", &edge_trajectories::edge_similarities,
+                R"pbdoc(
+                Each entry of this list is a triple `(i, j, w)`, where `i` 
+                is the `i`-th edge in `trajectories` (similarly for `j`) and `w`
+                is their similarity.
+                )pbdoc")
+        .def_readwrite("int_to_node", &edge_trajectories::int_to_node, 
+                R"pbdoc(A dictionary int -> string which keeps 
+                the original node names.)pbdoc")
+        .def_readwrite("time_unit", &edge_trajectories::time_unit,
+                R"pbdoc(A string containing the unit of 
+                time for this network.)pbdoc")
+        .def_readwrite("notes", &edge_trajectories::notes, 
+                R"pbdoc(A string containing additional notes for this network.)pbdoc")
+        .def_readwrite("N", &edge_trajectories::N, 
+                R"pbdoc(Number of nodes)pbdoc")
+        .def_readwrite("t0", &edge_trajectories::t0, 
+                R"pbdoc(The initial time)pbdoc")
+        .def_readwrite("tmax", &edge_trajectories::tmax, 
+                R"pbdoc(The final time)pbdoc")
         ;
 
     py::class_<SIS>(m,"SIS","Base class for the simulation of an SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIS` to simulate and retrieve the simulation results.")
@@ -873,7 +972,7 @@ PYBIND11_MODULE(_tacoma, m) {
         .def_readwrite("SI", &SIS::SI, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("I", &SIS::I, "A list containing the number of recovered at time :math:`t`.");
 
-    py::class_<node_based_SIS>(m,"node_based_SIS",R"pbdoc(Base class for the simulation of an SIS compartmental infection model on a temporal network using an SI-Graph for keeping track of SI-edges (meaning this is a node-based algorithm). Pass this to :mod:`gillespie_node_based_SIS` to simulate and retrieve the simulation results.)pbdoc")
+    py::class_<node_based_SIS>(m,"node_based_SIS",R"pbdoc(Base class for the simulation of an SIS compartmental infection model on a temporal network using an SI-Graph for keeping track of SI-edges (meaning this is a node-based algorithm). Pass this to :func:`tacoma.api.gillespie_node_based_SIS` to simulate and retrieve the simulation results.)pbdoc")
         .def(py::init<size_t,double,double,double,size_t,size_t,bool,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
@@ -920,7 +1019,7 @@ PYBIND11_MODULE(_tacoma, m) {
         .def_readwrite("SI", &node_based_SIS::SI, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("I", &node_based_SIS::I, "A list containing the number of recovered at time :math:`t`.");
 
-    py::class_<SI>(m,"SI","Base class for the simulation of an SI compartmental infection model on a temporal network. Pass this to :mod:`gillespie_SI` to simulate and retrieve the simulation results.")
+    py::class_<SI>(m,"SI","Base class for the simulation of an SI compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SI` to simulate and retrieve the simulation results.")
         .def(py::init<size_t,double,double,size_t,size_t,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
@@ -954,7 +1053,7 @@ PYBIND11_MODULE(_tacoma, m) {
         .def_readwrite("SI", &SI::_SI, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("I", &SI::I, "A list containing the number of recovered at time :math:`t`.");
 
-    py::class_<SIR>(m,"SIR","Base class for the simulation of an SIR compartmental infection model on a temporal network. Pass this to :mod:`gillespie_SIR` to simulate and retrieve the simulation results.")
+    py::class_<SIR>(m,"SIR","Base class for the simulation of an SIR compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIR` to simulate and retrieve the simulation results.")
         .def(py::init<size_t,double,double,double,size_t,size_t,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
@@ -999,7 +1098,7 @@ PYBIND11_MODULE(_tacoma, m) {
         .def_readwrite("I", &SIR::I, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("R", &SIR::R, "A list containing the number of recovered at time :math:`t`.");
 
-    py::class_<SIRS>(m,"SIRS","Base class for the simulation of an SIRS compartmental infection model on a temporal network. Pass this to :mod:`gillespie_SIRS` to simulate and retrieve the simulation results.")
+    py::class_<SIRS>(m,"SIRS","Base class for the simulation of an SIRS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIRS` to simulate and retrieve the simulation results.")
         .def(py::init<size_t,double,double,double,double,size_t,size_t,size_t,bool>(),
                 py::arg("N"),
                 py::arg("t_simulation"),
