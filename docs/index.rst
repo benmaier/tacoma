@@ -19,6 +19,7 @@ Temporal contact modeling and analysis
    temporal_networks/manipulating_temporal_networks
    temporal_networks/binning_and_sampling
    temporal_networks/read_write_and_share
+   temporal_networks/construction_example
 
 .. toctree::
    :maxdepth: 3

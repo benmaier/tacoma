@@ -30,7 +30,6 @@
       ~edge_changes_with_histograms.edges_out
       ~edge_changes_with_histograms.final_size_histogram
       ~edge_changes_with_histograms.group_changes
-      ~edge_changes_with_histograms.group_durations
       ~edge_changes_with_histograms.initial_size_histogram
       ~edge_changes_with_histograms.inter_contact_durations
       ~edge_changes_with_histograms.t
