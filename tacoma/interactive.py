@@ -43,18 +43,18 @@ standard_config = {
     "font_size_in_px" : 14,
     "link_width" : 1,
     "d3_format_string": ".3f",
-
 }
 
 html_source_path = os.path.join(tc.__path__[0],'interactive')
 
 def _make_and_get_directory(path):
+    """Simulate ``mkdir -p`` and return the path of the repository"""
     directory, single = os.path.split(os.path.abspath(os.path.expanduser(path)))
     mkdirp_customdir(directory)
     return directory
 
 def download_d3():
-    """Download `d3.v4.min.js` and save it in `~/.tacoma/d3`."""
+    """Download `d3.v4.min.js` and save it in `~/.tacoma/d3`, if the file does not exist yet."""
 
     url = "https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"
     filename = "~/.tacoma/web/d3.v4/d3.v4.min.js"
@@ -79,7 +79,7 @@ def prepare_visualization_directory():
         copy_tree(src, dst)
 
 class StoppableHTTPServer(http.server.HTTPServer):
-    """ from https://stackoverflow.com/questions/268629/how-to-stop-basehttpserver-serve-forever-in-a-basehttprequesthandler-subclass """
+    """Taken from https://stackoverflow.com/questions/268629/how-to-stop-basehttpserver-serve-forever-in-a-basehttprequesthandler-subclass """
 
     def __init__(self, server_address, handler, subfolder):
         http.server.HTTPServer.__init__(self, server_address, handler)
@@ -120,6 +120,7 @@ class StoppableHTTPServer(http.server.HTTPServer):
     #    self.stop_this()
 
 def _get_prepared_network(tn,dt,time_unit,time_normalization_factor):
+    """Prepare the provided network (i.e. bin it in discrete time)"""
     
     tn_b = tc.bin(tn,dt=dt) # rebin the network
     tn_b.t = [ t * time_normalization_factor for t in tn_b.t ] # rescale the network's time
@@ -137,6 +138,56 @@ def visualize(temporal_networks,
               titles = None,
               config = None,
               port = 8226):
+    """
+    Visualize a temporal network or a list of temporal networks interactively.
+    This routine starts up an HTTP server, bins the networks according to the
+    time step ``frame_dt`` and copies them to ``~/.tacoma/web``. Subsequently,
+    a the interaction is started in the standard browser.
+
+    The visualization is stopped with KeyboardInterrupt. The temporary
+    temporal network files will subsequently be deleted.
+
+    Parameters
+    ----------
+    temporal_networks : an instance of :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_lists_with_histograms`, :class:`_tacoma.edge_changes_with_histograms` or a list containing those.
+        The temporal networks to visualize. If a list is provided, all networks need to have the
+        same `t0` and `tmax`.
+    frame_dt : float
+        The duration of a frame in the visualization.
+    time_normalization_factor : float, default : 1.0
+        Rescale time with this factor.
+    time_unit : string, default : None,
+        Unit of time of the visualization.
+    titles : string or list of strings, default : None
+        Titles to put on the figures of the corresponding temporal networks.
+    config : dict
+        Configuration values for the JavaScript visualization.
+    port : int, default : 8226
+        Port of the started HTTP server.
+
+    Notes
+    -----
+
+    The configuration dictionary is filled with values to control
+    the appearance of the visualizations. The standard configuration is
+
+    .. code:: python
+
+        config = {
+            "plot_width" : 320 ,
+            "network_plot_height" : 250,
+            "edges_plot_height" : 100,
+            "padding" : 10,
+            "start_it" : 0,
+            "node_radius" : 2.5,
+            "link_distance" : 10,
+            "node_charge": -8,
+            "edge_line_width" : 1,
+            "font_size_in_px" : 14,
+            "link_width" : 1,
+            "d3_format_string": ".3f",
+        }
+    """
 
 
     if not hasattr(temporal_networks,'__len__'):
@@ -146,7 +197,8 @@ def visualize(temporal_networks,
         titles = ["" for _ in temporal_networks]
     elif type(titles) == str or not hasattr(titles,'__len__'):
         titles = [titles]
-    print(titles)
+
+    # print(titles)
 
     # define the server address
     server_address = ('127.0.0.1', port)

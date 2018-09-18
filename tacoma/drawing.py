@@ -118,6 +118,8 @@ def draw_edges(traj,
                fit = False,
                edge_order = None,
                color = None,
+               alpha = 0.5,
+               linewidth = 1.0,
                intervals_to_discard_for_fit = [],
                fit_color = 'k',
                return_fit_params = False,
@@ -141,6 +143,10 @@ def draw_edges(traj,
         Reorder the edges according to this list before drawing.
     color : a matplotlib color, default : None
         Color in which to draw the edges in
+    alpha : float, default : 0.5
+        Line opacity of edges
+    linewidth : float, default : 1.0
+        Line width of edges
     intervals_to_discard_for_fit : list of tuple of float
         a list of time intervals which have to be discarded for the fit
     fit_color : a matplotlib color, default : 'k'
@@ -201,7 +207,7 @@ def draw_edges(traj,
     lines = [list(zip(x, y)) for x, y in lines]
     colors = [ color for _ in range(len(lines)) ] 
 
-    ax.add_collection(LineCollection(lines,colors=colors,alpha=0.5,linewidth=1))
+    ax.add_collection(LineCollection(lines,colors=colors,alpha=alpha,linewidth=linewidth))
 
     t0 = min(all_t_min)
     ax.set_ylim(-1,max_i)
@@ -244,6 +250,8 @@ def edge_activity_plot(temporal_network,
                        fit = False,
                        edge_order = None,
                        color = None,
+                       alpha = 0.5,
+                       linewidth = 1,
                        intervals_to_discard_for_fit = [],
                        fit_color = None,
                        return_fit_params = False,
@@ -268,6 +276,10 @@ def edge_activity_plot(temporal_network,
         Reorder the edges according to this list before drawing.
     color : a matplotlib color, default : None
         Color in which to draw the edges in
+    alpha : float, default : 0.5
+        Line opacity of edges
+    linewidth : float, default : 1.0
+        Line width of edges
     intervals_to_discard_for_fit : list of tuple of float
         a list of time intervals which have to be discarded for the fit
     fit_color : a matplotlib color, default : 'k'
@@ -294,6 +306,8 @@ def edge_activity_plot(temporal_network,
                        fit = fit,
                        edge_order = edge_order,
                        color = color,
+                       alpha = alpha,
+                       linewidth = linewidth,
                        intervals_to_discard_for_fit = intervals_to_discard_for_fit,
                        fit_color = fit_color,
                        return_fit_params = return_fit_params,

@@ -526,6 +526,13 @@ def write_edge_trajectory_coordinates(temporal_network, filename, filter_for_dur
     with open(filename,'w') as f:
         json.dump(data, f)
 
+def load_json_dict(fn):
+    """Load a dictionary from a JSON-file"""
+    with open(fn,'r') as f:
+         this_dict = json.load(f)
+
+    return this_dict
+
 if __name__ == "__main__":
     el = download_and_convert_sociopatterns_hypertext_2009()
 

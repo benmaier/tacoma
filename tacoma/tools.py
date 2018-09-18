@@ -20,18 +20,20 @@ from scipy.integrate import quad
 
 from lmfit import minimize, Parameters
 
-def complete_graph(N):
-    """Get a single fram which consists of a complete network.
+def complete_graph(N,tmax=1.0):
+    """Get a single frame which consists of a complete network.
 
     Parameters
     ----------
     N : int
         Number of nodes.
+    tmax : float, default : 1.0
+        Maximum time of the static network.
         
     Returns 
     -------
-    :mod:`edge_lists`
-        An instance of `tacoma.edge_lists` with t = [0.0], tmax = 1.0.
+    :class:`_tacoma.edge_lists`
+        An instance of `tacoma.edge_lists` with t = [0.0], tmax = ``tmax``.
     """
 
     edge_list = []
@@ -41,13 +43,13 @@ def complete_graph(N):
 
     this = tc.edge_lists()
     this.t = [0.]
-    this.tmax = 1.
+    this.tmax = tmax
     this.edges = [edge_list]
     this.N = N
 
     return this
 
-def convert_static_network(N,edge_list,tmax):
+def convert_static_network(N,edge_list,tmax=1.0):
     """Get a single frame which consists of the static network.
 
     Parameters
@@ -61,8 +63,8 @@ def convert_static_network(N,edge_list,tmax):
         
     Returns 
     -------
-    :mod:`edge_lists`
-        An instance of `tacoma.edge_lists` with t = [0.0], tmax = 1.0.
+    :class:`_tacoma.edge_lists`
+        An instance of `tacoma.edge_lists` with t = [0.0], tmax = ``tmax``.
     """
 
     new_edge_list = []
@@ -85,6 +87,28 @@ def get_logarithmic_histogram(data,
                               bins, #number of bins
                               return_bin_means = True,
                               density = True):
+    """Get a logarithmic histogram.
+
+    Parameters
+    ----------
+    data : array-like
+        The data to bin.
+    bins : int
+        The number of bins.
+    return_bin_means : bool, default : True
+        return the geometric means of binning intervals,
+        otherwise return bin edges
+    density : bool, default : True
+        return probability density, if `False`, return counts
+
+    Returns
+    -------
+    x : numpy.ndarray
+        Either geometric intervals or interval edges
+    y : numpy.ndarray
+        Either probability density or counts.
+    """
+    
     data = np.array(data)
     data = data[data>0]
     MIN = min(data)
@@ -261,6 +285,37 @@ def slow_mean_degree(temporal_network):
     return t, k
 
 def time_average(t,x,tmax=None):
+    """
+    Return a temporal average of an observable `x(t)`, 
+
+    .. math::
+
+        \\overline x = \\frac{1}{t_\\mathrm{max}-t_0} 
+                       \\int\\limits_{t_0}^{t_\\mathrm{max}} dt\, x(t).
+
+    Where it's assumed that `x` changes as a step function, such that
+
+    .. math::
+
+        \\overline x = \\frac{1}{t_\\mathrm{max}-t_0} 
+                       \\left( (t_\\mathrm{max} - t_{N_t-1})  x(t_{N_t-1}) +
+                                \\sum_{i=1}^{N_t-1} (t_{i}-t_{i-1})x(t_{i-1}) \\right).
+
+    Parameters
+    ----------
+    t : numpy.ndarray
+        Times at which `x` changes
+    x : numpy.ndarray
+        Value of the observable at the corresponding times.
+    tmax : float, default : None
+        If this is None, the integral is computed until 
+        time t[-1], otherwise it's evaluated until tmax.
+
+    Returns
+    -------
+    average_x : float
+        The temporal average of `x`.
+    """
     
     if len(t) != len(x):
         raise ValueError("t and x must have the same shape")
@@ -277,6 +332,35 @@ def time_average(t,x,tmax=None):
     return dt.dot(x[:-1]) / sum_dt
 
 def time_RMSE(t,x1,x2,tmax=None):
+    r"""
+    Get the root mean squared error (RMSE) of two observables
+    over the same time. Combine with :func:`tacoma.tools.sample_a_function`.
+
+    .. math::
+
+        \mathrm{RMSE} = \left( 
+                            \frac{1}{t_\mathrm{max}-t_0}
+                            \int\limits_{t_0}^{t_\mathrm{max}} dt\, 
+                                \left( x_1(t) - x_2(t) \right)^2.
+                        \right)^{1/2}
+
+    Parameters
+    ----------
+    t : numpy.ndarray
+        times at which ``x1`` and ``x2`` change
+    x1 : numpy.ndarray
+        The first observable to compute the RMSE.
+    x2 : numpy.ndarray
+        The second observable to compute the RMSE.
+    tmax : float, default : None
+        If this is None, the integral is computed until 
+        time t[-1], otherwise it's evaluated until tmax.
+
+    Returns
+    -------
+    RMSE : float
+        The root mean squared error.
+    """
     
     if len(t) != len(x1):
         raise ValueError("t and x1 must have the same shape")
@@ -292,6 +376,26 @@ def time_RMSE(t,x1,x2,tmax=None):
     return np.sqrt(time_average(t,(x1-x2)**2))
 
 def bin_a_function(x,y,bins,mode='mean'):
+    r"""
+    Bin a step function :math:`y(t)` over time bins. Binning can be done using
+    either ``numpy.sum`` or ``numpy.mean``.
+
+    Parameters
+    ----------
+    x : numpy.ndarray
+        domain values at which `y` changes
+    y : numpy.ndarray
+        values of the cunt
+    bins : numpy.ndarray
+        Bin to those bin edges
+    mode : string, default : mean
+        Build either a ``mean`` over the bins or a ``sum``.
+
+    Returns
+    -------
+    new_y : numpy.ndarray
+        binned observable
+    """
     if mode=='mean':
         cumfunc = np.mean
     elif mode=='sum':
@@ -308,6 +412,28 @@ def bin_a_function(x,y,bins,mode='mean'):
     return new_y
 
 def sample_a_function(x,y,time_points,sample_width=0):
+    r"""
+    Sample an observable :math:`y` which is a step function
+    and changes at corresponding values :math:`t`.
+
+    Parameters
+    ----------
+    t : numpy.ndarray
+        domain values at which `y` changes
+    y : numpy.ndarray
+        observable to sample
+    time_points : numpy.ndarray
+        time points for which to sample.
+    sample_width : float, default : 0.0
+        sample as a temporal average over [t-sample_width/2, t+sample_width/2].
+
+    Returns
+    -------
+    new_y : numpy.ndarray
+        values of `y` sampled at `time_points`.
+    """
+
+    x = t
     new_y = []
     for bin in time_points:
         if sample_width > 0:
@@ -403,15 +529,14 @@ def number_of_discovered_edges(temporal_network):
 
     return np.array(t), np.array(count,dtype=float)
 
-def get_edge_probability_and_rate(temporal_network,tmax=None,t0=0.0):
-    """For each edge compute the total number of discovered unique edges C(t), i.e. the contact coverage.
+def get_edge_probability_and_rate(temporal_network):
+    """
+    For each edge compute the probability that it is active and the rate
+    with which it is activated.
     
     Parameters
     ==========
-    temporal_network : :mod:`edge_lists` or :mod:`edge_changes` or :obj:`list` of :mod:`edge_trajectory_entry`
-    tmax : float (default : None)
-        This has to be set if `temporal_network` is a list of :mod:`edge_trajectory_entry`.
-    t0 : float (default : 0)
+    temporal_network : :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes` or :class:`_tacoma.edge_trajectories`
 
     Returns
     =======
@@ -419,23 +544,22 @@ def get_edge_probability_and_rate(temporal_network,tmax=None,t0=0.0):
         The probability to be switched on for each observed edge of the network 
         (the remaining un-observed edges have probability p = 0).
     omega : numpy.ndarray
-        The rate with which the observed edges are switched on omega = 1/(1/tau+ + 1/tau-)
-        (the remaining un-observed edges have rate omega = 0).
+        The rate with which the observed edges are switched on 
+        :math:`\\omega = \\left(\\frac{1}{\\tau^+} + \\frac{1}{\\tau^{-}}\\right)^{-1}`
+        (the remaining un-observed edges have rate :math:`\\omega = 0`).
     """
 
     if type(temporal_network) in [ ec, el, el_h, ec_h ]:
-        result = tc.get_edge_trajectories(temporal_network)
-        traj = result.trajectories
+        traj = tc.get_edge_trajectories(temporal_network)
         tmax = temporal_network.tmax
         if type(temporal_network) in [ ec, ec_h ]:
             t0 = temporal_network.t0
         else:
             t0 = temporal_network.t[0]
-        
-    elif type(temporal_network) == list and type(temporal_network[0]) == tc.edge_trajectory_entry:
-        traj = temporal_network
-        if tmax is None:
-            raise ValueError("Please provide tmax and t0 if the temporal network is a list of tacoma.edge_trajectory_entry")
+    elif type(temporal_network) == edge_trajectories:
+        traj = temporal_network.trajectories
+        tmax = temporal_network.tmax
+        t0 = temporal_network.t0
     else:
         raise ValueError("Unknown type for temporal network:", type(temporal_network))
 
@@ -455,9 +579,27 @@ def get_edge_probability_and_rate(temporal_network,tmax=None,t0=0.0):
 
     return connection_probability, activity_rate
 
-def get_reduced_time(x, intervals_to_discard_for_fit):
+def get_reduced_time(t, intervals_to_discard):
+    """
+    Reduce the provided time in a way that intervals
+    are cut out.
 
-    x_ = x.copy()
+    Parameters
+    ----------
+    t : numpy.ndarray
+        time array to reduce
+    intervals_to_discard : list of tuple of float
+        The time intervals which have to be discarded.
+
+    Returns
+    -------
+    new_t : numpy.ndarray
+        reduced time with equal shape to ``t``. Each time in
+        intervals which have to be discarded are remapped
+        to the beginning of the intervals.
+    """
+
+    x_ = t.copy()
 
     offset = 0.0
 
@@ -470,10 +612,37 @@ def get_reduced_time(x, intervals_to_discard_for_fit):
 
     return x_
 
-def fit_number_of_discovered_edges(N, time, edge_count, intervals_to_discard_for_fit=[],kind='gamma'):
+def fit_contact_coverage(N, time, contact_coverage, intervals_to_discard_for_fit=[], kind='gamma'):
+    """
+    Fit the contact coverage :math:`C(t)` to an edge activity rate distribution of kind ``kind``.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes.
+    time : numpy.ndarray
+        Time points at which the contact converage changed.
+    contact_coverage : numpy.ndarray
+        Contact coverage at the corresponding times in ``time``.
+    intervals_to_discard_for_fit : list of tuple of float
+        a list of time intervals which have to be discarded for the fit
+    kind : string, default : 'gamma'
+        Rate distribution model for fit. Can be ``gamma``, ``exponential``,
+        ``uniform``, ``normal``, ``delta``, ``power-law``.
+
+    Returns
+    -------
+    fit_function : function
+        The fit function
+    popt : tuple of float
+        The found optimal parameters to pass to ``fit_function``
+    pstd : tuple of float
+        standard uncertainty of the parameters
+    """
 
 
     fac = N*(N-1)/2.
+    edge_count = contact_coverage
 
 
     if kind == 'gamma':
@@ -579,8 +748,3 @@ def fit_number_of_discovered_edges(N, time, edge_count, intervals_to_discard_for
     return fit, popt, np.sqrt(np.diag(pcov))
 
 
-def load_json_dict(fn):
-    with open(fn,'r') as f:
-         this_dict = json.load(f)
-
-    return this_dict
