@@ -896,7 +896,7 @@ PYBIND11_MODULE(_tacoma, m) {
         
         .. math::
 
-            `E_{ij} = \int\limits_0^{t_{\mathrm{max}}}dt\ A_{uv}(t)A_{uw}(t)`
+            E_{ij} = \int\limits_0^{t_{\mathrm{max}}}dt\ A_{uv}(t)A_{uw}(t)
     )pbdoc")
         .def(py::init<>())
         .def_readwrite("trajectories", &edge_trajectories::trajectories, 
