@@ -47,7 +47,8 @@ namespace EPI {
         S = 0,
         I = 1,
         R = 2,
-        E = 3
+        E = 3,
+        V = 4
     };
 };
 

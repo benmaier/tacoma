@@ -1131,7 +1131,7 @@ PYBIND11_MODULE(_tacoma, m) {
                         value 1 is not an ideal initial value as fluctuations may lead to a quick end of the simulation
                         skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
                     number_of_initially_vaccinated : int, default = 0
-                        Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                        Number of nodes which will be in the vaccinated compartment at :math:`t = t_0`.
                     seed : int, default = 0
                         Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
                     verbose : bool, default = False

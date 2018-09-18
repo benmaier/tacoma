@@ -9,11 +9,11 @@ N = 20
 compl = tc.complete_graph(N)
 G = nx.complete_graph(N)
 
-R0s = np.logspace(-0.5,1.0,10)
+R0s = np.logspace(1.0,2.0,5)
 
 k = N - 1.0
 rho = 1.0
-I0 = 1
+I0 = N // 2
 
 N_meas = 100
 Rs = np.zeros((len(R0s),N_meas))
@@ -24,7 +24,7 @@ fig, ax = pl.subplots(4,3,figsize=(18,14))
 ax = ax.flatten()
 
 
-for iR0,R0 in enumerate(R0s):
+for iR0, R0 in enumerate(R0s):
 
     for meas in range(N_meas):
         eta = R0*rho/k

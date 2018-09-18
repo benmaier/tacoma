@@ -141,7 +141,7 @@ class SIRS
 
             for(size_t node=0; node<number_of_initially_vaccinated; node++)
             {
-                node_status[node_ints[node]] = EPI::R;
+                node_status[node_ints[node]] = EPI::V;
             }
 
             for(size_t node = number_of_initially_vaccinated; node < number_of_initially_vaccinated + number_of_initially_infected; node++)
