@@ -308,7 +308,7 @@ def get_edge_order(edge_traj, edge_sim, threshold=0.):
     ----------
     edge_traj : list of :class:`_tacoma.edge_trajectory_entry`
         Edge trajectories, first result of :func:`tacoma.api.get_edge_trajectories`,
-        or entry ``trajectories` of :class`_tacoma.edge_trajectories`.
+        or entry ``trajectories`` of :class`_tacoma.edge_trajectories`.
     edge_sim : dict where key is a tuple of int and value is a float 
         Edge similarities, tuple of int denoting the pair of edges,
         similarity is in dimension of time.
@@ -321,7 +321,7 @@ def get_edge_order(edge_traj, edge_sim, threshold=0.):
 
     Returns
     -------
-    list of int
+    edge_order : list of int
         Edge indices ordered in clusters.
     """
 
@@ -354,7 +354,7 @@ def get_edge_graph(edge_traj, edge_sim, threshold = 0.):
     ----------
     edge_traj : list of :class:`_tacoma.edge_trajectory_entry`
         Edge trajectories, first result of :func:`tacoma.api.get_edge_trajectories`,
-        or entry ``trajectories` of :class`_tacoma.edge_trajectories`.
+        or entry ``trajectories`` of :class`_tacoma.edge_trajectories`.
     edge_sim : dict where key is a tuple of int and value is a float 
         Edge similarities, tuple of int denoting the pair of edges,
         similarity is in dimension of time.
@@ -367,7 +367,7 @@ def get_edge_graph(edge_traj, edge_sim, threshold = 0.):
 
     Returns
     -------
-    nx.Graph
+    G : nx.Graph
         An undirected, unweighted graph where nodes are edges in the temporal network
         and edges mean their similarity is above the threshold.
     """
