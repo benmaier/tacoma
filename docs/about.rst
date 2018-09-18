@@ -10,7 +10,7 @@ limited to) human face-to-face contact networks.
 Quick example
 -------------
 
-In order to download the SocioPatterns `‘Hypertext 2009’-dataset`_ and
+In order to download the SocioPatterns `'Hypertext 2009'-dataset`_ and
 visualize it interactively, do the following.
 
 .. code:: python
@@ -79,5 +79,5 @@ If you get compiling errors, make sure that `pybind11`_ is installed.
 Note that a C++11-compiler has to be installed on the system before
 installing ``tacoma``.
 
-.. _‘Hypertext 2009’-dataset: http://www.sociopatterns.org/datasets/hypertext-2009-dynamic-contact-network/
+.. _'Hypertext 2009'-dataset: http://www.sociopatterns.org/datasets/hypertext-2009-dynamic-contact-network/
 .. _pybind11: https://github.com/pybind/pybind11
