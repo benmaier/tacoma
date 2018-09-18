@@ -58,7 +58,7 @@ def convert_static_network(N,edge_list,tmax=1.0):
         Number of nodes.
     edge_list : :obj:`list` of :obj:`tuple` of int
         The edges of the static graph
-    tmax : double
+    tmax : double, default : 1.0
         The maximum time until the network is looped.
         
     Returns 
