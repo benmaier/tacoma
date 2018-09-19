@@ -17,6 +17,11 @@ import os
 
 from mock import Mock as MagicMock
 
+USE_KATEX = False
+
+if USE_KATEX:
+    import sphinxcontrib.katex as katex
+
 class Mock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
@@ -46,13 +51,16 @@ sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
 ]
 
+if USE_KATEX:
+    extensions.append('sphinxcontrib.katex')
+else:
+    extensions.append('sphinx.ext.mathjax')
 autosummary_generate = True
 
 # Add any paths that contain templates here, relative to this directory.
@@ -128,6 +136,32 @@ pygments_style = 'sphinx'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
+
+# -------------- KaTeX options --------------
+
+if USE_KATEX:
+
+    katex_options = r"""{
+        displayMode: true,
+        macros: {
+            "\\expv": "\\left\\langle #1\\right\\rangle",
+            "\\inn": "\\mathrm{in}",
+            "\\out": "\\mathrm{out}",
+            "\\max": "\\mathrm{max}"
+        }
+    }"""
+
+else:
+    mathjax_config = {
+            'TeX' : {
+                    'Macros' : {
+                        'expv' : ( r'{\\left\\langle #1\\right\\rangle}', 1 ),
+                        'inn'  : r'{\\mathrm{in}}',
+                        'out'  : r'{\\mathrm{out}}',
+                        'max'  : r'{\\mathrm{max}}'
+                    }
+                }
+            }
 
 
 # -- Options for HTML output ----------------------------------------------
