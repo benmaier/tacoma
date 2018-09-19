@@ -242,7 +242,7 @@ The contact and inter-contact durations can be analyzed using
     for the SocioPatterns Hypertext 09 dataset.
 
 Aggregated network
-~~~~~~~~~~~~~~~~~~
+------------------
 
 The aggregated network
 
