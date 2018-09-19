@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Contains a bunch of information about this package
+"""
+
 __version__ = "0.0.29"
 
 __author__ = "Benjamin F. Maier"

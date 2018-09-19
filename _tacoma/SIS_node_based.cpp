@@ -29,9 +29,8 @@ using namespace std;
 //namespace node_based_SIS = node_based_SIS;
 
 void node_based_SIS::update_network(
-                    vector < set < size_t > > &_G,
-                    double t
-                    )
+    vector<set<size_t>> &_G,
+    double t)
 {
     // map this network to the current network
     G = &_G;
@@ -39,44 +38,42 @@ void node_based_SIS::update_network(
     // compute degree and R0
     size_t number_of_edges_times_two = 0;
 
-    for(auto const &neighbors: *G)
+    for (auto const &neighbors : *G)
         number_of_edges_times_two += neighbors.size();
 
-    mean_degree = number_of_edges_times_two / (double) N;
+    mean_degree = number_of_edges_times_two / (double)N;
 
     // update infected
     SI_count = 0;
     auto it_SI_degree = SI_degree.begin();
-    for(auto &neighs: SI_Graph)
+    for (auto &neighs : SI_Graph)
     {
         neighs.clear();
         *it_SI_degree = 0;
         ++it_SI_degree;
     }
 
-
     // for each infected, check its neighbors.
     // if the neighbor is susceptible, push it to the
     // endangered susceptible vector
-    for(auto const &inf: infected)
-        for(auto const &neighbor_of_infected: (*G)[inf])
+    for (auto const &inf : infected)
+        for (auto const &neighbor_of_infected : (*G)[inf])
             if (node_status[neighbor_of_infected] == EPI::S)
             {
                 SI_Graph[inf].insert(neighbor_of_infected);
                 ++SI_degree[inf];
                 ++SI_count;
-            }    
+            }
 
     // update the arrays containing the observables
     update_observables(t);
 }
 
 void node_based_SIS::update_network(
-                    vector < set < size_t > > &_G,
-                    vector < pair < size_t, size_t > > &edges_in,
-                    vector < pair < size_t, size_t > > &edges_out,
-                    double t
-                    )
+    vector<set<size_t>> &_G,
+    vector<pair<size_t, size_t>> &edges_in,
+    vector<pair<size_t, size_t>> &edges_out,
+    double t)
 {
     // map this network to the current network
     G = &_G;
@@ -84,12 +81,12 @@ void node_based_SIS::update_network(
     // compute degree and R0
     size_t number_of_edges_times_two = 0;
 
-    for(auto const &neighbors: *G)
+    for (auto const &neighbors : *G)
         number_of_edges_times_two += neighbors.size();
 
-    mean_degree = number_of_edges_times_two / (double) N;
-    
-    for(auto const &e: edges_out)
+    mean_degree = number_of_edges_times_two / (double)N;
+
+    for (auto const &e : edges_out)
     {
         size_t u = e.first;
         size_t v = e.second;
@@ -108,7 +105,7 @@ void node_based_SIS::update_network(
         }
     }
 
-    for(auto const &e: edges_in)
+    for (auto const &e : edges_in)
     {
         size_t u = e.first;
         size_t v = e.second;
@@ -132,9 +129,8 @@ void node_based_SIS::update_network(
 }
 
 void node_based_SIS::get_rates_and_Lambda(
-                    vector < double > &_rates,
-                    double &_Lambda
-                  )
+    vector<double> &_rates,
+    double &_Lambda)
 {
     // delete current rates
     rates.clear();
@@ -147,13 +143,12 @@ void node_based_SIS::get_rates_and_Lambda(
 
     // return those new rates
     _rates = rates;
-    _Lambda = accumulate(rates.begin(),rates.end(),0.0);
+    _Lambda = accumulate(rates.begin(), rates.end(), 0.0);
 }
 
 void node_based_SIS::make_event(
-                size_t const &event,
-                double t
-               )
+    size_t const &event,
+    double t)
 {
     if (event == 0)
         infection_event();
@@ -168,15 +163,15 @@ void node_based_SIS::make_event(
 void node_based_SIS::infection_event()
 {
     // choose random infected
-    uniform_real_distribution < double > random_uni(0.0,1.0);
+    uniform_real_distribution<double> random_uni(0.0, 1.0);
     size_t this_infected = arg_choose_from_vector(SI_degree, generator, random_uni);
 
     // choose random susceptible neighbor of this infected
-    uniform_int_distribution < size_t > random_susceptible(0,SI_Graph[this_infected].size()-1);
+    uniform_int_distribution<size_t> random_susceptible(0, SI_Graph[this_infected].size() - 1);
     size_t this_susceptible_index = random_susceptible(generator);
     auto it_susceptible = SI_Graph[this_infected].begin();
     advance(it_susceptible, this_susceptible_index);
-    size_t this_susceptible = *it_susceptible; 
+    size_t this_susceptible = *it_susceptible;
 
     // save this node as an infected
     infected.push_back(this_susceptible);
@@ -187,7 +182,7 @@ void node_based_SIS::infection_event()
     // erase all edges in the SI set where this susceptible is part of
     SI_Graph[this_infected].erase(this_susceptible);
 
-    for(auto const &neighbor: (*G)[this_susceptible])
+    for (auto const &neighbor : (*G)[this_susceptible])
     {
         if (node_status[neighbor] == EPI::S)
         {
@@ -195,24 +190,22 @@ void node_based_SIS::infection_event()
             ++SI_count;
             ++SI_degree[this_susceptible];
         }
-        else if(node_status[neighbor] == EPI::I)
+        else if (node_status[neighbor] == EPI::I)
         {
             SI_Graph[neighbor].erase(this_susceptible);
             --SI_count;
             --SI_degree[neighbor];
         }
     }
-
-
 }
 
 void node_based_SIS::recovery_event()
 {
     if ((prevent_disease_extinction) and (infected.size() == 1))
-        return ;
+        return;
 
     // initialize uniform integer random distribution
-    uniform_int_distribution < size_t > random_infected(0,infected.size()-1);
+    uniform_int_distribution<size_t> random_infected(0, infected.size() - 1);
 
     // find the index of the susceptible which will become infected
     size_t this_infected_index = random_infected(generator);
@@ -222,7 +215,7 @@ void node_based_SIS::recovery_event()
     size_t this_infected = *(it_infected);
 
     // delete this from the infected vector
-    infected.erase( it_infected );
+    infected.erase(it_infected);
 
     // change node status of this node
     node_status[this_infected] = EPI::S;
@@ -232,7 +225,7 @@ void node_based_SIS::recovery_event()
     SI_count -= SI_degree[this_infected];
     SI_degree[this_infected] = 0;
 
-    for(auto &neigh: (*G)[this_infected])
+    for (auto &neigh : (*G)[this_infected])
         if (node_status[neigh] == EPI::I)
         {
             SI_Graph[neigh].insert(this_infected);
@@ -242,8 +235,7 @@ void node_based_SIS::recovery_event()
 }
 
 void node_based_SIS::update_observables(
-                double t
-               )
+    double t)
 {
     double _R0 = infection_rate * mean_degree / recovery_rate;
     R0.push_back(_R0);
@@ -257,4 +249,3 @@ void node_based_SIS::update_observables(
     // push back time
     time.push_back(t);
 }
-

@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+This module provides functions to estimate model parameters
+from existing temporal networks which then can be
+passed to 
+"""
 
 from __future__ import print_function
 import numpy as np
@@ -8,21 +13,22 @@ from numpy.polynomial import Polynomial
 from scipy.optimize import fsolve
 from scipy.optimize import minimize
 
-from tacoma import edge_changes as ec
-from tacoma import edge_lists as el
-from tacoma import edge_lists_with_histograms as el_h
-from tacoma import edge_changes_with_histograms as ec_h
-from tacoma import get_logarithmic_histogram
+from _tacoma import edge_changes as ec
+from _tacoma import edge_lists as el
+from _tacoma import edge_lists_with_histograms as el_h
+from _tacoma import edge_changes_with_histograms as ec_h
+from tacoma.tools import get_logarithmic_histogram
 from tacoma.power_law_fitting import fit_power_law_clauset
-from tacoma import _get_raw_temporal_network
-from tacoma import mean_coordination_number
-from tacoma import convert
-from tacoma import get_flockwork_P_args
-from tacoma import get_flockwork_P_node_parameters_gamma_and_P
-from tacoma import get_flockwork_P_node_parameters_alpha_and_beta_from_gamma_and_P
-from tacoma import get_flockwork_alpha_beta_args
-from tacoma import get_flockwork_node_parameters_alpha_and_beta
-from tacoma import get_flockwork_node_rates_alpha_and_beta
+from tacoma.api import _get_raw_temporal_network
+from tacoma.tools import mean_coordination_number
+from tacoma.api import convert
+from _tacoma import get_flockwork_P_args
+from _tacoma import get_flockwork_P_node_parameters_gamma_and_P
+from _tacoma import get_flockwork_P_node_parameters_alpha_and_beta_from_gamma_and_P
+from _tacoma import get_flockwork_alpha_beta_args
+from _tacoma import get_flockwork_node_parameters_alpha_and_beta
+from _tacoma import get_flockwork_node_rates_alpha_and_beta
+
 import tacoma as tc
 
 from scipy.stats import lognorm
@@ -198,7 +204,7 @@ def estimate_flockwork_P_args_for_single_nodes(temporal_network,use_event_rate_m
         # kwargs.pop('use_event_rate_method')
         kw = estimate_flockwork_P_args(temporal_network,*args,**kwargs)
     else:
-        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     if not use_event_rate_method:
 
@@ -371,7 +377,7 @@ def estimate_flockwork_P_args(temporal_network,*args,**kwargs):
         if with_affinity:
             new_kwargs['neighbor_affinity'] = kw.neighbor_affinity
     else:
-        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return new_kwargs 
 
@@ -432,7 +438,7 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes(temporal_network,
         # kwargs.pop('use_event_rate_method')
         kw = estimate_flockwork_alpha_beta_args(temporal_network,*args,**kwargs)
     else:
-        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     if not estimate_for_each_time_bin:
 
@@ -564,7 +570,7 @@ def estimate_flockwork_alpha_beta_args_for_single_nodes_randomly(temporal_networ
         # kwargs.pop('use_event_rate_method')
         kw = estimate_flockwork_alpha_beta_args(temporal_network,*args,**kwargs)
     else:
-        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     s = sigma
     scale = 1.0
@@ -676,7 +682,7 @@ def estimate_flockwork_alpha_beta_args(temporal_network,*args,**kwargs):
         if with_affinity:
             new_kwargs['neighbor_affinity'] = kw.neighbor_affinity
     else:
-        raise ValueError('Unknown temporal network format: ' + str(type(_t)))
+        raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
     return new_kwargs 
 
@@ -748,6 +754,7 @@ if __name__ == "__main__":
     import matplotlib.pyplot as pl
     from tacoma.analysis import temporal_network_group_analysis
     
+    # THESE TESTS ARE DEPRECATED
 
     test = tc.dtu_week()
     rewiring_rate = test.gamma

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This module provides functions related to the flockwork
 temporal network model.
@@ -13,7 +14,8 @@ from tacoma.power_law_fitting import fit_power_law_clauset
 
 import tacoma as tc
 
-def flockwork_P_equilibrium_group_size_distribution(N,P):
+
+def flockwork_P_equilibrium_group_size_distribution(N, P):
     """Get the equilibrium group size distribution of a Flockwork-P model
     given node number N and probability to reconnect P.
 
@@ -46,29 +48,29 @@ def flockwork_P_equilibrium_group_size_distribution(N,P):
         dist = np.zeros((N+1,))
         dist[-1] = 1.
     else:
-        dist = [ N*(1.-P) ]
+        dist = [N*(1.-P)]
 
-        N_fak = N - np.arange(1,N-1)
-        j_fak = ( P * np.arange(1,N-1) - N+1.)
+        N_fak = N - np.arange(1, N-1)
+        j_fak = (P * np.arange(1, N-1) - N+1.)
         div = N_fak / j_fak
         cum_product_div = np.cumprod(div)
-        for m in range(2,N):
+        for m in range(2, N):
             #dist.append( (-1)**(m%2) * float(N)/float(m) * (P-1.) * np.prod(N_fak[1:m]/j_fak[1:m]) * P**(m-1) )
-            dist.append( (-1)**(m%2) * float(N)/float(m) * (P-1.) * cum_product_div[m-2] * P**(m-1) )
+            dist.append((-1)**(m % 2) * float(N)/float(m) *
+                        (P-1.) * cum_product_div[m-2] * P**(m-1))
 
-
-        value = (-1)**( N % 2 ) * P
-        for j in range(1,N-1):
-            value *= float(N-j-1) / ( (P-N+1.) / P + (j-1))
+        value = (-1)**(N % 2) * P
+        for j in range(1, N-1):
+            value *= float(N-j-1) / ((P-N+1.) / P + (j-1))
         #value *= P**(N-1)
         dist.append(value)
-        
+
         dist = [0.] + dist
 
     return np.array(dist)
 
 
-def flockwork_P_equilibrium_configuration(N,P,shuffle_nodes = True):
+def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True):
     """Get an equilibrium configuration of a Flockwork-P model
     given node number N and probability to reconnect P.
 
@@ -91,7 +93,7 @@ def flockwork_P_equilibrium_configuration(N,P,shuffle_nodes = True):
 
     """
 
-    dist = flockwork_P_equilibrium_group_size_distribution(N,P)
+    dist = flockwork_P_equilibrium_group_size_distribution(N, P)
 
     dist = dist[1:]
 
@@ -117,7 +119,7 @@ def flockwork_P_equilibrium_configuration(N,P,shuffle_nodes = True):
         # loop through group sizes in descending order.
         # start with the smallest group size that
         # may contain all of the nodes left
-        for m in range(nodes_left,0,-1):
+        for m in range(nodes_left, 0, -1):
 
             # if the expected number of groups of this size is not zero
             if dist[m-1] > 0. and nodes_left >= m:
@@ -129,7 +131,7 @@ def flockwork_P_equilibrium_configuration(N,P,shuffle_nodes = True):
                 new_C_m = random.poisson(dist[m-1])
 
                 # if the new number of groups of size m is larger than the previously drawn number
-                if new_C_m>C_m[m-1]:
+                if new_C_m > C_m[m-1]:
                     # accept the new number and add the difference in group count of this group size
                     delta_C_m = int(new_C_m - C_m[m-1])
                 elif nodes_left == 1 and m == 1:
@@ -140,15 +142,15 @@ def flockwork_P_equilibrium_configuration(N,P,shuffle_nodes = True):
 
                 # add the additional number of groups of this size
                 for group_instance in range(delta_C_m):
-                    #for u in xrange(nodes_left-1,nodes_left-m,-1):
+                    # for u in xrange(nodes_left-1,nodes_left-m,-1):
                     #    for v in xrange(u-1,nodes_left-m-1,-1):
                     #        edges.append((node_ints[u],node_ints[v]))
 
                     # add fully connected clusters to the edge set
                     if m > 1:
-                        edges.extend([ (node_ints[u],node_ints[v])\
-                                        for u in range(nodes_left-1,nodes_left-m,-1) \
-                                            for v in range(u-1,nodes_left-m-1,-1) ])
+                        edges.extend([(node_ints[u], node_ints[v])
+                                      for u in range(nodes_left-1, nodes_left-m, -1)
+                                      for v in range(u-1, nodes_left-m-1, -1)])
 
                     # remove the grouped nodes from the pool of remaining nodes
                     nodes_left -= m
@@ -166,9 +168,10 @@ def flockwork_P_equilibrium_configuration(N,P,shuffle_nodes = True):
 
     return edges, np.append(np.array([0.]), C_m)
 
-def flockwork_P_mean_degree_for_varying_rates(flockwork_P_params,N=None):
+
+def flockwork_P_mean_degree_for_varying_rates(flockwork_P_params, N=None):
     """Compute the mean group size distribution for a Flockwork-P system with varying rates.
-    
+
     Parameters
     ----------
     flockwork_P_params : :obj:`dict`
@@ -196,16 +199,16 @@ def flockwork_P_mean_degree_for_varying_rates(flockwork_P_params,N=None):
 
     # get arrays for rewiring
     gamma = np.array(data['rewiring_rate'])
-    T, gamma = gamma[:,0], gamma[:,1]
+    T, gamma = gamma[:, 0], gamma[:, 1]
     T = np.append(T, data['tmax'])
     gamma = np.append(gamma, gamma[-1])
 
-    P = np.array( data['P'] )
+    P = np.array(data['P'])
     P = np.append(P, P[-1])
 
     # define the linear ODE describing the mean degree evolution
-    def dkdt(t,k,g_,P_):
-        return 2 * g_ * P_ - 2*k* (g_*(1-P_))
+    def dkdt(t, k, g_, P_):
+        return 2 * g_ * P_ - 2*k * (g_*(1-P_))
 
     # intialize the integrator
     r = ode(dkdt)
@@ -219,16 +222,16 @@ def flockwork_P_mean_degree_for_varying_rates(flockwork_P_params,N=None):
 
         # for every interval set the initial mean degree
         # and new parameters
-        r.set_initial_value(k[-1],t_)
-        r.set_f_params(g_,P_)
+        r.set_initial_value(k[-1], t_)
+        r.set_f_params(g_, P_)
 
         # for 10 time points within this interval,
         # compute the expected mean degree
-        this_t = np.linspace(t_,T[i+1],10)
+        this_t = np.linspace(t_, T[i+1], 10)
         for t__ in this_t[1:]:
-            new_t.append( t__ )
+            new_t.append(t__)
             this_k = r.integrate(t__)
-            k.append( this_k )
+            k.append(this_k)
 
         # increase interval
         i += 1
@@ -236,9 +239,9 @@ def flockwork_P_mean_degree_for_varying_rates(flockwork_P_params,N=None):
     return np.array(new_t), np.array(k)
 
 
-def flockwork_P_mean_group_size_distribution_for_varying_rates(flockwork_P_params,N=None):
+def flockwork_P_mean_group_size_distribution_for_varying_rates(flockwork_P_params, N=None):
     """Compute the mean group size distribution for a Flockwork-P system with varying rates.
-    
+
     Parameters
     ----------
     flockwork_P_params : :obj:`dict`
@@ -259,7 +262,7 @@ def flockwork_P_mean_group_size_distribution_for_varying_rates(flockwork_P_param
         N = flockwork_P_params['N']
 
     # estimate mean degree from integrating ODE
-    new_t, k = flockwork_P_mean_degree_for_varying_rates(flockwork_P_params,N)
+    new_t, k = flockwork_P_mean_degree_for_varying_rates(flockwork_P_params, N)
 
     # from equilibrium assumption k = P/(1-P) compute adjusted P
     new_P = k / (k+1)
@@ -271,17 +274,18 @@ def flockwork_P_mean_group_size_distribution_for_varying_rates(flockwork_P_param
         this_distro = flockwork_P_equilibrium_group_size_distribution(N, P_)
         distro.append(this_distro[1:])
 
-    # compute the mean group size distribution as a time integral over the 
+    # compute the mean group size distribution as a time integral over the
     # group size distribution
     distro = np.array(distro)
-    mean_distro = np.trapz(distro,x=new_t,axis=0) / (new_t[-1] - new_t[0])
+    mean_distro = np.trapz(distro, x=new_t, axis=0) / (new_t[-1] - new_t[0])
 
     return mean_distro
+
 
 def estimated_mean_group_size_distribution(temporal_network):
     """Compute the mean group size distribution for a temporal network under the assumption
     that it can be described reasonably by a flockwork-P model.
-    
+
     Parameters
     ----------
     temporal_network : :mod:`edge_changes` or :mod:`edge_lists`
@@ -295,7 +299,7 @@ def estimated_mean_group_size_distribution(temporal_network):
         The result is an array of length `N` with its `i`-th entry containing the mean number of
         groups of size `m = i + 1`.
     """
-    
+
     new_t, k = tc.mean_degree(temporal_network)
     N = temporal_network.N
 
@@ -309,19 +313,19 @@ def estimated_mean_group_size_distribution(temporal_network):
         this_distro = flockwork_P_equilibrium_group_size_distribution(N, P_)
         distro.append(this_distro[1:])
 
-    # compute the mean group size distribution as a time integral over the 
+    # compute the mean group size distribution as a time integral over the
     # group size distribution
     distro = np.array(distro)
-    mean_distro = np.trapz(distro,x=new_t,axis=0) / (new_t[-1] - new_t[0])
+    mean_distro = np.trapz(distro, x=new_t, axis=0) / (new_t[-1] - new_t[0])
 
     return mean_distro
 
 
-def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flockwork_P_params, dk, N = None):
-    """Compute the mean group size distribution for a Flockwork-P system with varying rates from the 
+def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flockwork_P_params, dk, N=None):
+    r"""Compute the mean group size distribution for a Flockwork-P system with varying rates from the 
     mean degree distribution which is fitted as <k>^(-alpha), hence this returns
     :math:`<N_m> = \int dk P(k) * N_m( k/(k+1) )`
-    
+
     Parameters
     ----------
     flockwork_P_params : :obj:`dict`
@@ -339,24 +343,25 @@ def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flock
         An array of length `N` with its `i`-th entry containing the mean number of
         groups of size `m = i + 1`.
     """
-    
+
     if N is None:
         N = flockwork_P_params['N']
 
     # estimate mean degree from integrating ODE
-    new_t, k = flockwork_P_mean_degree_for_varying_rates(flockwork_P_params,N)
-    
+    new_t, k = flockwork_P_mean_degree_for_varying_rates(flockwork_P_params, N)
+
     kmin = 2.0 / N
-    ind = np.where(k>=kmin)
+    ind = np.where(k >= kmin)
     new_t = new_t[ind]
     k = k[ind]
 
     alpha, err, xmin = fit_power_law_clauset(k)
     kmin = k.min()
     kmax = k.max()
-    
+
     norm = 1/(1-alpha) * (kmax**(-alpha+1) - kmin**(-alpha+1))
-    dist = lambda k_:  k_**(-alpha) / norm
+
+    def dist(k_): return k_**(-alpha) / norm
 
     k = np.linspace(kmin, kmax, int((kmax-kmin) / dk) + 1)
 
@@ -372,7 +377,7 @@ def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flock
 
     distro = np.array(distro)
 
-    mean_distro = simps(dist(k)[:,None] * distro, x = k, axis = 0)
+    mean_distro = simps(dist(k)[:, None] * distro, x=k, axis=0)
 
     return mean_distro
 
@@ -382,6 +387,6 @@ if __name__ == "__main__":
     N = 10
     P = 0.5
 
-    dist = flockwork_P_equilibrium_group_size_distribution(N,P)
+    dist = flockwork_P_equilibrium_group_size_distribution(N, P)
 
-    print(dist, sum([ m * h for m,h in enumerate(dist)]))
+    print(dist, sum([m * h for m, h in enumerate(dist)]))

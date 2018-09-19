@@ -411,7 +411,7 @@ def bin_a_function(x,y,bins,mode='mean'):
 
     return new_y
 
-def sample_a_function(x,y,time_points,sample_width=0):
+def sample_a_function(t,y,time_points,sample_width=0):
     r"""
     Sample an observable :math:`y` which is a step function
     and changes at corresponding values :math:`t`.
@@ -533,7 +533,7 @@ def get_edge_probability_and_rate(temporal_network):
     """
     For each edge compute the probability that it is active and the rate
     with which it is activated.
-    
+
     Parameters
     ==========
     temporal_network : :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes` or :class:`_tacoma.edge_trajectories`

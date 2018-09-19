@@ -65,9 +65,6 @@ def measure_group_sizes_and_durations(temporal_network,ignore_size_histogram=Fal
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        if "ignore_size_histograms" in kwargs:
-            val = kwargs.pop("ignore_size_histograms")
-            kwargs["ignore_size_histogram_differences"] = val
         result = _tc.measure_group_sizes_and_durations_for_edge_changes(temporal_network,
                                                                         ignore_size_histogram,
                                                                         verbose,
@@ -462,9 +459,9 @@ def gillespie_SIRS(temporal_network,SIRS,is_static=False,verbose=False):
     temporal_network = _get_raw_temporal_network(temporal_network)
 
     if type(temporal_network) == ec:
-        result = _tc.gillespie_SIRS_on_edge_changes(temporal_network,SIRS,verbose)
+        _tc.gillespie_SIRS_on_edge_changes(temporal_network,SIRS,verbose)
     elif type(temporal_network) == el:
-        result = _tc.gillespie_SIRS_on_edge_lists(temporal_network,SIRS,is_static,verbose)
+        _tc.gillespie_SIRS_on_edge_lists(temporal_network,SIRS,is_static,verbose)
     else:
         raise ValueError('Unknown temporal network format: ' + str(type(temporal_network)))
 
