@@ -1,2 +1,3 @@
 pip==18.0
 pybind11==2.2.3
+sphinxcontrib-katex=0.3
