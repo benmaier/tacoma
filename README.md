@@ -26,7 +26,7 @@ unweighted temporal networks, with a focus on (but not limited to) human face-to
 
 ### Pros of using tacoma
 
-* networks are natively described in continuous time
+* networks are natively described in continuous time (which includes descriptions in discrete time
 * two main native formats to describe temporal networks (`tc.edge_lists` and `tc.edge_changes`),
   a third way, a sorted list of `on`-intervals for each edge called `tc.edge_trajectories` is
   available, but algorithms work on the two native formats only
@@ -56,9 +56,15 @@ If you get compiling errors, make sure that [pybind11](https://github.com/pybind
     $ git clone https://github.com/benmaier/tacoma
     $ pip install ./tacoma
 
-Note that a C++11-compiler has to be installed on the system before installing `tacoma`.
+Note that a C++11-compiler has to be installed on the system before installing `tacoma`. On OS X
+it might happen that even though pip installed `pybind11` it's not available during installation.
+If that happens please open a detailed issue here. You might want to try 
+    
+    $ brew install pybind11
 
-## Packages not installed during installing
+as a work-around.
+
+### Packages not automatically installed during installation
 
 The following packages are not installed during installation with `pip` since they're only required
 for drawing and drawing is not essential. If you want to use `tacoma.drawing`, please install
@@ -67,6 +73,10 @@ for drawing and drawing is not essential. If you want to use `tacoma.drawing`, p
     networkx
     python-louvain (community)
 
+## Documentation
+
+The documentation is currently available at http://rocs.hu-berlin.de/~tacoma. It is full of
+typos and non-exhaustive but I think the important points are in there.
 
 
 ## Examples
@@ -100,3 +110,4 @@ visualize(temporal_network, frame_dt = 0.05)
 
 ![visualization example](https://github.com/benmaier/tacoma/raw/master/img/tacoma_example.gif)
 
+## License
