@@ -17,7 +17,7 @@ adjacency matrix
 In `tacoma`, we will interpret temporal networks as if they were recorded in an experiment.
 We expect that over the course of time :math:`t_0\leq t < t_\mathrm{max}` in which we
 recorded activity, we encountered :math:`N` nodes from the node set 
-:math:`V=\{0,1,\dots,N-1\}` (nodes posses an integer label). However, nodes do not need
+:math:`V=\{0,1,\dots,N-1\}` (nodes possess an integer label). However, nodes do not need
 to be active (i.e. connected to other nodes) during the time of the experiment to be considered
 in the node set.
 
