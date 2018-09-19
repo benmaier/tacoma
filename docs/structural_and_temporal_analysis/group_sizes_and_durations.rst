@@ -241,8 +241,21 @@ The contact and inter-contact durations can be analyzed using
     Contact and inter-contact distributions
     for the SocioPatterns Hypertext 09 dataset.
 
+Aggregated network
+~~~~~~~~~~~~~~~~~~
 
-:func:`tacoma.api.aggregated_network`
+The aggregated network
+
+.. math::
+    
+    W_{ij} = \int\limits_{t_0}^{t_\mathrm{max}}dt\,A_{ij}(t)
+
+is given as a dictionary in ``result.aggregated_network``. Each key
+is a pair of ints, representing the edge :math:`(i, j)`, the
+corresponding value is :math:`W_{ij}`.
+
+If you just want the aggregated network without the other results,
+use :func:`tacoma.api.aggregated_network`.
 
 .. _Zhao, Stehlé, Bianconi, and Barrat: https://arxiv.org/abs/1102.2423
 
