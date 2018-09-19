@@ -285,21 +285,21 @@ def slow_mean_degree(temporal_network):
     return t, k
 
 def time_average(t,x,tmax=None):
-    """
+    r"""
     Return a temporal average of an observable `x(t)`, 
 
     .. math::
 
-        \\overline x = \\frac{1}{t_\\mathrm{max}-t_0} 
-                       \\int\\limits_{t_0}^{t_\\mathrm{max}} dt\, x(t).
+        \overline x = \frac{1}{t_\mathrm{max}-t_0} 
+                       \int\limits_{t_0}^{t_\mathrm{max}} dt\, x(t).
 
     Where it's assumed that `x` changes as a step function, such that
 
     .. math::
 
-        \\overline x = \\frac{1}{t_\\mathrm{max}-t_0} 
-                       \\left( (t_\\mathrm{max} - t_{N_t-1})  x(t_{N_t-1}) +
-                                \\sum_{i=1}^{N_t-1} (t_{i}-t_{i-1})x(t_{i-1}) \\right).
+        \overline x = \frac{1}{t_\mathrm{max}-t_0} 
+                       \left( (t_\mathrm{max} - t_{N_t-1})  x(t_{N_t-1}) +
+                                \sum_{i=1}^{N_t-1} (t_{i}-t_{i-1})x(t_{i-1}) \right).
 
     Parameters
     ----------
@@ -489,7 +489,7 @@ def rescale_time(temporal_network, new_t0, new_tmax):
 
     return temporal_network
 
-def number_of_discovered_edges(temporal_network):
+def contact_coverage(temporal_network):
     """Get the total number of discovered unique edges C(t), i.e. the contact coverage.
     
     Parameters
@@ -530,7 +530,7 @@ def number_of_discovered_edges(temporal_network):
     return np.array(t), np.array(count,dtype=float)
 
 def get_edge_probability_and_rate(temporal_network):
-    """
+    r"""
     For each edge compute the probability that it is active and the rate
     with which it is activated.
 
@@ -545,8 +545,8 @@ def get_edge_probability_and_rate(temporal_network):
         (the remaining un-observed edges have probability p = 0).
     omega : numpy.ndarray
         The rate with which the observed edges are switched on 
-        :math:`\\omega = \\left(\\frac{1}{\\tau^+} + \\frac{1}{\\tau^{-}}\\right)^{-1}`
-        (the remaining un-observed edges have rate :math:`\\omega = 0`).
+        :math:`\omega = \left(\frac{1}{\tau^+} + \frac{1}{\tau^{-}}\right)^{-1}`
+        (the remaining un-observed edges have rate :math:`\omega = 0`).
     """
 
     if type(temporal_network) in [ ec, el, el_h, ec_h ]:
