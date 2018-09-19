@@ -111,3 +111,5 @@ visualize(temporal_network, frame_dt = 0.05)
 ![visualization example](https://github.com/benmaier/tacoma/raw/master/img/tacoma_example.gif)
 
 ## License
+
+The whole software is published under the MIT software. The documentation and all figures are copyrighted by Benjamin F. Maier. Ask for permission if you want to distribute parts.
