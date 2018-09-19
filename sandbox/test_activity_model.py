@@ -27,7 +27,7 @@ ax[0].plot(t1,k_,label='simulation')
 ax[0].plot(t1[[0,-1]],[k_mean]*2,'--',lw=3,label='temporal average')
 ax[0].plot(t1[[0,-1]],[k]*2,'-',lw=2,label='demanded')
 
-t, C = tc.number_of_discovered_edges(temporal_network)
+t, C = tc.contact_coverage(temporal_network)
 m0 = len(temporal_network.edges_initial)
 C *= (m-m0) / m
 C += m0
