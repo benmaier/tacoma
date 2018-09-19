@@ -110,7 +110,7 @@ def temporal_network_group_analysis(result,
 def plot_group_size_histogram(result,
                               ax,
                               marker='.',
-                              xlabel='group size $m$',
+                              xlabel='group size $g$',
                               plot_step=False,
                               fit_power_law=False,
                               ):
@@ -134,7 +134,7 @@ def plot_group_size_histogram(result,
                 mfc='None'
                 )
     ax.set_xlabel(xlabel)
-    ax.set_ylabel(r'mean number of $m$-sized groups $\overline{N_m}$')
+    ax.set_ylabel(r'average number of $g$-sized groups $\overline{N_g}$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     res = {'size_histogram': (x_group, y_group)}
@@ -214,7 +214,7 @@ def plot_group_durations(result,
                 ax.plot(x, y,
                         ls='',
                         marker=marker_sequence[size % len(marker_sequence)],
-                        label='$m=%d$' % size,
+                        label='$g=%d$' % size,
                         ms=4,
                         mew=1,
                         mfc='None'
@@ -263,7 +263,7 @@ def plot_social_trajectory(traj,
     for group, entry in enumerate(traj):
         for t in entry.time_pairs:
             t = np.array(t)
-            ax.plot(t*time_normalization_factor, [group, group], '-')
+            ax.plot(t*time_normalization_factor, [group, group], '-k')
 
     xlabel = 'time'
     if time_unit is not None:
