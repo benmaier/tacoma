@@ -22,3 +22,4 @@ fw = flockwork_P(N, P, t_run_total)
 import tacoma as tc
 print("Number of rule violations in generated temporal network:", 
       tc.verify(fw))
+print(type(fw))
