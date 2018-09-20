@@ -47,6 +47,7 @@ Pros
   different models
 - easy way to simulate Gillespie (here, epidemic spreading) processes
   on temporal networks
+  with an implementation of `Vestergaard's and Génois's adapted algortihm`_
 - easy framework to develop new Gillespie-simulations algorithms on
   temporal networks
 - multiple and simple ways to interactively visualize temporal networks
@@ -81,3 +82,4 @@ installing ``tacoma``.
 
 .. _'Hypertext 2009'-dataset: http://www.sociopatterns.org/datasets/hypertext-2009-dynamic-contact-network/
 .. _pybind11: https://github.com/pybind/pybind11
+.. _Vestergaard's and Génois's adapted algortihm: https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004579
