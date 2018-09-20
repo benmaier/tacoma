@@ -14,7 +14,7 @@ seed = 7925
 infection_rate = 1.0
 recovery_rate = 0.1
 
-E, _ = flockwork_P_equilibrium_configuration(N,P[0])
+E = flockwork_P_equilibrium_configuration(N,P[0])
 
 fwP_ec = tc.flockwork_P_varying_rates(E,N,P,t_run_total,rewiring_rate,tmax,seed=seed)
 fwP_el = tc.convert(fwP_ec)

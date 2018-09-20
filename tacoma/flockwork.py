@@ -12,6 +12,9 @@ from scipy.integrate import simps
 
 from tacoma.power_law_fitting import fit_power_law_clauset
 
+from _tacoma import flockwork_P_varying_rates
+from tacoma import _get_raw_temporal_network
+
 import tacoma as tc
 
 
@@ -70,7 +73,7 @@ def flockwork_P_equilibrium_group_size_distribution(N, P):
     return np.array(dist)
 
 
-def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True):
+def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histogram=False, seed=0):
     """Get an equilibrium configuration of a Flockwork-P model
     given node number N and probability to reconnect P.
 
@@ -80,18 +83,28 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True):
         Number of nodes
     P : float
         Probability to reconnect
-    shuffle_nodes : bool, optional
+    shuffle_nodes : bool, default : True
         Shuffle the node order in which nodes are distributed
-        to groups. 'True' is recommended. default : True
+        to groups. 'True' is recommended.
+    return_group_size_histogram : bool, default : False
+        Return a numpy array containing the counts of groups
+        of size :math:`g`.
+    seed : int, default : 0
+        The random seed. RNG is initialized randomly if ``seed = 0``.
+    
 
     Returns
     -------
     :obj:`list` of :obj:`tuple` of int
         edge list of equilibrium configuration
     numpy.ndarray
-        group size counter of this configuration
+        group size counter of this configuration (only
+        if ``return_group_size_histogram`` is `True`
 
     """
+
+    if seed > 0:
+        random.seed(seed)
 
     dist = flockwork_P_equilibrium_group_size_distribution(N, P)
 
@@ -166,7 +179,10 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True):
 
             # go to next smaller group size
 
-    return edges, np.append(np.array([0.]), C_m)
+    if return_histogram:
+        return edges, np.append(np.array([0.]), C_m)
+    else:
+        return edges
 
 
 def flockwork_P_mean_degree_for_varying_rates(flockwork_P_params, N=None):
@@ -382,6 +398,65 @@ def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flock
     return mean_distro
 
 
+def flockwork_P(N, P, t_run_total, initial_edges = None, seed = 0, return_edge_changes_with_histograms=False):
+    r"""
+    Simulate a flockwork P-model where the disconnection rate is 
+    :math:`\gamma=1` and reconnection probability is :math:`P`.
+    In order to start with an equilibrated initial state, use
+    :func:`tacoma.flockwork.flockwork_P_equilibrium_configuration`
+    or just pass ``initial_edges = None`` to this function.
+
+    Parameters
+    ----------
+    N : int
+        number of nodes
+    P : float
+        The reconnection probability. Has to be :math:`0\leq P\leq 1`
+    t_run_total : float
+        The total run time in units of :math:`\gamma^{-1}=1`.
+    initial_edges : list of tuple of int
+        The initial state of the network as an edge list.
+        If `None` is provided, the initial state will be taken
+        from an equilibrium configuration generated with
+        :func:`tacoma.flockwork.flockwork_P_equilibrium_configuration`
+    seed : int, default : 0
+        The random seed.
+    return_edge_changes_with_histograms : bool, default : False
+        Instead of the converted :class:`_tacoma.edge_changes`,
+        return the original instance of 
+        :class:`_tacoma.edge_changes_with_histograms`.
+
+    Returns
+    -------
+    :class:`_tacoma.edge_changes`
+        The simulated network. if return_edge_changes_with_histograms is `True`,
+        returns an instance of :class:`_tacoma.edge_changes_with_histograms` instead.
+
+    """
+
+    if initial_edges is None:
+        initial_edges = flockwork_P_equilibrium_configuration(N, P)
+
+    Ps = [ P ]
+    rewiring_rate = [ (0.0, 1.0) ]
+    tmax = t_run_total
+
+    fw = flockwork_P_varying_rates(
+                                    initial_edges,
+                                    N,
+                                    Ps,
+                                    t_run_total,
+                                    rewiring_rate,
+                                    tmax,
+                                    use_random_rewiring=False,
+                                    seed=seed
+                                  )
+
+    if not return_edge_changes_with_histograms:
+        fw = _get_raw_temporal_network(fw)
+
+    return fw
+
 if __name__ == "__main__":
 
     N = 10
@@ -390,3 +465,4 @@ if __name__ == "__main__":
     dist = flockwork_P_equilibrium_group_size_distribution(N, P)
 
     print(dist, sum([m * h for m, h in enumerate(dist)]))
+

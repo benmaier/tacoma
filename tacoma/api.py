@@ -753,3 +753,4 @@ def edge_counts(temporal_network):
                          str(type(temporal_network)))
 
     return m_in, m_out, m
+
