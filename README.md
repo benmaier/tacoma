@@ -113,4 +113,4 @@ visualize(temporal_network, frame_dt = 0.05)
 
 ## License
 
-The whole software is published under the MIT software. The documentation and all figures are copyrighted by Benjamin F. Maier. Ask for permission if you want to distribute parts.
+The whole software is published under the MIT software license. The documentation and all figures are copyrighted by Benjamin F. Maier. Ask for permission if you want to distribute parts.
