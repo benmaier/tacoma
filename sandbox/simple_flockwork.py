@@ -7,7 +7,7 @@ P = k / (k+1)
 
 # The disconnection rate per node is set 
 # to gamma = 1, so the total run time is 
-# in units of 1/gamma = t_run_total
+# in units of 1/gamma = 1
 t_run_total = 100
 
 # In order to start with any initial state,
