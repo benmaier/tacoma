@@ -35,6 +35,7 @@ unweighted temporal networks, with a focus on (but not limited to) human face-to
   variety of languages)
 * easy functions to produce surrogate temporal networks from four different models
 * easy way to simulate Gillespie (here, epidemic spreading) processes on temporal networks
+  with an implementation of [Vestergaard's and Génois's adapted algortihm](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004579)
 * easy framework to develop new Gillespie-simulations algorithms on temporal networks
 * multiple and simple ways to interactively visualize temporal networks
 * simple functions to manipulate temporal networks (slice, concatenate, rescale time, sample, bin, convert)
