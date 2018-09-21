@@ -23,7 +23,7 @@ from distutils.dir_util import copy_tree
 import tacoma as tc
 from tacoma.data_io import mkdirp_customdir
 
-standard_config = {
+ht09_config = {
     "temporal_network_files": [
     ],
     "edges_coordinate_files": [
@@ -43,6 +43,38 @@ standard_config = {
     "link_width": 1,
     "d3_format_string": ".3f",
 }
+
+dtu_config = {
+    "plot_width" : 320 ,
+    "network_plot_height" : 250,
+    "edges_plot_height" : 100,
+    "padding" : 10,
+    "start_it" : 0,
+    "node_radius" : 1.5,
+    "link_distance" : 7,
+    "node_charge": -3,
+    "edge_line_width" : 0.5,
+    "node_edge_width" : 1,
+    "font_size_in_px" : 14,
+    "link_width" : 0.8
+}
+
+hs13_config = {
+    "plot_width" : 320 ,
+    "network_plot_height" : 350,
+    "edges_plot_height" : 100,
+    "padding" : 10,
+    "start_it" : 0,
+    "node_radius" : 2.5,
+    "link_distance" : 8,
+    "node_charge": -5,
+    "edge_line_width" : 1,
+    "font_size_in_px" : 14,
+    "link_width" : 1,
+    "node_edge_width": 1
+}
+
+standard_config = ht09_config
 
 html_source_path = os.path.join(tc.__path__[0], 'interactive')
 
@@ -162,14 +194,22 @@ def visualize(temporal_networks,
         same `t0` and `tmax`.
     frame_dt : float
         The duration of a frame in the visualization.
+
+        .. note::
+
+            This has to be given in the original time units
+            of the temporal network, disregarding any
+            value of ``time_normalization_factor``.
     time_normalization_factor : float, default : 1.0
         Rescale time with this factor.
     time_unit : string, default : None,
         Unit of time of the visualization.
     titles : string or list of strings, default : None
         Titles to put on the figures of the corresponding temporal networks.
-    config : dict
-        Configuration values for the JavaScript visualization.
+    config : dict or str
+        Configuration values for the JavaScript visualization. If this
+        is a string, it can be either ``hs13``, ``dtu``, or ``ht09`` and
+        the appropriate configuration is loaded.
     port : int, default : 8226
         Port of the started HTTP server.
 
@@ -204,6 +244,16 @@ def visualize(temporal_networks,
         titles = ["" for _ in temporal_networks]
     elif type(titles) == str or not hasattr(titles, '__len__'):
         titles = [titles]
+
+    if isinstance(config, str):
+        if config == 'dtu':
+            config = dtu_config
+        elif config == 'hs13':
+            config = hs13_config
+        elif config == 'ht09':
+            config = ht09_config
+        else:
+            raise ValueError("config", config, "is unknown.")
 
     # print(titles)
 
