@@ -22,3 +22,6 @@ a.out
 
 /py_only_docs/
 /docs/_build/
+
+/.vscode/
+/_vscode/
