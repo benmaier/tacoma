@@ -12,6 +12,8 @@ submodule, please make sure `matplotlib` is installed.
 
 from math import log10
 
+from collections import Counter
+
 import numpy as np
 
 try:
@@ -198,10 +200,16 @@ def plot_group_durations(result,
                          xlabel='duration',
                          bins=100,
                          time_normalization_factor=1.,
+                         bin_dt=None,
                          time_unit=None,
                          plot_step=False,
                          fit_power_law=False,
                          ):
+
+    if bin_dt is not None:
+        use_discrete_dt = True
+    else:
+        use_discrete_dt = False
 
     res = {}
 
@@ -210,7 +218,18 @@ def plot_group_durations(result,
             data = time_normalization_factor * \
                 np.array(result.group_durations[size], dtype=float)
             if not plot_step:
-                x, y = get_logarithmic_histogram(data, bins)
+                if not use_discrete_dt:
+                    x, y = get_logarithmic_histogram(data, bins)
+                else:
+                    c = Counter(data / bin_dt)
+                    total = sum(c.values())
+                    x = []
+                    y = []
+                    for x_, y_ in c.items():
+                        x.append(x_* bin_dt)
+                        y.append(y_/total / bin_dt)
+
+
                 ax.plot(x, y,
                         ls='',
                         marker=marker_sequence[size % len(marker_sequence)],

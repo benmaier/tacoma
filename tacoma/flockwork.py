@@ -339,8 +339,12 @@ def estimated_mean_group_size_distribution(temporal_network):
 
 def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flockwork_P_params, dk, N=None):
     r"""Compute the mean group size distribution for a Flockwork-P system with varying rates from the 
-    mean degree distribution which is fitted as <k>^(-alpha), hence this returns
-    :math:`<N_m> = \int dk P(k) * N_m( k/(k+1) )`
+    mean degree distribution which is fitted as :math:`\left\langle k\right\rangle^{-\alpha}`,
+    hence this returns
+
+    .. math::
+
+        \left\langle N_m \right\rangle = \int dk P(k)  \times N_m( k/(k+1) )
 
     Parameters
     ----------
