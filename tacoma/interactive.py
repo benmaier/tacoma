@@ -174,7 +174,7 @@ def _get_prepared_network(tn, dt, time_unit, time_normalization_factor):
 def visualize(temporal_networks,
               frame_dt,
               time_normalization_factor=1,
-              new_time_unit=None,
+              time_unit=None,
               titles=None,
               config=None,
               port=8226):
@@ -289,7 +289,7 @@ def visualize(temporal_networks,
     for itn, tn in enumerate(temporal_networks):
         print("preparing network", titles[itn])
         tn_b = _get_prepared_network(
-            tn, frame_dt, new_time_unit, time_normalization_factor)
+            tn, frame_dt, time_unit, time_normalization_factor)
         taco_fname = os.path.join(subfolder, subfolder+'_'+str(itn)+'.taco')
         edge_fname = os.path.join(subfolder, subfolder+'_'+str(itn)+'.json')
         tc.write_edge_trajectory_coordinates(tn_b,
@@ -332,5 +332,5 @@ def visualize(temporal_networks,
 if __name__ == "__main__":
     # download_d3()
     a = tc.load_json_taco("~/.tacoma/ht09.taco")
-    visualize(a, frame_dt=20, titles='HT09', new_time_unit='h',
+    visualize(a, frame_dt=20, titles='HT09', time_unit='h',
               time_normalization_factor=1./3600.)
