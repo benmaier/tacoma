@@ -281,7 +281,7 @@ def visualize(temporal_networks,
     cwd = os.getcwd()
     os.chdir(web_dir)
 
-    server = StoppableHTTPServer(("127.0.0.1", 8226),
+    server = StoppableHTTPServer(("127.0.0.1", port),
                                  http.server.SimpleHTTPRequestHandler,
                                  subfolder_path,
                                  )
