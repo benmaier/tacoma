@@ -112,8 +112,10 @@ def prepare_visualization_directory():
     """Move all files from the tacoma/interactive directory to ~/.tacoma/web"""
     src = html_source_path
     dst = os.path.abspath(os.path.expanduser("~/.tacoma/web/"))
-    if not os.path.exists(os.path.join(dst, "index.html")):
-        copy_tree(src, dst)
+    #if not os.path.exists(os.path.join(dst, "index.html")):
+
+    # always copy source files to the subdirectory
+    copy_tree(src, dst)
 
 
 class StoppableHTTPServer(http.server.HTTPServer):
