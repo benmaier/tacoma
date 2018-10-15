@@ -313,7 +313,7 @@ def visualize(temporal_networks,
     thread = threading.Thread(None, server.run)
     thread.start()
 
-    webbrowser.open("http://localhost:8226/?data=" + subfolder)
+    webbrowser.open("http://localhost:"+str(port)+"/?data=" + subfolder)
 
     try:
         while True:
