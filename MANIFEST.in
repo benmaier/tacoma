@@ -1,5 +1,10 @@
 include MANIFEST.in
+include LICENSE
 include setup.py
 include README.md
 include tacoma/resources/*
 include tacoma/interactive/*
+include tacoma/interactive/css/*
+include tacoma/interactive/custom_js/*
+include tacoma/interactive/img/*
+include tacoma/interactive/widget_js/*
