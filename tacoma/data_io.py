@@ -10,6 +10,7 @@ import gzip  # for sociopatterns data
 import csv
 
 import wget
+import shutil
 
 import tacoma as tc
 from tacoma import _get_raw_temporal_network
@@ -21,6 +22,12 @@ def mkdirp_customdir(directory='~/.tacoma/'):
     directory = os.path.abspath(os.path.expanduser(directory))
     if not os.path.exists(directory):
         os.makedirs(directory)
+
+def reset_web_directory():
+    """Reset the internal system directory `~/.tacoma/`"""
+    directory = '~/.tacoma/web/'
+    directory = os.path.abspath(os.path.expanduser(directory))
+    shutil.rmtree(directory)
 
 
 def write_json_taco(temporal_network, fp):
