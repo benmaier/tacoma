@@ -14,6 +14,8 @@ import webbrowser
 import time
 import threading
 
+import copy
+
 import wget
 import shutil
 
@@ -247,15 +249,18 @@ def visualize(temporal_networks,
     elif type(titles) == str or not hasattr(titles, '__len__'):
         titles = [titles]
 
+    this_config = copy.deepcopy(standard_config)
+
     if isinstance(config, str):
         if config == 'dtu':
-            config = dtu_config
+            config = dict(dtu_config)
         elif config == 'hs13':
-            config = hs13_config
+            config = dict(hs13_config)
         elif config == 'ht09':
-            config = ht09_config
+            config = dict(ht09_config)
         else:
             raise ValueError("config", config, "is unknown.")
+        this_config.update(config)
 
     # print(titles)
 
@@ -272,10 +277,10 @@ def visualize(temporal_networks,
     prepare_visualization_directory()
 
     # create a subfolder based on the current time
-    subfolder = "tmp_{:x}".format(int(time.time()*1000))
+    subdir = "tmp_{:x}".format(int(time.time()*1000))
     mkdirp_customdir(directory=web_dir)
-    subfolder_path = os.path.join(web_dir, subfolder)
-    mkdirp_customdir(directory=subfolder_path)
+    subdir_path = os.path.join(web_dir, subdir)
+    mkdirp_customdir(directory=subdir_path)
 
     # change directory to this directory
     print("changing directory to", web_dir)
@@ -285,35 +290,32 @@ def visualize(temporal_networks,
 
     server = StoppableHTTPServer(("127.0.0.1", port),
                                  http.server.SimpleHTTPRequestHandler,
-                                 subfolder_path,
+                                 subdir_path,
                                  )
 
     for itn, tn in enumerate(temporal_networks):
         print("preparing network", titles[itn])
         tn_b = _get_prepared_network(
             tn, frame_dt, time_unit, time_normalization_factor)
-        taco_fname = os.path.join(subfolder, subfolder+'_'+str(itn)+'.taco')
-        edge_fname = os.path.join(subfolder, subfolder+'_'+str(itn)+'.json')
+        taco_fname = os.path.join(subdir, subdir+'_'+str(itn)+'.taco')
+        edge_fname = os.path.join(subdir, subdir+'_'+str(itn)+'.json')
         tc.write_edge_trajectory_coordinates(tn_b,
                                              os.path.join(web_dir, edge_fname),
                                              filter_for_duration=frame_dt * time_normalization_factor)
         tc.write_json_taco(tn_b, os.path.join(web_dir, taco_fname))
 
-        standard_config['temporal_network_files'].append(taco_fname)
-        standard_config['edges_coordinate_files'].append(edge_fname)
-        standard_config['titles'].append(titles[itn])
+        this_config['temporal_network_files'].append(taco_fname)
+        this_config['edges_coordinate_files'].append(edge_fname)
+        this_config['titles'].append(titles[itn])
 
-    if type(config) == dict:
-        standard_config.update(config)
-
-    with open(os.path.join(web_dir, subfolder+'_config.json'), 'w') as f:
-        json.dump(standard_config, f)
+    with open(os.path.join(web_dir, subdir+'_config.json'), 'w') as f:
+        json.dump(this_config, f)
 
     # ========= start server ============
     thread = threading.Thread(None, server.run)
     thread.start()
 
-    webbrowser.open("http://localhost:"+str(port)+"/?data=" + subfolder)
+    webbrowser.open("http://localhost:"+str(port)+"/?data=" + subdir)
 
     try:
         while True:
@@ -322,7 +324,7 @@ def visualize(temporal_networks,
         # thread.join()
         print('stopping server ...')
         server.stop_this()
-        # thread.join()
+        #thread.join()        
 
     # time.sleep(1)
 
