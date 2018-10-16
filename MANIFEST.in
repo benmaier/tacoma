@@ -7,4 +7,4 @@ include tacoma/interactive/*
 include tacoma/interactive/css/*
 include tacoma/interactive/custom_js/*
 include tacoma/interactive/img/*
-include tacoma/interactive/widget_js/*
+include tacoma/interactive/widgets_js/*
