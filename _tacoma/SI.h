@@ -1,25 +1,25 @@
-/* 
+/*
  * The MIT License (MIT)
  * Copyright (c) 2018, Benjamin Maier
  *
- * Permission is hereby granted, free of charge, to any person 
- * obtaining a copy of this software and associated documentation 
- * files (the "Software"), to deal in the Software without 
- * restriction, including without limitation the rights to use, 
- * copy, modify, merge, publish, distribute, sublicense, and/or 
- * sell copies of the Software, and to permit persons to whom the 
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall 
+ * The above copyright notice and this permission notice shall
  * be included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-
- * INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS 
- * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
- * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF 
- * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+ * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
 
@@ -44,7 +44,7 @@
 
 using namespace std;
 
-class SI 
+class SI
 {
     public:
         size_t N;
@@ -53,6 +53,7 @@ class SI
         size_t number_of_initially_infected;
         size_t number_of_initially_vaccinated;
         size_t seed;
+        bool save_infection_events;
         bool verbose;
 
         mt19937_64 generator;
@@ -61,6 +62,7 @@ class SI
         vector < double > time;
         vector < size_t > _SI;
         vector < size_t > I;
+        vector < pair <size_t, size_t>> infection_events;
 
         SI(
             size_t _N,
@@ -69,6 +71,7 @@ class SI
             size_t _number_of_initially_infected = 1,
             size_t _number_of_initially_vaccinated = 0,
             size_t _seed = 0,
+            bool _save_infection_events = false,
             bool _verbose = false
         )
         {
@@ -77,6 +80,7 @@ class SI
             infection_rate = _infection_rate;
             number_of_initially_vaccinated = _number_of_initially_vaccinated;
             number_of_initially_infected = _number_of_initially_infected;
+            save_infection_events = _save_infection_events;
             verbose = _verbose;
             seed = _seed;
 
@@ -85,13 +89,14 @@ class SI
             randuni = uniform_real_distribution < double > (0.0, 1.0);
         }
 
-        void reset() 
+        void reset()
         {
             // reset observables
             //
             time.clear();
             _SI.clear();
             I.clear();
+            infection_events.clear();
 
             // seed engine
             if (seed == 0)
@@ -102,7 +107,7 @@ class SI
 
             //check if number of infected and number of vaccinated does not
             //exceed total node number
-            if (number_of_initially_vaccinated + number_of_initially_infected > N) 
+            if (number_of_initially_vaccinated + number_of_initially_infected > N)
                 throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
 
             //initialize status vector of nodes and vector of infected
@@ -113,10 +118,10 @@ class SI
             vector < size_t > node_ints;
             for(size_t n=0; n<N; n++)
             {
-                node_ints.push_back(n);            
+                node_ints.push_back(n);
             }
 
-            if (verbose) 
+            if (verbose)
             {
                 cout << "choosing " << number_of_initially_vaccinated
                      << " vaccinated and " << number_of_initially_infected
@@ -148,7 +153,7 @@ class SI
             }
         }
 
-        bool simulation_ended() 
+        bool simulation_ended()
         {
             return (infected.size() == N);
         };

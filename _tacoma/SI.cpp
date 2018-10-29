@@ -1,25 +1,25 @@
-/* 
+/*
  * The MIT License (MIT)
  * Copyright (c) 2018, Benjamin Maier
  *
- * Permission is hereby granted, free of charge, to any person 
- * obtaining a copy of this software and associated documentation 
- * files (the "Software"), to deal in the Software without 
- * restriction, including without limitation the rights to use, 
- * copy, modify, merge, publish, distribute, sublicense, and/or 
- * sell copies of the Software, and to permit persons to whom the 
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall 
+ * The above copyright notice and this permission notice shall
  * be included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-
- * INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS 
- * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
- * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF 
- * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+ * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
 
@@ -76,16 +76,16 @@ void SI::update_network(
         number_of_edges_times_two += neighbors.size();
 
     mean_degree = number_of_edges_times_two / (double) N;
-    
+
     // make searchable list
     set < pair < size_t, size_t > > set_of_out_edges(edges_out.begin(), edges_out.end());
 
     // erase all entries from SI which are part of the list of edges leaving
     SI_edges.erase(
             remove_if(
-                    SI_edges.begin(), 
+                    SI_edges.begin(),
                     SI_edges.end(),
-                [&set_of_out_edges](const pair < size_t, size_t > & edge) { 
+                [&set_of_out_edges](const pair < size_t, size_t > & edge) {
                         size_t u = edge.first;
                         size_t v = edge.second;
 
@@ -94,7 +94,7 @@ void SI::update_network(
 
                         return set_of_out_edges.find( make_pair(u,v) ) != set_of_out_edges.end();
                 }),
-            SI_edges.end() 
+            SI_edges.end()
             );
 
     for(auto &e: edges_in)
@@ -158,15 +158,21 @@ void SI::infection_event()
     // change node status of this node
     node_status[this_susceptible] = EPI::I;
 
+    // save the infection edge in observable
+    if(save_infection_events)
+    {
+      infection_events.push_back(SI_edges.at(this_susceptible_index));
+    }
+
     // erase all edges in the SI set where this susceptible is part of
-    SI_edges.erase( 
-            remove_if( 
-                    SI_edges.begin(), 
+    SI_edges.erase(
+            remove_if(
+                    SI_edges.begin(),
                     SI_edges.end(),
-                [&this_susceptible](const pair < size_t, size_t > & edge) { 
+                [&this_susceptible](const pair < size_t, size_t > & edge) {
                         return edge.second == this_susceptible;
                 }),
-            SI_edges.end() 
+            SI_edges.end()
         );
 
     // push the new SI edges
@@ -189,4 +195,3 @@ void SI::update_observables(
     // push back time
     time.push_back(t);
 }
-
