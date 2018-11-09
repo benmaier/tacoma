@@ -603,11 +603,11 @@ def get_reduced_time(t, intervals_to_discard):
 
     offset = 0.0
 
-    for interval in intervals_to_discard_for_fit:
+    for interval in intervals_to_discard:
         t0, t1 = interval
-        x_[np.logical_and(x>=t0, x<t1)] = t0 - offset
+        x_[np.logical_and(t>=t0, t<t1)] = t0 - offset
 
-        x_[x>=t1] -= t1 - t0
+        x_[t>=t1] -= t1 - t0
         offset += t1 - t0
 
     return x_
