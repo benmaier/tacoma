@@ -505,7 +505,7 @@ def degree_moment(N,P,m):
 
     Returns
     -------
-    :math:`\left<k^m\right>` : float
+    <k^m> : float
         The :math:`m`-th moment of the degree distribution.
     """
 
@@ -527,7 +527,7 @@ def mean_degree(N,P,m):
 
     Returns
     -------
-    :math:`\left<k\right>` : float
+    <k> : float
         The mean degree.
     """
 
