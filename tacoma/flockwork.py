@@ -532,6 +532,39 @@ def mean_degree(N,P,m):
     """
 
     return degree_moment(N, P, 1)
+
+def convert_to_edge_activity_parameters(N, P, gamma=1.0):
+    r"""
+    Convert the Flockwork-P parameters math:`P` and :math:`\gamma` 
+    to the corresponding parameters in the edge activity model
+    :math:`\omega^{+}` and :math:`\omega^{-}`.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    P : float
+        Probability to reconnect
+    gamma : float, default = 1
+        Rewiring rate.
+
+    Returns
+    -------
+    omega_plus : float
+        The rate with which inactive edges are activated.
+    omega_minus : float
+        The rate with which active edges are deactivated.
+    """
+
+    k = degree_moment(N, P, 1)
+    k2 = degree_moment(N, P, 2)
+
+    omega_minus = 2*gamma*(1-P/(N-1)*k2/k)
+    rho = k / (N-1)
+    omega = omega_minus * rho
+    omega_plus = omega / (1-rho)
+
+    return omega_plus, omega_minus
     
 
 if __name__ == "__main__":
