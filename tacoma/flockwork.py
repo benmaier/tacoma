@@ -73,7 +73,7 @@ def flockwork_P_equilibrium_group_size_distribution(N, P):
     return np.array(dist)
 
 
-def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histogram=False, seed=0):
+def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histogram=False, seed=0, shuffle_group_sizes=True):
     """Get an equilibrium configuration of a Flockwork-P model
     given node number N and probability to reconnect P.
 
@@ -91,16 +91,17 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histo
         of size :math:`g`.
     seed : int, default : 0
         The random seed. RNG is initialized randomly if ``seed = 0``.
+    shuffle_group_sizes : bool, default : True
+        Shuffle the order of group sizes in which nodes are distributed
+        to groups. 'True' is recommended.
     
-
     Returns
     -------
     :obj:`list` of :obj:`tuple` of int
         edge list of equilibrium configuration
     numpy.ndarray
         group size counter of this configuration (only
-        if ``return_group_size_histogram`` is `True`
-
+        if ``return_group_size_histogram`` is `True`)
     """
 
     if seed > 0:
@@ -132,7 +133,11 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histo
         # loop through group sizes in descending order.
         # start with the smallest group size that
         # may contain all of the nodes left
-        for m in range(nodes_left, 0, -1):
+        group_sizes = 1 + random.permutation(N)
+        for m in group_sizes:
+
+            if (nodes_left-m) < 0:
+                continue
 
             # if the expected number of groups of this size is not zero
             if dist[m-1] > 0. and nodes_left >= m:
@@ -160,10 +165,12 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histo
                     #        edges.append((node_ints[u],node_ints[v]))
 
                     # add fully connected clusters to the edge set
-                    if m > 1:
-                        edges.extend([(node_ints[u], node_ints[v])
-                                      for u in range(nodes_left-1, nodes_left-m, -1)
-                                      for v in range(u-1, nodes_left-m-1, -1)])
+                    if m > 1 and nodes_left-m >= 0:
+                        edges.extend([tuple(sorted((int(node_ints[u]), int(node_ints[v]))))
+                                      for u in range(nodes_left-m, nodes_left-1)
+                                      for v in range(u+1, nodes_left)])
+                    elif nodes_left - m < 0:
+                        break
 
                     # remove the grouped nodes from the pool of remaining nodes
                     nodes_left -= m
@@ -460,6 +467,72 @@ def flockwork_P(N, P, t_run_total, initial_edges = None, seed = 0, return_edge_c
         fw = _get_raw_temporal_network(fw)
 
     return fw
+
+def degree_distribution(N,P):
+    """Get the equilibrium degree distribution of a Flockwork-P model
+    given node number N and probability to reconnect P.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    P : float
+        Probability to reconnect
+
+    Returns
+    -------
+    numpy.ndarray
+        Degree distribution of this configuration. The :math:`k`-th entry
+        of this array is the probability that a node has degree :math:`k`.
+    """
+
+    C_m = flockwork_P_equilibrium_group_size_distribution(N, P)
+    P_k = np.arange(1,N+1) * C_m[1:] / N
+
+    return P_k
+
+def degree_moment(N,P,m):
+    r"""Get the :math:`m`-th moment of the degree of an Flockwork-P model
+    equilibrium configuration
+    given node number N and probability to reconnect P.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    P : float
+        Probability to reconnect
+
+    Returns
+    -------
+    :math:`\left<k^m\right>` : float
+        The :math:`m`-th moment of the degree distribution.
+    """
+
+    P_k = degree_distribution(N, P)
+
+    return (np.arange(N)**m).dot(P_k)
+
+def mean_degree(N,P,m):
+    r"""
+    Get the exact theoretical mean degree :math:`\left< k\right>`
+    for a Flockwork-P model.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    P : float
+        Probability to reconnect
+
+    Returns
+    -------
+    :math:`\left<k\right>` : float
+        The mean degree.
+    """
+
+    return degree_moment(N, P, 1)
+    
 
 if __name__ == "__main__":
 

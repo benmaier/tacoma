@@ -570,11 +570,16 @@ def get_edge_probability_and_rate(temporal_network):
 
     for iedge, entry in enumerate(traj):
 
+
+        N_events = len(entry.time_pairs)
+        if entry.time_pairs[0][0] == t0:
+            N_events -= 1
+        activity_rate[iedge] = N_events / T
+
         t_on = 0.0
         for interval in entry.time_pairs:
             t_on += interval[1] - interval[0]
 
-        activity_rate[iedge] = len(entry.time_pairs) / T
         connection_probability[iedge] = t_on / T
 
     return connection_probability, activity_rate
