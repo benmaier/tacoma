@@ -54,10 +54,12 @@
 #include "SI.h"
 #include "SIRS.h"
 #include "dyn_gillespie.h"
+#include "model_gillespie.h"
 #include "conversion.h"
 #include "concatenation.h"
 #include "flockwork_parameter_estimation.h"
 #include "activity_model.h"
+#include "ActivityModel.h"
 #include "slice.h"
 
 using namespace std;
@@ -703,6 +705,13 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("SIRS"),
           py::arg("verbose") = false);
 
+    m.def("gillespie_SIS_ActivityModel", &gillespie_on_model<ActivityModel,SIS>,
+          "Perform a Gillespie SIS simulation on the edge activity model.",
+          py::arg("activity_model"),
+          py::arg("SIS"),
+          py::arg("verbose") = false);
+
+
     py::class_<edge_changes>(m, "edge_changes", R"pbdoc(Description of a temporal network by listing the changes of edges at a certain time.)pbdoc")
         .def(py::init<>())
         .def(py::init<const edge_changes_with_histograms &>(),
@@ -1165,4 +1174,37 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("SI", &SIRS::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
         .def_readwrite("I", &SIRS::I, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("R", &SIRS::R, "A list containing the number of recovered at time :math:`t`.");
+
+    py::class_<ActivityModel>(m, "ActivityModel", "Base class for the simulation of an edge activity model. Pass this to :func:`tacoma.api.gillespie_SIS_ActivityModel`")
+        .def(py::init<size_t, double, double, bool, size_t, bool>(),
+             py::arg("N"),
+             py::arg("rho"),
+             py::arg("omega"),
+             py::arg("save_temporal_network") = false,
+             py::arg("seed") = 0,
+             py::arg("verbose") = false,
+             R"pbdoc(
+                    Parameters
+                    ----------
+                    N : int
+                        Number of nodes in the temporal network.
+                    rho : float
+                        Demanded network density.
+                    omega : float
+                        rate with which edges are switched on and off, respectively,
+                        :math:`\omega^{-1}=(\omega^-)^{-1} + (\omega^+)^{-1}`.
+                    save_temporal_network : bool, default: False
+                        If this is `True`, the changes are saved in an instance of 
+                        :func:`_tacoma.edge_changes` (in the attribute `edge_changes`.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                        However, the generator will be rewritten 
+                        in :func:`tacoma.api.gillespie_SIS_ActivityModel` anyway.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc")
+        .def_readwrite("edge_changes", &ActivityModel::edg_chg, 
+                    R"pbdoc(An instance of :func:`_tacoma.edge_changes` with the saved temporal network (only if
+                    `save_temporal_network` is `True`.)pbdoc");
+
 }

@@ -53,154 +53,130 @@ class ActivityModel
         size_t N;
         double rho;
         double omega;
+        double omega_minus;
+        double omega_plus;
         size_t seed;
         bool verbose;
+        bool save_temporal_network;
 
-        mt19937_64 generator;
+        vector < set < size_t > > G;
+
+        mt19937_64 * generator;
         uniform_real_distribution<double> randuni;
 
-        edges_changes edg_chg;
+        edge_changes edg_chg;
 
         ActivityModel(
             size_t _N,
             double _rho,
             double _omega,
+            bool _save_temporal_network = false,
             size_t _seed = 0,
             bool _verbose = false
         )
         {
             N = _N;
             rho = _rho;
-            omega = _omega
+            omega = _omega;
             verbose = _verbose;
             seed = _seed;
+            save_temporal_network = _save_temporal_network;
 
-            mt19937_64 generator;
-
+            generator = new mt19937_64;
             randuni = uniform_real_distribution < double > (0.0, 1.0);
+
+            if ((rho<=0.0) or (rho>=1.0))
+                throw domain_error("rho has to be 0 < rho < 1.");
+            if (omega <= 0.0)
+                throw domain_error("omega has to be omega > 0");
+
+
+            double omega_minus = omega / rho;
+            double omega_plus = omega / (1.0 - rho);
+
+            if (verbose)
+            {
+                cout << "omega = " << omega << endl;
+                cout << "rho = " << rho << endl;
+                cout << "omega+ = " << omega_plus << endl;
+                cout << "omega- = " << omega_minus << endl;
+            }
+
         }
 
         void reset() 
         {
             // reset observables
-            time.clear();
-            R0.clear();
-            SI.clear();
-            I.clear();
+            edg_chg.N = N;
+
+            edg_chg.t.push_back(0.0);
 
             // seed engine
             if (seed == 0)
-                randomly_seed_engine(generator);
+                randomly_seed_engine(*generator);
             else
-                generator.seed(seed);
+                generator->seed(seed);
+
+            G = get_random_graph(N, rho, *generator);
 
 
-            //check if number of infected and number of vaccinated does not
-            //exceed total node number
-            if (number_of_initially_vaccinated + number_of_initially_infected > N) 
-                throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
+            if (save_temporal_network)
+                edgelist_from_graph(edg_chg.edges_initial, G);
 
-            //initialize status vector of nodes and vector of infected
-            node_status = vector < size_t >(N,EPI::S);
-            infected = vector < size_t >();
+            edges_on = 0;
+            m_max = (N * (N-1)) / 2;
 
-
-            vector < size_t > node_ints;
-            for(size_t n=0; n<N; n++)
+            for(size_t node=0; node<N; node++)
             {
-                node_ints.push_back(n);            
+                size_t this_k = G[node].size();
+                k.push_back(this_k);
+                complementary_k.push_back(N - 1 - this_k);
+
+                edges_on += this_k;
+
+                if (verbose)
+                {
+                    cout << "k[node]   = " << this_k << endl;
+                    cout << "c_k[node] = " << complementary_k.back() << endl;
+                }
             }
 
-            if (verbose) 
-            {
-                cout << "choosing " << number_of_initially_vaccinated
-                     << " vaccinated and " << number_of_initially_infected
-                     << " infected at random" << endl;
-            }
+            edges_on /= 2;
 
-            choose_random_unique(node_ints.begin(),
-                                 node_ints.end(),
-                                 number_of_initially_vaccinated + number_of_initially_infected,
-                                 generator,
-                                 randuni
-                                 );
-
-            for(size_t node=0; node<number_of_initially_vaccinated; node++)
-            {
-                node_status[node_ints[node]] = EPI::R;
-            }
-
-            for(size_t node = number_of_initially_vaccinated; node < number_of_initially_vaccinated + number_of_initially_infected; node++)
-            {
-                node_status[node_ints[node]] = EPI::I;
-                infected.push_back( node_ints[node] );
-            }
-
-            if (verbose)
-            {
-                cout << "infected set has size = " << infected.size() << endl;
-                print_infected();
-            }
+    
         }
-
-        bool simulation_ended() 
-        {
-            return (infected.size() == 0);
-        };
 
         void get_rates_and_Lambda(vector < double > &rates,
                                   double &Lambda
                                   );
 
-        void update_network(vector < set < size_t > > &G,
-                            double t
-                            );
-
-        void update_network(vector < set < size_t > > &G,
-                            vector < pair < size_t, size_t > > &edges_in,
-                            vector < pair < size_t, size_t > > &edges_out,
-                            double t
-                            );
-
         void make_event(size_t const &event,
-                        double t
+                        double t,
+                        vector < pair < size_t, size_t > > &e_in,
+                        vector < pair < size_t, size_t > > &e_out
                        );
-
-        void update_observables(double t);
 
         void print()
         {
-            print_infected();
-            print_SI_edges();
         }
 
+        void set_generator(mt19937_64 &_generator)
+        {
+            generator = &_generator;
+        } 
+
     private:
-        vector < size_t > infected;
-        vector < size_t > node_status;
-        vector < pair < size_t, size_t > > SI_edges;
-        double mean_degree;
-        vector < set < size_t > > * G;
+        vector < size_t > k;
+        vector < size_t > complementary_k;
+        size_t edges_on;
+        size_t m_max;
 
-        vector < double > rates;
 
-        void infection_event();
-        void recovery_event();
-
-        void print_infected()
+        void print_internal()
         {
-            cout << "infected = [ ";
-            for( auto const &inf: infected)
-                cout << inf << " ";
-            cout << "]" << endl;
-        };
+        }
 
-        void print_SI_edges()
-        {
-            cout << "SI_edges = [ ";
-            for( auto const &edge: SI_edges)
-                cout << "( "<< edge.first << ", " << edge.second << " ) ";
-            cout << "]" << endl;
-        };
+
 
 };
 

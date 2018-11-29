@@ -40,6 +40,7 @@
 #include <random>
 #include <ctime>
 #include <tuple>
+#include <assert.h>
 
 using namespace std;
 
@@ -52,22 +53,26 @@ void
             )
 {
 
-    // reset the simulation objects
-    this_gillespie_object.reset();
-    this_model_object.reset();
+    if (this_model_object.N != this_gillespie_object.N)
+        throw domain_error("Both model and gillespie object need to have the same node number.");
 
     // deal with random numbers
     mt19937_64 &generator = this_gillespie_object.generator;
     uniform_real_distribution<double> randuni(0.0,1.0);
+    this_model_object.set_generator(this_gillespie_object.generator);
+
+    // reset the simulation objects
+    this_gillespie_object.reset();
+    this_model_object.reset();
 
     // initialize time variables
     double t0 = 0.0;
     double t = t0;
 
     double t_simulation = this_gillespie_object.t_simulation;
+    this_model_object.edg_chg.tmax = t_simulation;
 
     // initialize a graph and pass it to the gillespie object
-    size_t N = this_model_object.N;
     this_gillespie_object.update_network(this_model_object.G,t);
 
     while ( (t-t0 < t_simulation) and (not this_gillespie_object.simulation_ended()) )
