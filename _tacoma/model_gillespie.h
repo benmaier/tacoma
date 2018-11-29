@@ -88,10 +88,21 @@ void
         this_gillespie_object.get_rates_and_Lambda(rates_dynamics,Lambda_dynamics);
         this_model_object.get_rates_and_Lambda(rates_model,Lambda_model);
 
+        if (verbose)
+        {
+            cout << "Lambda_dynamics = " << Lambda_dynamics << endl;
+            for(auto const &rate: rates_dynamics)
+                cout << "   rate = " << rate << endl;
+             
+            cout << "Lambda_model = " << Lambda_model << endl;
+            for(auto const &rate: rates_model)
+                cout << "   rate = " << rate << endl;
+        }
+
         double Lambda = Lambda_dynamics + Lambda_model;
         double rProduct = randuni(generator) * Lambda;
 
-        bool is_network_change = rProduct >= Lambda_dynamics;
+        bool is_network_change = (rProduct >= Lambda_dynamics);
 
         vector<double>::iterator this_rate;
         size_t n_rates;
@@ -111,11 +122,19 @@ void
         double sum_event = 0.0;
         size_t event = 0;
 
-        while ( (event < n_rates) and not ( (sum_event < rProduct) and (rProduct <= sum_event+(*this_rate)) ) )
+        while ( (event < n_rates) and not ( (sum_event < rProduct) and (rProduct <= sum_event + (*this_rate)) ) )
         {
             sum_event += (*this_rate);
             ++this_rate;
             ++event;
+        }
+
+        if (verbose)
+        {
+            cout << "is_network_change = " << is_network_change << endl;
+            cout << "rProduct = " << rProduct << endl;
+            cout << "event = " << event << endl;
+            cout << "this_rate = " << *this_rate << endl;
         }
 
         double tau = log(1.0/randuni(generator)) / Lambda;

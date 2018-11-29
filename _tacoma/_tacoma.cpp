@@ -96,6 +96,14 @@ PYBIND11_MODULE(_tacoma, m)
             SIRS
             node_based_SIS
 
+        Temporal network model classes
+        ------------------------------
+
+        .. autosummary::
+            :toctree: _generate
+
+            ActivityModel
+
         Analysis classes
         ----------------
 
@@ -705,10 +713,34 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("SIRS"),
           py::arg("verbose") = false);
 
-    m.def("gillespie_SIS_ActivityModel", &gillespie_on_model<ActivityModel,SIS>,
+    m.def("gillespie_SIS_on_ActivityModel", &gillespie_on_model<ActivityModel,SIS>,
           "Perform a Gillespie SIS simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SIS"),
+          py::arg("verbose") = false);
+
+    m.def("gillespie_SIR_on_ActivityModel", &gillespie_on_model<ActivityModel,SIR>,
+          "Perform a Gillespie SIR simulation on the edge activity model.",
+          py::arg("activity_model"),
+          py::arg("SIR"),
+          py::arg("verbose") = false);
+
+    m.def("gillespie_SIRS_on_ActivityModel", &gillespie_on_model<ActivityModel,SIRS>,
+          "Perform a Gillespie SIRS simulation on the edge activity model.",
+          py::arg("activity_model"),
+          py::arg("SIRS"),
+          py::arg("verbose") = false);
+
+    m.def("gillespie_SI_on_ActivityModel", &gillespie_on_model<ActivityModel,SI>,
+          "Perform a Gillespie SIRS simulation on the edge activity model.",
+          py::arg("activity_model"),
+          py::arg("SI"),
+          py::arg("verbose") = false);
+
+    m.def("gillespie_node_based_SIS_on_ActivityModel", &gillespie_on_model<ActivityModel,node_based_SIS>,
+          "Perform a node-based Gillespie SIS simulation on the edge activity model.",
+          py::arg("activity_model"),
+          py::arg("SI"),
           py::arg("verbose") = false);
 
 
@@ -1175,7 +1207,7 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("I", &SIRS::I, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("R", &SIRS::R, "A list containing the number of recovered at time :math:`t`.");
 
-    py::class_<ActivityModel>(m, "ActivityModel", "Base class for the simulation of an edge activity model. Pass this to :func:`tacoma.api.gillespie_SIS_ActivityModel`")
+    py::class_<ActivityModel>(m, "ActivityModel", "Base class for the simulation of an edge activity model. Pass this to :func:`tacoma.api.gillespie_epidemics`")
         .def(py::init<size_t, double, double, bool, size_t, bool>(),
              py::arg("N"),
              py::arg("rho"),
@@ -1204,7 +1236,7 @@ PYBIND11_MODULE(_tacoma, m)
                         Be talkative.
                 )pbdoc")
         .def_readwrite("edge_changes", &ActivityModel::edg_chg, 
-                    R"pbdoc(An instance of :func:`_tacoma.edge_changes` with the saved temporal network (only if
-                    `save_temporal_network` is `True`.)pbdoc");
+                    R"pbdoc(An instance of :class:`_tacoma.edge_changes` with the saved temporal network (only if
+                    `save_temporal_network` is `True`).)pbdoc");
 
 }

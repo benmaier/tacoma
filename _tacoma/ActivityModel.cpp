@@ -36,9 +36,18 @@ void ActivityModel::get_rates_and_Lambda(
     // delete current rates
     _rates.clear();
 
+    if (verbose)
+    {
+        cout << "edges_on = " << edges_on << endl;
+        cout << "omega- = " << omega_minus << endl;
+        cout << "omega+ = " << omega_plus << endl;
+        cout << "OMEGA- = " << omega_minus * ((double) edges_on) << endl; 
+        cout << "OMEGA+ = " << omega_plus * ((double) (m_max - edges_on)) << endl;
+    }
+
     // compute rates of infection
-    _rates.push_back(edges_on * omega_minus);
-    _rates.push_back((m_max-edges_on) * omega_plus);
+    _rates.push_back(omega_minus * ((double) edges_on));
+    _rates.push_back(omega_plus * ((double) (m_max-edges_on)));
 
     // return those new rates
     _Lambda = accumulate(_rates.begin(),_rates.end(),0.0);

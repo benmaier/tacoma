@@ -81,18 +81,12 @@ class ActivityModel
             verbose = _verbose;
             seed = _seed;
             save_temporal_network = _save_temporal_network;
+            omega_minus = omega / rho;
+            omega_plus = omega / (1.0 - rho);
+
 
             generator = new mt19937_64;
             randuni = uniform_real_distribution < double > (0.0, 1.0);
-
-            if ((rho<=0.0) or (rho>=1.0))
-                throw domain_error("rho has to be 0 < rho < 1.");
-            if (omega <= 0.0)
-                throw domain_error("omega has to be omega > 0");
-
-
-            double omega_minus = omega / rho;
-            double omega_plus = omega / (1.0 - rho);
 
             if (verbose)
             {
@@ -101,6 +95,12 @@ class ActivityModel
                 cout << "omega+ = " << omega_plus << endl;
                 cout << "omega- = " << omega_minus << endl;
             }
+            if ((rho<=0.0) or (rho>=1.0))
+                throw domain_error("rho has to be 0 < rho < 1.");
+            if (omega <= 0.0)
+                throw domain_error("omega has to be omega > 0");
+
+
 
         }
 
@@ -126,6 +126,9 @@ class ActivityModel
             edges_on = 0;
             m_max = (N * (N-1)) / 2;
 
+            k.clear();
+            complementary_k.clear();
+
             for(size_t node=0; node<N; node++)
             {
                 size_t this_k = G[node].size();
@@ -143,6 +146,8 @@ class ActivityModel
 
             edges_on /= 2;
 
+            if (verbose)
+                cout << "edges_on = " << edges_on << endl;
     
         }
 
@@ -162,6 +167,7 @@ class ActivityModel
 
         void set_generator(mt19937_64 &_generator)
         {
+            delete generator;
             generator = &_generator;
         } 
 

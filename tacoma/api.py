@@ -27,6 +27,7 @@ SI = _tc.SI
 SIS = _tc.SIS
 SIR = _tc.SIR
 SIRS = _tc.SIRS
+ActivityModel = _tc.ActivityModel
 
 
 def _get_raw_temporal_network(temporal_network):
@@ -325,9 +326,76 @@ def social_trajectory(temporal_network, node, verbose=False):
 
     return result
 
+def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=False, verbose=False):
+    """Simulates an epidemic process on the provided temporal network using the Gillespie stochastic simulation algorithm.
+
+    Parameters
+    ----------
+    temporal_network_or_model : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, :class:`_tacoma.edge_lists_with_histograms`, or :class:`_tacoma.ActivityModel`.
+        An instance of a temporal network or network model.
+    epidemic_object : :class:`_tacoma.SI`, :class:`_tacoma.SIS`, :class:`_tacoma.SIR`, :class:`_tacoma.SIRS`, :class:`_tacoma.node_based_SIS`
+        An initialized epidemic object.
+    is_static : bool, default : False
+        The algorithm works a bit differently if it knows that the network is actually static.
+        It works only with instances of :class:`_tacoma.edge_lists`.
+    verbose: bool, optional
+        Be chatty.
+
+    Returns
+    -------
+    None
+        But the observables are saved in the :mod:`_tacoma` epidemic object.
+    """
+
+    tn_or_mdl = temporal_network_or_model
+
+    if type(tn_or_mdl) in [ec, ec_h]:
+        temporal_network = _get_raw_temporal_network(tn_or_mdl)
+        if type(epidemic_object) == SI:
+            _tc.gillespie_SI_on_edge_changes(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == SIS:
+            _tc.gillespie_SIS_on_edge_changes(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == SIR:
+            _tc.gillespie_SIR_on_edge_changes(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == SIRS:
+            _tc.gillespie_SIRS_on_edge_changes(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == node_based_SIS:
+            _tc.gillespie_node_based_SIS_on_edge_changes(temporal_network, epidemic_object, verbose)
+        else:
+            raise ValueError('Invalid epidemic object type: ' + str(type(tn_or_mdl)))
+    elif type(tn_or_mdl) in [el, el_h]:
+        temporal_network = _get_raw_temporal_network(tn_or_mdl)
+        if type(epidemic_object) == SI:
+            _tc.gillespie_SI_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
+        elif type(epidemic_object) == SIS:
+            _tc.gillespie_SIS_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
+        elif type(epidemic_object) == SIR:
+            _tc.gillespie_SIR_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
+        elif type(epidemic_object) == SIRS:
+            _tc.gillespie_SIRS_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
+        elif type(epidemic_object) == node_based_SIS:
+            _tc.gillespie_node_based_SIS_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
+        else:
+            raise ValueError('Invalid epidemic object type: ' + str(type(tn_or_mdl)))
+    elif type(tn_or_mdl) in [ActivityModel]:
+        temporal_network = tn_or_mdl
+        if type(epidemic_object) == SI:
+            _tc.gillespie_SI_on_ActivityModel(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == SIS:
+            _tc.gillespie_SIS_on_ActivityModel(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == SIR:
+            _tc.gillespie_SIR_on_ActivityModel(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == SIRS:
+            _tc.gillespie_SIRS_on_ActivityModel(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == node_based_SIS:
+            _tc.gillespie_node_based_SIS_on_ActivityModel(temporal_network, epidemic_object, verbose)
+        else:
+            raise ValueError('Invalid epidemic object type: ' + str(type(tn_or_mdl)))
+    else:
+        raise ValueError('Invalid temporal network/model format: ' + str(type(tn_or_mdl)))
 
 def gillespie_SIS(temporal_network, SIS, is_static=False, verbose=False):
-    """Simulates an SIS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
+    """Simulates an SIS process on the provided temporal network using the Gillespie stochastic simulation algorithm.
 
     Parameters
     ----------
@@ -363,7 +431,7 @@ def gillespie_SIS(temporal_network, SIS, is_static=False, verbose=False):
 
 
 def gillespie_node_based_SIS(temporal_network, SIS, is_static=False, verbose=False):
-    """Simulates a node-based SIS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
+    """Simulates a node-based SIS process on the provided temporal network using the Gillespie stochastic simulation algorithm.
 
     Parameters
     ----------
@@ -399,7 +467,7 @@ def gillespie_node_based_SIS(temporal_network, SIS, is_static=False, verbose=Fal
 
 
 def gillespie_SI(temporal_network, SI, is_static=False, verbose=False):
-    """Simulates an SI process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
+    """Simulates an SI process on the provided temporal network using the Gillespie stochastic simulation algorithm.
 
     Parameters
     ----------
@@ -435,7 +503,7 @@ def gillespie_SI(temporal_network, SI, is_static=False, verbose=False):
 
 
 def gillespie_SIR(temporal_network, SIR, is_static=False, verbose=False):
-    """Simulates an SIR process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
+    """Simulates an SIR process on the provided temporal network using the Gillespie stochastic simulation algorithm.
 
     Parameters
     ----------
@@ -471,7 +539,7 @@ def gillespie_SIR(temporal_network, SIR, is_static=False, verbose=False):
 
 
 def gillespie_SIRS(temporal_network, SIRS, is_static=False, verbose=False):
-    """Simulates an SIRS process on the provided temporal network using the Gillespie stochastic simulation algorithm.``
+    """Simulates an SIRS process on the provided temporal network using the Gillespie stochastic simulation algorithm.
 
     Parameters
     ----------
