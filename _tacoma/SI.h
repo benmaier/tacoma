@@ -54,6 +54,7 @@ class SI
         size_t number_of_initially_vaccinated;
         size_t seed;
         bool verbose;
+        double sampling_dt;
 
         mt19937_64 generator;
         uniform_real_distribution<double> randuni;
@@ -68,6 +69,7 @@ class SI
             double _infection_rate,
             size_t _number_of_initially_infected = 1,
             size_t _number_of_initially_vaccinated = 0,
+            double _sampling_dt = 0.0,
             size_t _seed = 0,
             bool _verbose = false
         )
@@ -79,6 +81,7 @@ class SI
             number_of_initially_infected = _number_of_initially_infected;
             verbose = _verbose;
             seed = _seed;
+            sampling_dt = _sampling_dt;
 
             mt19937_64 generator;
 
@@ -87,6 +90,8 @@ class SI
 
         void reset() 
         {
+            next_sampling_time = sampling_dt;
+
             // reset observables
             //
             time.clear();
@@ -187,6 +192,7 @@ class SI
         vector < set < size_t > > * G;
 
         vector < double > rates;
+        double next_sampling_time;
 
         void infection_event();
 

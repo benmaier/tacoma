@@ -180,13 +180,36 @@ void SI::update_observables(
                 double t
                )
 {
-    // compute SI
-    _SI.push_back(SI_edges.size());
+    if (sampling_dt > 0.0)
+    {
+        if (t >= next_sampling_time)
+        {
+            // compute SI
+            _SI.push_back(SI_edges.size());
 
-    // compute I
-    I.push_back(infected.size());
+            // compute I
+            I.push_back(infected.size());
 
-    // push back time
-    time.push_back(t);
+            // push back time
+            time.push_back(t);
+
+            // advance next sampling time
+            do
+            {
+                next_sampling_time += sampling_dt;
+            } while (next_sampling_time < t);
+        }
+    }
+    else
+    {
+        // compute SI
+        _SI.push_back(SI_edges.size());
+
+        // compute I
+        I.push_back(infected.size());
+
+        // push back time
+        time.push_back(t);
+    }
 }
 

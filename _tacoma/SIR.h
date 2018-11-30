@@ -55,6 +55,7 @@ class SIR
         size_t number_of_initially_vaccinated;
         size_t seed;
         bool verbose;
+        double sampling_dt;
 
         mt19937_64 generator;
         uniform_real_distribution<double> randuni;
@@ -72,6 +73,7 @@ class SIR
             double _recovery_rate,
             size_t _number_of_initially_infected = 1,
             size_t _number_of_initially_vaccinated = 0,
+            double _sampling_dt = 0.0,
             size_t _seed = 0,
             bool _verbose = false
         )
@@ -84,6 +86,7 @@ class SIR
             number_of_initially_infected = _number_of_initially_infected;
             verbose = _verbose;
             seed = _seed;
+            sampling_dt = _sampling_dt;
 
             mt19937_64 generator;
 
@@ -92,6 +95,8 @@ class SIR
 
         void reset() 
         {
+            next_sampling_time = sampling_dt;
+
             // reset observables
             //
             time.clear();
@@ -192,6 +197,7 @@ class SIR
         vector < pair < size_t, size_t > > SI_edges;
         double mean_degree;
         vector < set < size_t > > * G;
+        double next_sampling_time;
 
         vector < double > rates;
 

@@ -33,9 +33,14 @@ for k in range(1,8,3):
             infection_rate = R0 / k * recovery_rate
 
 
-            SIS = _tc.SIS(N,t_run_total,infection_rate,recovery_rate,number_of_initially_infected=N,verbose=False,seed=seed)
+            SIS = _tc.SIS(N,t_run_total,infection_rate,recovery_rate,
+                    number_of_initially_infected=N,
+                    verbose=False,
+                    seed=seed,
+                    sampling_dt=1,
+                    )
 
-            _tc.gillespie_SIS_ActivityModel(AM,SIS,verbose=False)
+            _tc.gillespie_SIS_on_ActivityModel(AM,SIS,verbose=False)            
 
             t = np.array(SIS.time)
             I = np.array(SIS.I)
@@ -45,7 +50,12 @@ for k in range(1,8,3):
 
 
 
-            SIS = _tc.SIS(N,t_run_total,infection_rate,recovery_rate,number_of_initially_infected=N)
+            SIS = _tc.SIS(N,
+                          t_run_total,
+                          infection_rate,
+                          recovery_rate,
+                          number_of_initially_infected=N,
+                          sampling_dt=1)
 
             tn = _tc.activity_model(N,k/(N-1.), omega, t_run_total)
             tc.gillespie_SIS(tn, SIS)

@@ -56,6 +56,7 @@ class SIS
         size_t seed;
         bool verbose;
         bool prevent_disease_extinction;
+        double sampling_dt;
 
         mt19937_64 generator;
         uniform_real_distribution<double> randuni;
@@ -73,6 +74,7 @@ class SIS
             size_t _number_of_initially_infected = 1,
             size_t _number_of_initially_vaccinated = 0,
             bool _prevent_disease_extinction = false,
+            double _sampling_dt = 0.0,
             size_t _seed = 0,
             bool _verbose = false
         )
@@ -86,6 +88,7 @@ class SIS
             prevent_disease_extinction = _prevent_disease_extinction;
             verbose = _verbose;
             seed = _seed;
+            sampling_dt = _sampling_dt;
 
             mt19937_64 generator;
 
@@ -94,6 +97,8 @@ class SIS
 
         void reset() 
         {
+            next_sampling_time = sampling_dt;
+
             // reset observables
             time.clear();
             R0.clear();
@@ -192,6 +197,8 @@ class SIS
         vector < pair < size_t, size_t > > SI_edges;
         double mean_degree;
         vector < set < size_t > > * G;
+
+        double next_sampling_time;
 
         vector < double > rates;
 

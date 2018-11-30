@@ -991,7 +991,7 @@ PYBIND11_MODULE(_tacoma, m)
                        R"pbdoc(The final time)pbdoc");
 
     py::class_<SIS>(m, "SIS", "Base class for the simulation of an SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIS` to simulate and retrieve the simulation results.")
-        .def(py::init<size_t, double, double, double, size_t, size_t, bool, size_t, bool>(),
+        .def(py::init<size_t, double, double, double, size_t, size_t, bool, double, size_t, bool>(),
              py::arg("N"),
              py::arg("t_simulation"),
              py::arg("infection_rate"),
@@ -999,6 +999,7 @@ PYBIND11_MODULE(_tacoma, m)
              py::arg("number_of_initially_infected") = 1,
              py::arg("number_of_initially_vaccinated") = 0,
              py::arg("prevent_disease_extinction") = false,
+             py::arg("sampling_dt") = 0.0,
              py::arg("seed") = 0,
              py::arg("verbose") = false,
              R"pbdoc(
@@ -1021,8 +1022,10 @@ PYBIND11_MODULE(_tacoma, m)
                         skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
                     number_of_initially_vaccinated : int, default = 0
                         Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
-                    prevent_disease_extinction : bool, default: False
+                    prevent_disease_extinction : bool, default = False
                         If this is `True`, the recovery of the last infected node will always be prevented.
+                    sampling_dt : float, default = 0.0
+                        If this is ``>0.0``, save observables roughly every sampling_dt instead of on every change.
                     seed : int, default = 0
                         Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
                     verbose : bool, default = False
@@ -1037,7 +1040,7 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("I", &SIS::I, "A list containing the number of recovered at time :math:`t`.");
 
     py::class_<node_based_SIS>(m, "node_based_SIS", R"pbdoc(Base class for the simulation of an SIS compartmental infection model on a temporal network using an SI-Graph for keeping track of SI-edges (meaning this is a node-based algorithm). Pass this to :func:`tacoma.api.gillespie_node_based_SIS` to simulate and retrieve the simulation results.)pbdoc")
-        .def(py::init<size_t, double, double, double, size_t, size_t, bool, size_t, bool>(),
+        .def(py::init<size_t, double, double, double, size_t, size_t, bool, double, size_t, bool>(),
              py::arg("N"),
              py::arg("t_simulation"),
              py::arg("infection_rate"),
@@ -1045,6 +1048,7 @@ PYBIND11_MODULE(_tacoma, m)
              py::arg("number_of_initially_infected") = 1,
              py::arg("number_of_initially_vaccinated") = 0,
              py::arg("prevent_disease_extinction") = false,
+             py::arg("sampling_dt") = 0.0,
              py::arg("seed") = 0,
              py::arg("verbose") = false,
              R"pbdoc(
@@ -1069,6 +1073,8 @@ PYBIND11_MODULE(_tacoma, m)
                         Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
                     prevent_disease_extinction : bool, default: False
                         If this is `True`, the recovery of the last infected node will always be prevented.
+                    sampling_dt : float, default = 0.0
+                        If this is ``>0.0``, save observables roughly every sampling_dt instead of on every change.
                     seed : int, default = 0
                         Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
                     verbose : bool, default = False
@@ -1083,12 +1089,13 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("I", &node_based_SIS::I, "A list containing the number of recovered at time :math:`t`.");
 
     py::class_<SI>(m, "SI", "Base class for the simulation of an SI compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SI` to simulate and retrieve the simulation results.")
-        .def(py::init<size_t, double, double, size_t, size_t, size_t, bool>(),
+        .def(py::init<size_t, double, double, size_t, size_t, double, size_t, bool>(),
              py::arg("N"),
              py::arg("t_simulation"),
              py::arg("infection_rate"),
              py::arg("number_of_initially_infected") = 1,
              py::arg("number_of_initially_vaccinated") = 0,
+             py::arg("sampling_dt") = 0.0,
              py::arg("seed") = 0,
              py::arg("verbose") = false,
              R"pbdoc(
@@ -1106,6 +1113,8 @@ PYBIND11_MODULE(_tacoma, m)
                         Number of nodes which will be in the infected compartment at :math:`t = t_0`. 
                     number_of_initially_vaccinated : int, default = 0
                         Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    sampling_dt : float, default = 0.0
+                        If this is ``>0.0``, save observables roughly every sampling_dt instead of on every change.
                     seed : int, default = 0
                         Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
                     verbose : bool, default = False
@@ -1116,13 +1125,14 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("I", &SI::I, "A list containing the number of recovered at time :math:`t`.");
 
     py::class_<SIR>(m, "SIR", "Base class for the simulation of an SIR compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIR` to simulate and retrieve the simulation results.")
-        .def(py::init<size_t, double, double, double, size_t, size_t, size_t, bool>(),
+        .def(py::init<size_t, double, double, double, size_t, size_t, double, size_t, bool>(),
              py::arg("N"),
              py::arg("t_simulation"),
              py::arg("infection_rate"),
              py::arg("recovery_rate"),
              py::arg("number_of_initially_infected") = 1,
              py::arg("number_of_initially_vaccinated") = 0,
+             py::arg("sampling_dt") = 0.0,
              py::arg("seed") = 0,
              py::arg("verbose") = false,
              R"pbdoc(
@@ -1145,6 +1155,8 @@ PYBIND11_MODULE(_tacoma, m)
                         skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
                     number_of_initially_vaccinated : int, default = 0
                         Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    sampling_dt : float, default = 0.0
+                        If this is ``>0.0``, save observables roughly every sampling_dt instead of on every change.
                     seed : int, default = 0
                         Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
                     verbose : bool, default = False
@@ -1160,7 +1172,7 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("R", &SIR::R, "A list containing the number of recovered at time :math:`t`.");
 
     py::class_<SIRS>(m, "SIRS", "Base class for the simulation of an SIRS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIRS` to simulate and retrieve the simulation results.")
-        .def(py::init<size_t, double, double, double, double, size_t, size_t, size_t, bool>(),
+        .def(py::init<size_t, double, double, double, double, size_t, size_t, double, size_t, bool>(),
              py::arg("N"),
              py::arg("t_simulation"),
              py::arg("infection_rate"),
@@ -1168,6 +1180,7 @@ PYBIND11_MODULE(_tacoma, m)
              py::arg("waning_immunity_rate"),
              py::arg("number_of_initially_infected") = 1,
              py::arg("number_of_initially_vaccinated") = 0,
+             py::arg("sampling_dt") = 0.0,
              py::arg("seed") = 0,
              py::arg("verbose") = false,
              R"pbdoc(
@@ -1193,6 +1206,8 @@ PYBIND11_MODULE(_tacoma, m)
                         skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
                     number_of_initially_vaccinated : int, default = 0
                         Number of nodes which will be in the vaccinated compartment at :math:`t = t_0`.
+                    sampling_dt : float, default = 0.0
+                        If this is ``>0.0``, save observables roughly every sampling_dt instead of on every change.
                     seed : int, default = 0
                         Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
                     verbose : bool, default = False
