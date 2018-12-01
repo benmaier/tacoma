@@ -27,6 +27,7 @@
       ~SIRS.R
       ~SIRS.R0
       ~SIRS.SI
+      ~SIRS.t_simulation
       ~SIRS.time
    
    

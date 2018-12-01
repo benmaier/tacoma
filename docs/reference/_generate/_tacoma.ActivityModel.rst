@@ -23,6 +23,7 @@
 
    .. autosummary::
    
+      ~ActivityModel.N
       ~ActivityModel.edge_changes
    
    

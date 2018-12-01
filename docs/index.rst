@@ -65,6 +65,7 @@ Temporal contact modeling and analysis
    reference/tacoma_drawing
    reference/tacoma_interactive
    reference/tacoma_data_io
+   reference/tacoma_epidemics
    reference/tacoma_model_conversions
    reference/tacoma_flockwork
    reference/tacoma_load_model_parameters

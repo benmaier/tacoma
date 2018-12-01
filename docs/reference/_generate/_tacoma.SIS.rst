@@ -26,6 +26,7 @@
       ~SIS.I
       ~SIS.R0
       ~SIS.SI
+      ~SIS.t_simulation
       ~SIS.time
    
    

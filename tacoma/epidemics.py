@@ -8,22 +8,32 @@ import numpy as np
 import tacoma as tc
 
 
-def measure_i_inf(temporal_network_or_model,epidemic_object,t_equilibrate,is_static=False,verbose=False):
+def simulate_and_measure_i_inf(temporal_network_or_model,epidemic_object,t_equilibrate,is_static=False,verbose=False):
     """Get the equilibrium ratio of infected. 
 
     Parameters
     ----------
-    N : int
-        Number of nodes
-    P : float
-        Probability to reconnect
+    temporal_network_or_model : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, :class:`_tacoma.edge_lists_with_histograms`, or :class:`_tacoma.ActivityModel`.
+        An instance of a temporal network or network model.
+    epidemic_object : :class:`_tacoma.SI`, :class:`_tacoma.SIS`, :class:`_tacoma.SIR`, :class:`_tacoma.SIRS`, :class:`_tacoma.node_based_SIS`
+        An initialized epidemic object.
+    t_equilibrate: float
+        Time passed after t0 after which to start measuring.
+    is_static : bool, default : False
+        The algorithm works a bit differently if it knows that the network is actually static.
+        It works only with instances of :class:`_tacoma.edge_lists`.
+    verbose: bool, optional
+        Be chatty.
+
 
     Returns
     -------
-    numpy.ndarray
-        Group size distribution of this configuration. The m-th entry
-        of this array contains the expected number of nodes of groups
-        of size m.
+    i_inf: float
+        Temporal average over the ratio of infected after equilibration.
+    i_inf_std: float
+        RMSE of the ratio of infected.
+    R0: float
+        As measured after equilibration
     """
 
     tn = temporal_network_or_model
@@ -83,4 +93,4 @@ if __name__ == "__main__":
             sampling_dt=0.0,
             )
 
-    print(measure_i_inf(AM, SIS,t_equilibrate=900))
+    print(simulate_and_measure_i_inf(AM, SIS,t_equilibrate=900))
