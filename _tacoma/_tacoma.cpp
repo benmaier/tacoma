@@ -1037,7 +1037,8 @@ PYBIND11_MODULE(_tacoma, m)
                    where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
                    )pbdoc")
         .def_readwrite("SI", &SIS::SI, "A list containing the number of infected at time :math:`t`.")
-        .def_readwrite("I", &SIS::I, "A list containing the number of recovered at time :math:`t`.");
+        .def_readwrite("I", &SIS::I, "A list containing the number of recovered at time :math:`t`.")
+        .def_readwrite("t_simulation", &SIS::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<node_based_SIS>(m, "node_based_SIS", R"pbdoc(Base class for the simulation of an SIS compartmental infection model on a temporal network using an SI-Graph for keeping track of SI-edges (meaning this is a node-based algorithm). Pass this to :func:`tacoma.api.gillespie_node_based_SIS` to simulate and retrieve the simulation results.)pbdoc")
         .def(py::init<size_t, double, double, double, size_t, size_t, bool, double, size_t, bool>(),
@@ -1086,7 +1087,8 @@ PYBIND11_MODULE(_tacoma, m)
                    where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
                    )pbdoc")
         .def_readwrite("SI", &node_based_SIS::SI, "A list containing the number of infected at time :math:`t`.")
-        .def_readwrite("I", &node_based_SIS::I, "A list containing the number of recovered at time :math:`t`.");
+        .def_readwrite("I", &node_based_SIS::I, "A list containing the number of recovered at time :math:`t`.")
+        .def_readwrite("t_simulation", &node_based_SIS::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<SI>(m, "SI", "Base class for the simulation of an SI compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SI` to simulate and retrieve the simulation results.")
         .def(py::init<size_t, double, double, size_t, size_t, double, size_t, bool>(),
@@ -1122,7 +1124,8 @@ PYBIND11_MODULE(_tacoma, m)
                 )pbdoc")
         .def_readwrite("time", &SI::time, "A list containing the time points at which one or more of the observables changed.")
         .def_readwrite("SI", &SI::_SI, "A list containing the number of infected at time :math:`t`.")
-        .def_readwrite("I", &SI::I, "A list containing the number of recovered at time :math:`t`.");
+        .def_readwrite("I", &SI::I, "A list containing the number of recovered at time :math:`t`.")
+        .def_readwrite("t_simulation", &SI::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<SIR>(m, "SIR", "Base class for the simulation of an SIR compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIR` to simulate and retrieve the simulation results.")
         .def(py::init<size_t, double, double, double, size_t, size_t, double, size_t, bool>(),
@@ -1169,7 +1172,8 @@ PYBIND11_MODULE(_tacoma, m)
                    )pbdoc")
         .def_readwrite("SI", &SIR::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
         .def_readwrite("I", &SIR::I, "A list containing the number of infected at time :math:`t`.")
-        .def_readwrite("R", &SIR::R, "A list containing the number of recovered at time :math:`t`.");
+        .def_readwrite("R", &SIR::R, "A list containing the number of recovered at time :math:`t`.")
+        .def_readwrite("t_simulation", &SIR::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<SIRS>(m, "SIRS", "Base class for the simulation of an SIRS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIRS` to simulate and retrieve the simulation results.")
         .def(py::init<size_t, double, double, double, double, size_t, size_t, double, size_t, bool>(),
@@ -1220,13 +1224,15 @@ PYBIND11_MODULE(_tacoma, m)
             )pbdoc")
         .def_readwrite("SI", &SIRS::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
         .def_readwrite("I", &SIRS::I, "A list containing the number of infected at time :math:`t`.")
-        .def_readwrite("R", &SIRS::R, "A list containing the number of recovered at time :math:`t`.");
+        .def_readwrite("R", &SIRS::R, "A list containing the number of recovered at time :math:`t`.")
+        .def_readwrite("t_simulation", &SIRS::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<ActivityModel>(m, "ActivityModel", "Base class for the simulation of an edge activity model. Pass this to :func:`tacoma.api.gillespie_epidemics`")
-        .def(py::init<size_t, double, double, bool, size_t, bool>(),
+        .def(py::init<size_t, double, double, double, bool, size_t, bool>(),
              py::arg("N"),
              py::arg("rho"),
              py::arg("omega"),
+             py::arg("t0") = 0.0,
              py::arg("save_temporal_network") = false,
              py::arg("seed") = 0,
              py::arg("verbose") = false,
@@ -1240,6 +1246,8 @@ PYBIND11_MODULE(_tacoma, m)
                     omega : float
                         rate with which edges are switched on and off, respectively,
                         :math:`\omega^{-1}=(\omega^-)^{-1} + (\omega^+)^{-1}`.
+                    t0 : float, default = 0.0
+                        initial time
                     save_temporal_network : bool, default: False
                         If this is `True`, the changes are saved in an instance of 
                         :func:`_tacoma.edge_changes` (in the attribute `edge_changes`.
@@ -1252,6 +1260,8 @@ PYBIND11_MODULE(_tacoma, m)
                 )pbdoc")
         .def_readwrite("edge_changes", &ActivityModel::edg_chg, 
                     R"pbdoc(An instance of :class:`_tacoma.edge_changes` with the saved temporal network (only if
-                    `save_temporal_network` is `True`).)pbdoc");
+                    `save_temporal_network` is `True`).)pbdoc")
+        .def_readwrite("N", &ActivityModel::N, 
+                    R"pbdoc(Number of nodes.)pbdoc");
 
 }

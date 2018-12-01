@@ -55,6 +55,7 @@ class ActivityModel
         double omega;
         double omega_minus;
         double omega_plus;
+        double t0;
         size_t seed;
         bool verbose;
         bool save_temporal_network;
@@ -70,6 +71,7 @@ class ActivityModel
             size_t _N,
             double _rho,
             double _omega,
+            double _t0 = 0.0, 
             bool _save_temporal_network = false,
             size_t _seed = 0,
             bool _verbose = false
@@ -78,6 +80,7 @@ class ActivityModel
             N = _N;
             rho = _rho;
             omega = _omega;
+            t0 = _t0;
             verbose = _verbose;
             seed = _seed;
             save_temporal_network = _save_temporal_network;
@@ -109,7 +112,9 @@ class ActivityModel
             // reset observables
             edg_chg.N = N;
 
-            edg_chg.t.push_back(0.0);
+            edg_chg.t.clear();
+            edg_chg.edges_in.clear();
+            edg_chg.edges_out.clear();
 
             // seed engine
             if (seed == 0)
@@ -169,13 +174,22 @@ class ActivityModel
         {
             delete generator;
             generator = &_generator;
+            has_external_generator = true;
         } 
+
+        ~ActivityModel() 
+        {
+            if (not has_external_generator)
+                delete generator;
+        }
 
     private:
         vector < size_t > k;
         vector < size_t > complementary_k;
         size_t edges_on;
         size_t m_max;
+
+        bool has_external_generator = false;
 
 
         void print_internal()

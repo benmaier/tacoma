@@ -66,7 +66,7 @@ void
     this_model_object.reset();
 
     // initialize time variables
-    double t0 = 0.0;
+    double t0 = this_model_object.t0;
     double t = t0;
 
     double t_simulation = this_gillespie_object.t_simulation;
@@ -74,6 +74,7 @@ void
 
     // initialize a graph and pass it to the gillespie object
     this_gillespie_object.update_network(this_model_object.G,t);
+    this_gillespie_object.update_observables(t);
 
     while ( (t-t0 < t_simulation) and (not this_gillespie_object.simulation_ended()) )
     {

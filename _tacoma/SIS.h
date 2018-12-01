@@ -97,7 +97,7 @@ class SIS
 
         void reset() 
         {
-            next_sampling_time = sampling_dt;
+            next_sampling_time = 0.0;
 
             // reset observables
             time.clear();
@@ -158,6 +158,11 @@ class SIS
                 cout << "infected set has size = " << infected.size() << endl;
                 print_infected();
             }
+        }
+
+        void set_initial_time(double t0)
+        {
+            next_sampling_time = t0;
         }
 
         bool simulation_ended() 

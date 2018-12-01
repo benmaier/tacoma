@@ -74,6 +74,8 @@ void
     double t = t0;
     double dt_to_next_change;
 
+    this_gillespie_object.set_initial_time(t0);
+
     double t_simulation = this_gillespie_object.t_simulation;
 
     // initialize a graph
@@ -177,7 +179,10 @@ void
         // update all the stuff that might have changed for this Gillespie object
         // because G changed
         if ((not is_static) or (t == t0))
+        {
             this_gillespie_object.update_network(G,t);
+            this_gillespie_object.update_observables(t);
+        }
 
         if (verbose)
         {
@@ -288,6 +293,8 @@ void
     double t = t0;
     double dt_to_next_change;
 
+    this_gillespie_object.set_initial_time(t0);
+
     double t_simulation = this_gillespie_object.t_simulation;
 
     // initialize a graph and pass it to the gillespie object
@@ -339,6 +346,7 @@ void
             // update all the stuff that might have changed for this Gillespie object
             // because G changed
             this_gillespie_object.update_network(G,t);
+            this_gillespie_object.update_observables(t);
         }
         else
         {
@@ -384,6 +392,7 @@ void
             // update all the stuff that might have changed for this Gillespie object
             // because G changed
             this_gillespie_object.update_network(G,*next_edges_in,*next_edges_out,t);
+            this_gillespie_object.update_observables(t);
 
             //advance to the upcoming change
             next_time++;
