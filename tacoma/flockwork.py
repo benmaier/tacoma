@@ -9,6 +9,7 @@ from numpy import random
 
 from scipy.integrate import ode
 from scipy.integrate import simps
+from scipy.special import gamma as Gamma
 
 from tacoma.power_law_fitting import fit_power_law_clauset
 
@@ -16,6 +17,7 @@ from _tacoma import flockwork_P_varying_rates
 from tacoma import _get_raw_temporal_network
 
 import tacoma as tc
+
 
 
 def flockwork_P_equilibrium_group_size_distribution(N, P):
@@ -54,23 +56,80 @@ def flockwork_P_equilibrium_group_size_distribution(N, P):
         dist = [N*(1.-P)]
 
         N_fak = N - np.arange(1, N-1)
-        j_fak = (P * np.arange(1, N-1) - N+1.)
+        j_fak = ((N-1)-P * np.arange(1, N-1))
         div = N_fak / j_fak
         cum_product_div = np.cumprod(div)
         for m in range(2, N):
             #dist.append( (-1)**(m%2) * float(N)/float(m) * (P-1.) * np.prod(N_fak[1:m]/j_fak[1:m]) * P**(m-1) )
-            dist.append((-1)**(m % 2) * float(N)/float(m) *
-                        (P-1.) * cum_product_div[m-2] * P**(m-1))
+            dist.append(float(N)/float(m) *
+                        (1-P) * cum_product_div[m-2] * P**(m-1))
 
-        value = (-1)**(N % 2) * P
+        value = P
         for j in range(1, N-1):
-            value *= float(N-j-1) / ((P-N+1.) / P + (j-1))
+            #value *= float(N-j-1) / ((P-N+1.) / P + (j-1))
+            value *= float(N-j-1) * P / ((N-1)-P*j)
         #value *= P**(N-1)
         dist.append(value)
 
         dist = [0.] + dist
 
     return np.array(dist)
+
+
+def group_size_distribution_asymptotics(N, P, mmax=None, simple_pochhammer_approximation=True):
+    """Get the asymptotic equilibrium group size distribution of a Flockwork-P model
+    given node number N and probability to reconnect P.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    P : float
+        Probability to reconnect
+    mmax : int, default = None
+        The maximum group size for which to calculate the asymptotics
+    simple_pochhammer_approximation : bool, default = True
+        Whether to use a simple first order Pochhammer approximation
+        or the Gamma-function approximation.
+
+    Returns
+    -------
+    ms : numpy.ndarray
+        group size vector
+    dist : numpy.ndarray
+        Asymptotic group size distribution
+    """
+
+    N = int(N)
+    P = float(P)
+
+    assert N > 2
+    assert P >= 0.
+    assert P < 1.
+
+    if mmax is None:
+        mmax = int(N) // 2
+
+    ms = np.arange(1,mmax+1)
+
+    if P == 0.:
+        ms = np.arange(N+1)
+        dist = np.zeros((N+1,))
+        dist[1] = N
+    else:
+        dist = [(1.-P)]
+
+        for m in ms[1:]:
+            if simple_pochhammer_approximation:
+                factor = ( 1 - P/(N-1)*(m-1)*(m-2)/2 )**(-1)
+            else:
+                factor = ((-1)**(m % 2) * (P*m/(N-1)/np.exp(1))**m * 2*np.pi / Gamma(-(N-1)/P) * m**(-(N-1)/P - 0.5))**(-1)
+            this = 1/m * (P/np.exp(1))**(m-1) * ((N-1)/(N-m))**(N-m+0.5) * factor
+
+            dist.append(this)
+
+    return ms, N*np.array(dist)
+
 
 
 def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histogram=False, seed=0, shuffle_group_sizes=True):
