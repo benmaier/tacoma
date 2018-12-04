@@ -1037,7 +1037,7 @@ PYBIND11_MODULE(_tacoma, m)
                    where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
                    )pbdoc")
         .def_readwrite("SI", &SIS::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
-        .def_readwrite("I", &SIS::I, "A list containing the number of infected at time :math:`t`.");
+        .def_readwrite("I", &SIS::I, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("t_simulation", &SIS::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<node_based_SIS>(m, "node_based_SIS", R"pbdoc(Base class for the simulation of an SIS compartmental infection model on a temporal network using an SI-Graph for keeping track of SI-edges (meaning this is a node-based algorithm). Pass this to :func:`tacoma.api.gillespie_node_based_SIS` to simulate and retrieve the simulation results.)pbdoc")
@@ -1086,6 +1086,10 @@ PYBIND11_MODULE(_tacoma, m)
                    A list containing the basic reproduction number defined as :math:`R_0(t) = \eta\left\langle k \right\rangle(t) / \rho`
                    where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
                    )pbdoc")
+        .def_readwrite("SI", &node_based_SIS::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
+        .def_readwrite("I", &node_based_SIS::I, "A list containing the number of infected at time :math:`t`.")
+        .def_readwrite("t_simulation", &node_based_SIS::t_simulation, "Absolute run time of the simulation.");
+
 
     py::class_<SI>(m, "SI", "Base class for the simulation of an SI compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SI` to simulate and retrieve the simulation results.")
         .def(py::init<size_t, double, double, size_t, size_t, double, size_t, bool, bool>(),
@@ -1125,7 +1129,7 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("time", &SI::time, "A list containing the time points at which one or more of the observables changed.")
         .def_readwrite("SI", &SI::_SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
         .def_readwrite("I", &SI::I, "A list containing the number of infected at time :math:`t`.")
-        .def_readwrite("infection_events", &SI::infection_events, "A list containing the edges along which each infection event took place, in the form (infection_source, susceptible).");
+        .def_readwrite("infection_events", &SI::infection_events, "A list containing the edges along which each infection event took place, in the form (infection_source, susceptible).")
         .def_readwrite("t_simulation", &SI::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<SIR>(m, "SIR", "Base class for the simulation of an SIR compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIR` to simulate and retrieve the simulation results.")
