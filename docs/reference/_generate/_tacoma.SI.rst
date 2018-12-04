@@ -25,6 +25,7 @@
    
       ~SI.I
       ~SI.SI
+      ~SI.infection_events
       ~SI.t_simulation
       ~SI.time
    
