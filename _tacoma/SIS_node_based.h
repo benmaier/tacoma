@@ -56,6 +56,7 @@ class node_based_SIS
         size_t seed;
         bool verbose;
         bool prevent_disease_extinction;
+        double sampling_dt;
 
         mt19937_64 generator;
         uniform_real_distribution<double> randuni;
@@ -73,6 +74,7 @@ class node_based_SIS
             size_t _number_of_initially_infected = 1,
             size_t _number_of_initially_vaccinated = 0,
             bool _prevent_disease_extinction = false,
+            double _sampling_dt = 0.0,
             size_t _seed = 0,
             bool _verbose = false
         )
@@ -86,6 +88,7 @@ class node_based_SIS
             prevent_disease_extinction = _prevent_disease_extinction;
             verbose = _verbose;
             seed = _seed;
+            sampling_dt = _sampling_dt;
 
             mt19937_64 generator;
 
@@ -94,6 +97,8 @@ class node_based_SIS
 
         void reset() 
         {
+            next_sampling_time = 0.0;
+
             // reset observables
             time.clear();
             R0.clear();
@@ -167,6 +172,11 @@ class node_based_SIS
             SI_count = 0;
         }
 
+        void set_initial_time(double t0)
+        {
+            next_sampling_time = t0;
+        }
+
         bool simulation_ended() 
         {
             return (infected.size() == 0);
@@ -208,6 +218,7 @@ class node_based_SIS
 
         double mean_degree;
         vector < set < size_t > > * G;
+        double next_sampling_time;
 
         vector < double > rates;
 

@@ -9,6 +9,7 @@ from numpy import random
 
 from scipy.integrate import ode
 from scipy.integrate import simps
+from scipy.special import gamma as Gamma
 
 from tacoma.power_law_fitting import fit_power_law_clauset
 
@@ -16,6 +17,7 @@ from _tacoma import flockwork_P_varying_rates
 from tacoma import _get_raw_temporal_network
 
 import tacoma as tc
+
 
 
 def flockwork_P_equilibrium_group_size_distribution(N, P):
@@ -54,17 +56,18 @@ def flockwork_P_equilibrium_group_size_distribution(N, P):
         dist = [N*(1.-P)]
 
         N_fak = N - np.arange(1, N-1)
-        j_fak = (P * np.arange(1, N-1) - N+1.)
+        j_fak = ((N-1)-P * np.arange(1, N-1))
         div = N_fak / j_fak
         cum_product_div = np.cumprod(div)
         for m in range(2, N):
             #dist.append( (-1)**(m%2) * float(N)/float(m) * (P-1.) * np.prod(N_fak[1:m]/j_fak[1:m]) * P**(m-1) )
-            dist.append((-1)**(m % 2) * float(N)/float(m) *
-                        (P-1.) * cum_product_div[m-2] * P**(m-1))
+            dist.append(float(N)/float(m) *
+                        (1-P) * cum_product_div[m-2] * P**(m-1))
 
-        value = (-1)**(N % 2) * P
+        value = P
         for j in range(1, N-1):
-            value *= float(N-j-1) / ((P-N+1.) / P + (j-1))
+            #value *= float(N-j-1) / ((P-N+1.) / P + (j-1))
+            value *= float(N-j-1) * P / ((N-1)-P*j)
         #value *= P**(N-1)
         dist.append(value)
 
@@ -73,7 +76,63 @@ def flockwork_P_equilibrium_group_size_distribution(N, P):
     return np.array(dist)
 
 
-def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histogram=False, seed=0):
+def group_size_distribution_asymptotics(N, P, mmax=None, simple_pochhammer_approximation=True):
+    """Get the asymptotic equilibrium group size distribution of a Flockwork-P model
+    given node number N and probability to reconnect P.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    P : float
+        Probability to reconnect
+    mmax : int, default = None
+        The maximum group size for which to calculate the asymptotics
+    simple_pochhammer_approximation : bool, default = True
+        Whether to use a simple first order Pochhammer approximation
+        or the Gamma-function approximation.
+
+    Returns
+    -------
+    ms : numpy.ndarray
+        group size vector
+    dist : numpy.ndarray
+        Asymptotic group size distribution
+    """
+
+    N = int(N)
+    P = float(P)
+
+    assert N > 2
+    assert P >= 0.
+    assert P < 1.
+
+    if mmax is None:
+        mmax = int(N) // 2
+
+    ms = np.arange(1,mmax+1)
+
+    if P == 0.:
+        ms = np.arange(N+1)
+        dist = np.zeros((N+1,))
+        dist[1] = N
+    else:
+        dist = [(1.-P)]
+
+        for m in ms[1:]:
+            if simple_pochhammer_approximation:
+                factor = ( 1 - P/(N-1)*(m-1)*(m-2)/2 )**(-1)
+            else:
+                factor = ((-1)**(m % 2) * (P*m/(N-1)/np.exp(1))**m * 2*np.pi / Gamma(-(N-1)/P) * m**(-(N-1)/P - 0.5))**(-1)
+            this = 1/m * (P/np.exp(1))**(m-1) * ((N-1)/(N-m))**(N-m+0.5) * factor
+
+            dist.append(this)
+
+    return ms, N*np.array(dist)
+
+
+
+def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histogram=False, seed=0, shuffle_group_sizes=True):
     """Get an equilibrium configuration of a Flockwork-P model
     given node number N and probability to reconnect P.
 
@@ -91,16 +150,17 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histo
         of size :math:`g`.
     seed : int, default : 0
         The random seed. RNG is initialized randomly if ``seed = 0``.
+    shuffle_group_sizes : bool, default : True
+        Shuffle the order of group sizes in which nodes are distributed
+        to groups. 'True' is recommended.
     
-
     Returns
     -------
     :obj:`list` of :obj:`tuple` of int
         edge list of equilibrium configuration
     numpy.ndarray
         group size counter of this configuration (only
-        if ``return_group_size_histogram`` is `True`
-
+        if ``return_group_size_histogram`` is `True`)
     """
 
     if seed > 0:
@@ -132,7 +192,11 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histo
         # loop through group sizes in descending order.
         # start with the smallest group size that
         # may contain all of the nodes left
-        for m in range(nodes_left, 0, -1):
+        group_sizes = 1 + random.permutation(N)
+        for m in group_sizes:
+
+            if (nodes_left-m) < 0:
+                continue
 
             # if the expected number of groups of this size is not zero
             if dist[m-1] > 0. and nodes_left >= m:
@@ -160,10 +224,12 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histo
                     #        edges.append((node_ints[u],node_ints[v]))
 
                     # add fully connected clusters to the edge set
-                    if m > 1:
-                        edges.extend([(node_ints[u], node_ints[v])
-                                      for u in range(nodes_left-1, nodes_left-m, -1)
-                                      for v in range(u-1, nodes_left-m-1, -1)])
+                    if m > 1 and nodes_left-m >= 0:
+                        edges.extend([tuple(sorted((int(node_ints[u]), int(node_ints[v]))))
+                                      for u in range(nodes_left-m, nodes_left-1)
+                                      for v in range(u+1, nodes_left)])
+                    elif nodes_left - m < 0:
+                        break
 
                     # remove the grouped nodes from the pool of remaining nodes
                     nodes_left -= m
@@ -460,6 +526,137 @@ def flockwork_P(N, P, t_run_total, initial_edges = None, seed = 0, return_edge_c
         fw = _get_raw_temporal_network(fw)
 
     return fw
+
+def degree_distribution(N,P):
+    """Get the equilibrium degree distribution of a Flockwork-P model
+    given node number N and probability to reconnect P.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    P : float
+        Probability to reconnect
+
+    Returns
+    -------
+    numpy.ndarray
+        Degree distribution of this configuration. The :math:`k`-th entry
+        of this array is the probability that a node has degree :math:`k`.
+    """
+
+    C_m = flockwork_P_equilibrium_group_size_distribution(N, P)
+    P_k = np.arange(1,N+1) * C_m[1:] / N
+
+    return P_k
+
+def degree_moment(N,P,m):
+    r"""Get the :math:`m`-th moment of the degree of an Flockwork-P model
+    equilibrium configuration
+    given node number N and probability to reconnect P.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    P : float
+        Probability to reconnect
+
+    Returns
+    -------
+    <k^m> : float
+        The :math:`m`-th moment of the degree distribution.
+    """
+
+    P_k = degree_distribution(N, P)
+
+    return (np.arange(N)**m).dot(P_k)
+
+def mean_degree(N,P,m):
+    r"""
+    Get the exact theoretical mean degree :math:`\left< k\right>`
+    for a Flockwork-P model.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    P : float
+        Probability to reconnect
+
+    Returns
+    -------
+    <k> : float
+        The mean degree.
+    """
+
+    return degree_moment(N, P, 1)
+
+def convert_to_edge_activity_parameters_plus_minus(N, P, gamma=1.0):
+    r"""
+    Convert the Flockwork-P parameters math:`P` and :math:`\gamma` 
+    to the corresponding parameters in the edge activity model
+    :math:`\omega^{+}` and :math:`\omega^{-}`.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    P : float
+        Probability to reconnect
+    gamma : float, default = 1
+        Rewiring rate.
+
+    Returns
+    -------
+    omega_plus : float
+        The rate with which inactive edges are activated.
+    omega_minus : float
+        The rate with which active edges are deactivated.
+    """
+
+    k = degree_moment(N, P, 1)
+    k2 = degree_moment(N, P, 2)
+
+    omega_minus = 2*gamma*(1-P/(N-1)*k2/k)
+    rho = k / (N-1)
+    omega = omega_minus * rho
+    omega_plus = omega / (1-rho)
+
+    return omega_plus, omega_minus
+    
+def convert_to_edge_activity_parameters(N, P, gamma=1.0):
+    r"""
+    Convert the Flockwork-P parameters math:`P` and :math:`\gamma` 
+    to the corresponding parameters in the edge activity model
+    :math:`\rho` and :math:`\omega`.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    P : float
+        Probability to reconnect
+    gamma : float, default = 1
+        Rewiring rate.
+
+    Returns
+    -------
+    rho : float
+        The network density.
+    omega : float
+        The rate with which either 
+    """
+
+    k = degree_moment(N, P, 1)
+    k2 = degree_moment(N, P, 2)
+
+    omega_minus = 2*gamma*(1-P/(N-1)*k2/k)
+    rho = k / (N-1)
+    omega = omega_minus * rho
+
+    return rho, omega
+    
 
 if __name__ == "__main__":
 

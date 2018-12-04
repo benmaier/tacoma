@@ -43,7 +43,8 @@ Gillespie function :func:`tacoma.api.gillespie_SI` for the simulation.
 
 .. code:: python
 
-    tc.gillespie_SI(temporal_network, SI)
+    tc.gillespie_SI(temporal_network, SI) #, or
+    tc.gillespie_epidemics(temporal_network, SI)
 
 During the simulation, the following observables are written to
 the `SI` object.
@@ -123,7 +124,8 @@ Gillespie function :func:`tacoma.api.gillespie_SIS` for the simulation.
 
 .. code:: python
 
-    tc.gillespie_SIS(temporal_network, SIS)
+    tc.gillespie_SIS(temporal_network, SIS) #, or
+    tc.gillespie_epidemics(temporal_network, SIS)
 
 During the simulation, the following observables are written to
 the `SIS` object.
@@ -204,7 +206,8 @@ Gillespie function :func:`tacoma.api.gillespie_SIR` for the simulation.
 
 .. code:: python
 
-    tc.gillespie_SIR(temporal_network, SIR)
+    tc.gillespie_SIR(temporal_network, SIR) #, or
+    tc.gillespie_epidemics(temporal_network, SIR)
 
 During the simulation, the following observables are written to
 the `SIR` object.
@@ -297,7 +300,8 @@ Gillespie function :func:`tacoma.api.gillespie_SIRS` for the simulation.
 
 .. code:: python
 
-    tc.gillespie_SIRS(temporal_network, SIRS)
+    tc.gillespie_SIRS(temporal_network, SIRS) #, or
+    tc.gillespie_epidemics(temporal_network, SIRS)
 
 During the simulation, the following observables are written to
 the `SIRS` object.

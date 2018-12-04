@@ -1,9 +1,9 @@
-\_tacoma.SIRS
-=============
+\_tacoma.ActivityModel
+======================
 
 .. currentmodule:: _tacoma
 
-.. autoclass:: SIRS
+.. autoclass:: ActivityModel
 
    
    .. automethod:: __init__
@@ -13,7 +13,7 @@
 
    .. autosummary::
    
-      ~SIRS.__init__
+      ~ActivityModel.__init__
    
    
 
@@ -23,11 +23,7 @@
 
    .. autosummary::
    
-      ~SIRS.I
-      ~SIRS.R
-      ~SIRS.R0
-      ~SIRS.SI
-      ~SIRS.t_simulation
-      ~SIRS.time
+      ~ActivityModel.N
+      ~ActivityModel.edge_changes
    
    

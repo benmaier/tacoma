@@ -570,11 +570,16 @@ def get_edge_probability_and_rate(temporal_network):
 
     for iedge, entry in enumerate(traj):
 
+
+        N_events = len(entry.time_pairs)
+        if entry.time_pairs[0][0] == t0:
+            N_events -= 1
+        activity_rate[iedge] = N_events / T
+
         t_on = 0.0
         for interval in entry.time_pairs:
             t_on += interval[1] - interval[0]
 
-        activity_rate[iedge] = len(entry.time_pairs) / T
         connection_probability[iedge] = t_on / T
 
     return connection_probability, activity_rate
@@ -603,11 +608,11 @@ def get_reduced_time(t, intervals_to_discard):
 
     offset = 0.0
 
-    for interval in intervals_to_discard_for_fit:
+    for interval in intervals_to_discard:
         t0, t1 = interval
-        x_[np.logical_and(x>=t0, x<t1)] = t0 - offset
+        x_[np.logical_and(t>=t0, t<t1)] = t0 - offset
 
-        x_[x>=t1] -= t1 - t0
+        x_[t>=t1] -= t1 - t0
         offset += t1 - t0
 
     return x_

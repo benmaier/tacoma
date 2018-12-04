@@ -39,6 +39,7 @@
 #include <tuple>
 #include <thread>
 #include <map>
+#include <iso646.h>
 
 using namespace std;
 

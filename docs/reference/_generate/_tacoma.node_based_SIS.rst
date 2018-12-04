@@ -26,6 +26,7 @@
       ~node_based_SIS.I
       ~node_based_SIS.R0
       ~node_based_SIS.SI
+      ~node_based_SIS.t_simulation
       ~node_based_SIS.time
    
    

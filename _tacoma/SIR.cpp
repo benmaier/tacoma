@@ -264,19 +264,50 @@ void SIR::update_observables(
                 double t
                )
 {
-    double _R0 = infection_rate * mean_degree / recovery_rate;
-    R0.push_back(_R0);
+    if (sampling_dt > 0.0)
+    {
+        if (t >= next_sampling_time)
+        {
+            double _R0 = infection_rate * mean_degree / recovery_rate;
+            R0.push_back(_R0);
 
-    // compute SI
-    SI.push_back(SI_edges.size());
+            // compute SI
+            SI.push_back(SI_edges.size());
 
-    // compute I
-    I.push_back(infected.size());
+            // compute I
+            I.push_back(infected.size());
 
-    // compute R
-    R.push_back(recovered.size());
+            // compute R
+            R.push_back(recovered.size());
 
-    // push back time
-    time.push_back(t);
+            // push back time
+            time.push_back(t);
+
+            // advance next sampling time
+            do
+            {
+                next_sampling_time += sampling_dt;
+            } while (next_sampling_time < t);
+        }
+    }
+    else
+    {
+        double _R0 = infection_rate * mean_degree / recovery_rate;
+        R0.push_back(_R0);
+
+        // compute SI
+        SI.push_back(SI_edges.size());
+
+        // compute I
+        I.push_back(infected.size());
+
+        // compute R
+        R.push_back(recovered.size());
+
+        // push back time
+        time.push_back(t);
+    }
+
+
 }
 
