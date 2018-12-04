@@ -324,7 +324,7 @@ def visualize(temporal_networks,
         # thread.join()
         print('stopping server ...')
         server.stop_this()
-        #thread.join()        
+        thread.join()        
 
     # time.sleep(1)
 
