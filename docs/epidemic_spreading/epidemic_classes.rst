@@ -336,3 +336,69 @@ Plot the results as
       looped.
     - The simulation works on both :class:`_tacoma.edge_lists` and
       :class:`_tacoma.edge_changes`.
+
+:math:`\varepsilon`-SIS
+-----------------------
+
+The :math:`\varepsilon`-SIS dynamics work similar to the SIS-dynamics
+except there exists a self-infection rate :math:`\varepsilon` with which
+susceptibles spontaneously become infected as
+
+.. math::
+
+    S \stackrel{\varepsilon}{\longrightarrow} I
+
+
+.. code:: python
+
+    eSIS = tc.eSIS(N, #number of nodes
+                   t_simulation, # maximum time of the simulation
+                   infection_rate,
+                   recovery_rate,
+                   self_infection_rate,
+                   number_of_initially_infected = int(N), # optional, default: 1
+                   number_of_initially_vaccinated = 0, # optional, default: 0
+                   seed = 792, # optional, default: randomly initiated
+                  )
+
+The self-infection rate is the expected number of infection events per susceptible
+per unit of time of the temporal network.
+
+The instance of the `eSIS` class is then passed to the corresponding
+Gillespie function :func:`tacoma.api.gillespie_epidemics` for the simulation.
+
+.. code:: python
+
+    tc.gillespie_epidemics(temporal_network, eSIS)
+
+During the simulation, the following observables are written to
+the `eSIS` object.
+
+- ``eSIS.time`` : A time-ordered list of floats where each entry is a time
+  point at which one of the observable changed. In between these
+  times the observables are constant.
+- ``eSIS.I``: A list of ints where each entry is the total number of infected
+  at the corresponding time in ``eSIS.time``
+- ``eSIS.R0``: A list of floats where each entry is the basic
+  reproduction number at the corresponding time in ``eSIS.time``. The basic
+  reproduction number is computed as
+  :math:`R_0 = \left\langle k\right\rangle (t) \eta / \rho`.
+- ``eSIS.SI``: A list of ints where each entry is the total number of
+  susceptible-infected contacts at the corresponding time in ``eSIS.time``
+
+Plot the results as
+
+.. code:: python
+
+    import matplotlib.pyplot as pl
+
+    pl.step(eSIS.time, eSIS.I)
+
+.. note::
+
+    - If the time of the epidemic spreading simulation is larger than
+      the duration of the temporal network the network is automatically
+      looped.
+    - The simulation works on both :class:`_tacoma.edge_lists` and
+      :class:`_tacoma.edge_changes`.
+

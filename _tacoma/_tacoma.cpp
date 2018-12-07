@@ -49,6 +49,7 @@
 #include "edge_trajectories.h"
 #include "verify_formats.h"
 #include "SIS.h"
+#include "eSIS.h"
 #include "SIS_node_based.h"
 #include "SIR.h"
 #include "SI.h"
@@ -95,6 +96,7 @@ PYBIND11_MODULE(_tacoma, m)
             SIR
             SIRS
             node_based_SIS
+            eSIS
 
         Temporal network model classes
         ------------------------------
@@ -661,6 +663,19 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("SIS"),
           py::arg("verbose") = false);
 
+    m.def("gillespie_eSIS_on_edge_lists", &gillespie_on_edge_lists<eSIS>,
+          R"pbdoc(Perform a Gillespie :math:`\varepsilon`-SIS simulation on edge lists.)pbdoc",
+          py::arg("edge_lists"),
+          py::arg("eSIS"),
+          py::arg("is_static") = false,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_eSIS_on_edge_changes", &gillespie_on_edge_changes<eSIS>,
+          R"pbdoc(Perform a Gillespie :math:`\varepsilon`-SIS simulation on edge changes.)pbdoc",
+          py::arg("edge_changes"),
+          py::arg("eSIS"),
+          py::arg("verbose") = false);
+
     m.def("gillespie_node_based_SIS_on_edge_changes", &gillespie_on_edge_changes<node_based_SIS>,
           "Perform a Gillespie SIS simulation on edge changes.",
           py::arg("edge_changes"),
@@ -717,6 +732,12 @@ PYBIND11_MODULE(_tacoma, m)
           "Perform a Gillespie SIS simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SIS"),
+          py::arg("verbose") = false);
+
+    m.def("gillespie_eSIS_on_ActivityModel", &gillespie_on_model<ActivityModel,eSIS>,
+          R"pbdoc(Perform a Gillespie :math:`\varepsilon`-SIS simulation on the edge activity model.)pbdoc",
+          py::arg("activity_model"),
+          py::arg("eSIS"),
           py::arg("verbose") = false);
 
     m.def("gillespie_SIR_on_ActivityModel", &gillespie_on_model<ActivityModel,SIR>,
@@ -1039,6 +1060,60 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("SI", &SIS::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
         .def_readwrite("I", &SIS::I, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("t_simulation", &SIS::t_simulation, "Absolute run time of the simulation.");
+
+    py::class_<eSIS>(m, "eSIS", R"pbdoc(Base class for the simulation of an :math:`\varepsilon`-SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_epidemics` to simulate and retrieve the simulation results.)pbdoc")
+        .def(py::init<size_t, double, double, double, double, size_t, size_t, bool, double, size_t, bool>(),
+             py::arg("N"),
+             py::arg("t_simulation"),
+             py::arg("infection_rate"),
+             py::arg("recovery_rate"),
+             py::arg("self_infection_rate"),
+             py::arg("number_of_initially_infected") = 1,
+             py::arg("number_of_initially_vaccinated") = 0,
+             py::arg("prevent_disease_extinction") = false,
+             py::arg("sampling_dt") = 0.0,
+             py::arg("seed") = 0,
+             py::arg("verbose") = false,
+             R"pbdoc(
+                    Parameters
+                    ----------
+                    N : int
+                        Number of nodes in the temporal network.
+                    t_simulation : float
+                        Maximum time for the simulation to run. Can possibly be greater than the maximum time of the temporal
+                        network in which case the temporal network is looped.
+                    infection_rate : float
+                        Infection rate per :math:`SI`-link (expected number of reaction events :math:`SI\rightarrow II`
+                        for a single :math:`SI`-link per dimension of time).
+                    recovery_rate : float
+                        Recovery rate per infected (expected number of reaction events :math:`I\rightarrow S`
+                        for a single infected node per dimension of time).
+                    self_infection_rate : float
+                        Infection rate per susecptible (expected number of reaction events :math:`S\rightarrow I`
+                        for a single susceptible node per dimension of time).
+                    number_of_initially_infected : int, default = 1
+                        Number of nodes which will be in the infected compartment at :math:`t = t_0`. Note that the default
+                        value 1 is not an ideal initial value as fluctuations may lead to a quick end of the simulation
+                        skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
+                    number_of_initially_vaccinated : int, default = 0
+                        Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    prevent_disease_extinction : bool, default = False
+                        If this is `True`, the recovery of the last infected node will always be prevented.
+                    sampling_dt : float, default = 0.0
+                        If this is ``>0.0``, save observables roughly every sampling_dt instead of on every change.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc")
+        .def_readwrite("time", &eSIS::time, "A list containing the time points at which one or more of the observables changed.")
+        .def_readwrite("R0", &eSIS::R0, R"pbdoc(
+                   A list containing the basic reproduction number defined as :math:`R_0(t) = \eta\left\langle k \right\rangle(t) / \rho`
+                   where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
+                   )pbdoc")
+        .def_readwrite("SI", &eSIS::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
+        .def_readwrite("I", &eSIS::I, "A list containing the number of infected at time :math:`t`.")
+        .def_readwrite("t_simulation", &eSIS::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<node_based_SIS>(m, "node_based_SIS", R"pbdoc(Base class for the simulation of an SIS compartmental infection model on a temporal network using an SI-Graph for keeping track of SI-edges (meaning this is a node-based algorithm). Pass this to :func:`tacoma.api.gillespie_node_based_SIS` to simulate and retrieve the simulation results.)pbdoc")
         .def(py::init<size_t, double, double, double, size_t, size_t, bool, double, size_t, bool>(),

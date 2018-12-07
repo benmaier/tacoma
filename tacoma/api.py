@@ -27,6 +27,8 @@ SI = _tc.SI
 SIS = _tc.SIS
 SIR = _tc.SIR
 SIRS = _tc.SIRS
+node_based_SIS = _tc.node_based_SIS
+eSIS = _tc.eSIS
 ActivityModel = _tc.ActivityModel
 
 
@@ -333,7 +335,7 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
     ----------
     temporal_network_or_model : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, :class:`_tacoma.edge_lists_with_histograms`, or :class:`_tacoma.ActivityModel`.
         An instance of a temporal network or network model.
-    epidemic_object : :class:`_tacoma.SI`, :class:`_tacoma.SIS`, :class:`_tacoma.SIR`, :class:`_tacoma.SIRS`, :class:`_tacoma.node_based_SIS`
+    epidemic_object : :class:`_tacoma.SI`, :class:`_tacoma.SIS`, :class:`_tacoma.SIR`, :class:`_tacoma.SIRS`, :class:`_tacoma.node_based_SIS`, :class:`_tacoma.eSIS`
         An initialized epidemic object.
     is_static : bool, default : False
         The algorithm works a bit differently if it knows that the network is actually static.
@@ -361,6 +363,8 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
             _tc.gillespie_SIRS_on_edge_changes(temporal_network, epidemic_object, verbose)
         elif type(epidemic_object) == node_based_SIS:
             _tc.gillespie_node_based_SIS_on_edge_changes(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == eSIS:
+            _tc.gillespie_eSIS_on_edge_changes(temporal_network, epidemic_object, verbose)
         else:
             raise ValueError('Invalid epidemic object type: ' + str(type(tn_or_mdl)))
     elif type(tn_or_mdl) in [el, el_h]:
@@ -375,6 +379,8 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
             _tc.gillespie_SIRS_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
         elif type(epidemic_object) == node_based_SIS:
             _tc.gillespie_node_based_SIS_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
+        elif type(epidemic_object) == eSIS:
+            _tc.gillespie_eSIS_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
         else:
             raise ValueError('Invalid epidemic object type: ' + str(type(tn_or_mdl)))
     elif type(tn_or_mdl) in [ActivityModel]:
@@ -389,6 +395,8 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
             _tc.gillespie_SIRS_on_ActivityModel(temporal_network, epidemic_object, verbose)
         elif type(epidemic_object) == node_based_SIS:
             _tc.gillespie_node_based_SIS_on_ActivityModel(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == eSIS:
+            _tc.gillespie_eSIS_on_ActivityModel(temporal_network, epidemic_object, verbose)
         else:
             raise ValueError('Invalid epidemic object type: ' + str(type(tn_or_mdl)))
     else:
