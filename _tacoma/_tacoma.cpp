@@ -60,7 +60,7 @@
 #include "concatenation.h"
 #include "flockwork_parameter_estimation.h"
 #include "activity_model.h"
-#include "ActivityModel.h"
+#include "EdgeActivityModel.h"
 #include "slice.h"
 
 using namespace std;
@@ -104,7 +104,7 @@ PYBIND11_MODULE(_tacoma, m)
         .. autosummary::
             :toctree: _generate
 
-            ActivityModel
+            EdgeActivityModel
 
         Analysis classes
         ----------------
@@ -728,37 +728,37 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("SIRS"),
           py::arg("verbose") = false);
 
-    m.def("gillespie_SIS_on_ActivityModel", &gillespie_on_model<ActivityModel,SIS>,
+    m.def("gillespie_SIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SIS>,
           "Perform a Gillespie SIS simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SIS"),
           py::arg("verbose") = false);
 
-    m.def("gillespie_eSIS_on_ActivityModel", &gillespie_on_model<ActivityModel,eSIS>,
+    m.def("gillespie_eSIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,eSIS>,
           R"pbdoc(Perform a Gillespie :math:`\varepsilon`-SIS simulation on the edge activity model.)pbdoc",
           py::arg("activity_model"),
           py::arg("eSIS"),
           py::arg("verbose") = false);
 
-    m.def("gillespie_SIR_on_ActivityModel", &gillespie_on_model<ActivityModel,SIR>,
+    m.def("gillespie_SIR_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SIR>,
           "Perform a Gillespie SIR simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SIR"),
           py::arg("verbose") = false);
 
-    m.def("gillespie_SIRS_on_ActivityModel", &gillespie_on_model<ActivityModel,SIRS>,
+    m.def("gillespie_SIRS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SIRS>,
           "Perform a Gillespie SIRS simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SIRS"),
           py::arg("verbose") = false);
 
-    m.def("gillespie_SI_on_ActivityModel", &gillespie_on_model<ActivityModel,SI>,
+    m.def("gillespie_SI_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SI>,
           "Perform a Gillespie SIRS simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SI"),
           py::arg("verbose") = false);
 
-    m.def("gillespie_node_based_SIS_on_ActivityModel", &gillespie_on_model<ActivityModel,node_based_SIS>,
+    m.def("gillespie_node_based_SIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,node_based_SIS>,
           "Perform a node-based Gillespie SIS simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SI"),
@@ -1307,7 +1307,7 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("R", &SIRS::R, "A list containing the number of recovered at time :math:`t`.")
         .def_readwrite("t_simulation", &SIRS::t_simulation, "Absolute run time of the simulation.");
 
-    py::class_<ActivityModel>(m, "ActivityModel", "Base class for the simulation of an edge activity model. Pass this to :func:`tacoma.api.gillespie_epidemics`")
+    py::class_<EdgeActivityModel>(m, "EdgeActivityModel", "Base class for the simulation of an edge activity model. Pass this to :func:`tacoma.api.gillespie_epidemics`")
         .def(py::init<size_t, double, double, double, bool, size_t, bool>(),
              py::arg("N"),
              py::arg("rho"),
@@ -1334,14 +1334,14 @@ PYBIND11_MODULE(_tacoma, m)
                     seed : int, default = 0
                         Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
                         However, the generator will be rewritten 
-                        in :func:`tacoma.api.gillespie_SIS_ActivityModel` anyway.
+                        in :func:`tacoma.api.gillespie_SIS_EdgeActivityModel` anyway.
                     verbose : bool, default = False
                         Be talkative.
                 )pbdoc")
-        .def_readwrite("edge_changes", &ActivityModel::edg_chg, 
+        .def_readwrite("edge_changes", &EdgeActivityModel::edg_chg, 
                     R"pbdoc(An instance of :class:`_tacoma.edge_changes` with the saved temporal network (only if
                     `save_temporal_network` is `True`).)pbdoc")
-        .def_readwrite("N", &ActivityModel::N, 
+        .def_readwrite("N", &EdgeActivityModel::N, 
                     R"pbdoc(Number of nodes.)pbdoc");
 
 }

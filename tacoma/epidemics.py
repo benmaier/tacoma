@@ -13,7 +13,7 @@ def simulate_and_measure_i_inf(temporal_network_or_model,epidemic_object,t_equil
 
     Parameters
     ----------
-    temporal_network_or_model : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, :class:`_tacoma.edge_lists_with_histograms`, or :class:`_tacoma.ActivityModel`.
+    temporal_network_or_model : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, :class:`_tacoma.edge_lists_with_histograms`, or :class:`_tacoma.EdgeActivityModel`.
         An instance of a temporal network or network model.
     epidemic_object : :class:`_tacoma.SI`, :class:`_tacoma.SIS`, :class:`_tacoma.SIR`, :class:`_tacoma.SIRS`, :class:`_tacoma.node_based_SIS`
         An initialized epidemic object.
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     R0 = 10
     t_run_total = 1000
 
-    AM = tc.ActivityModel(N,
+    AM = tc.EdgeActivityModel(N,
                            k/(N-1.),
                            omega,
                            t0 = 2000

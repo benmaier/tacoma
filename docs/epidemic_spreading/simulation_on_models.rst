@@ -9,11 +9,11 @@ generated temporal network. So far, this is implemented for the
 edge activity model only. It works as follows.
 
 First, you create an instance of the model, e.g. 
-:class:`_tacoma.ActivityModel` as
+:class:`_tacoma.EdgeActivityModel` as
 
 .. code:: python
     
-    AM = tc.ActivityModel(N, # number of nodes
+    AM = tc.EdgeActivityModel(N, # number of nodes
                           k/(N-1.), # network density
                           omega, # edge activity rate
                           save_temporal_network=False)
@@ -35,7 +35,7 @@ Second, create an instance of an epidemic class, e.g.
                  seed = 792, # optional, default: randomly initiated
                 )
 
-Note that the seed passed to :class:`_tacoma.ActivityModel` is overwritten
+Note that the seed passed to :class:`_tacoma.EdgeActivityModel` is overwritten
 with the random number generator (RNG) created in :class:`_tacoma.SIS`. 
 This RNG is also used in the corresponding Gillespie simulation, which is
 started and plotted as 

@@ -29,7 +29,7 @@ ext_modules = [
             '_tacoma/Events.cpp', 
             '_tacoma/slice.cpp', 
             '_tacoma/eSIS.cpp', 
-            '_tacoma/ActivityModel.cpp',
+            '_tacoma/EdgeActivityModel.cpp',
             '_tacoma/activity_model.cpp',
             '_tacoma/verify_formats.cpp', 
             '_tacoma/measurements.cpp', 

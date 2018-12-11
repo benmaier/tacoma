@@ -23,8 +23,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef __ACTIVITY_MODEL_CLASS_H__
-#define __ACTIVITY_MODEL_CLASS_H__
+#ifndef __EDGE_ACTIVITY_MODEL_CLASS_H__
+#define __EDGE_ACTIVITY_MODEL_CLASS_H__
 
 #include "Events.h"
 #include "Utilities.h"
@@ -47,7 +47,7 @@
 
 using namespace std;
 
-class ActivityModel 
+class EdgeActivityModel 
 {
     public:
         size_t N;
@@ -67,7 +67,7 @@ class ActivityModel
 
         edge_changes edg_chg;
 
-        ActivityModel(
+        EdgeActivityModel(
             size_t _N,
             double _rho,
             double _omega,
@@ -177,7 +177,7 @@ class ActivityModel
             has_external_generator = true;
         } 
 
-        ~ActivityModel() 
+        ~EdgeActivityModel() 
         {
             if (not has_external_generator)
                 delete generator;

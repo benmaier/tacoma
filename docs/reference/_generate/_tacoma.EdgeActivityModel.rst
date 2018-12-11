@@ -1,9 +1,9 @@
-\_tacoma.ActivityModel
-======================
+\_tacoma.EdgeActivityModel
+==========================
 
 .. currentmodule:: _tacoma
 
-.. autoclass:: ActivityModel
+.. autoclass:: EdgeActivityModel
 
    
    .. automethod:: __init__
@@ -13,7 +13,7 @@
 
    .. autosummary::
    
-      ~ActivityModel.__init__
+      ~EdgeActivityModel.__init__
    
    
 
@@ -23,7 +23,7 @@
 
    .. autosummary::
    
-      ~ActivityModel.N
-      ~ActivityModel.edge_changes
+      ~EdgeActivityModel.N
+      ~EdgeActivityModel.edge_changes
    
    

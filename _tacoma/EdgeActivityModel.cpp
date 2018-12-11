@@ -23,12 +23,12 @@
  * IN THE SOFTWARE.
  */
 
-#include "ActivityModel.h"
+#include "EdgeActivityModel.h"
 
 using namespace std;
 //namespace sis = SIS;
 
-void ActivityModel::get_rates_and_Lambda(
+void EdgeActivityModel::get_rates_and_Lambda(
                     vector < double > &_rates,
                     double &_Lambda
                   )
@@ -53,7 +53,7 @@ void ActivityModel::get_rates_and_Lambda(
     _Lambda = accumulate(_rates.begin(),_rates.end(),0.0);
 }
 
-void ActivityModel::make_event(
+void EdgeActivityModel::make_event(
                 size_t const &event,
                 double t,
                 vector < pair < size_t, size_t > > &e_in,
@@ -173,7 +173,7 @@ void ActivityModel::make_event(
     }
     else
     {
-        throw length_error("ActivityModel: There was an event chosen other than on or off, this should not happen.");
+        throw length_error("EdgeActivityModel: There was an event chosen other than on or off, this should not happen.");
     }
 
     if (save_temporal_network)
