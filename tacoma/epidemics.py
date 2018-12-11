@@ -73,8 +73,8 @@ def simulate_and_measure_i_inf(temporal_network_or_model,epidemic_object,t_equil
 
 if __name__ == "__main__":
 
-    N = 5
-    k = 2
+    N = 100
+    k = 10
     omega = 1.6
     recovery_rate = 0.1
     R0 = 10
