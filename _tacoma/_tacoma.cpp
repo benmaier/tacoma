@@ -731,9 +731,16 @@ PYBIND11_MODULE(_tacoma, m)
 
     m.def("gillespie_SIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SIS>,
           "Perform a Gillespie SIS simulation on the edge activity model.",
-          py::arg("activity_model"),
+          py::arg("edge_activity_model"),
           py::arg("SIS"),
           py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_QS_SIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,QS_SIS>,
+          "Perform a quasi-stationary Gillespie SIS simulation on the edge activity model.",
+          py::arg("edge_activity_model"),
+          py::arg("QS_SIS"),
+          py::arg("reset_simulation_objects") = false,
           py::arg("verbose") = false);
 
     m.def("gillespie_eSIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,eSIS>,
@@ -1062,6 +1069,15 @@ PYBIND11_MODULE(_tacoma, m)
                     verbose : bool, default = False
                         Be talkative.
                 )pbdoc")
+        .def_readwrite("last_active_time", &QS_SIS::last_active_time,
+                R"pbdoc(The last time the model was active. 
+                )pbdoc"
+            )
+        .def("ended_in_absorbing_state()",
+             &QS_SIS::simulation_ended,
+             R"pbdoc(Return whether or not the simulation ended in an absorbing state.
+             )pbdoc"
+            )
         .def("get_random_configuration",
              &QS_SIS::get_random_configuration,
              R"pbdoc(Get a random configuration from the quasi-stationary
@@ -1405,6 +1421,8 @@ PYBIND11_MODULE(_tacoma, m)
                     verbose : bool, default = False
                         Be talkative.
                 )pbdoc")
+        .def("set_initial_configuration",&EdgeActivityModel::set_initial_configuration,
+             R"pbdoc(Reset the state of the network to a certain graph (:obj:`list` of :obj:`set` of :obj:`int`))pbdoc")
         .def_readwrite("edge_changes", &EdgeActivityModel::edg_chg, 
                     R"pbdoc(An instance of :class:`_tacoma.edge_changes` with the saved temporal network (only if
                     `save_temporal_network` is `True`).)pbdoc")

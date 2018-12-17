@@ -107,8 +107,10 @@ class EdgeActivityModel
 
         }
 
-        void set_graph( vector < set < size_t > > &_G )
+        void set_initial_configuration( double _t0, vector < set < size_t > > &_G)
         {
+            t0 = _t0;
+
             // reset observables
             edg_chg.N = N;
 

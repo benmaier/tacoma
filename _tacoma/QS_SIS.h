@@ -55,7 +55,7 @@ class QS_SIS
         size_t number_of_initially_vaccinated;
         size_t seed;
         bool verbose;
-        double last_sampling_time;
+        double last_active_time;
 
         mt19937_64 generator;
         uniform_real_distribution<double> randuni;
@@ -107,7 +107,7 @@ class QS_SIS
         void reset() 
         {
             next_sampling_time = 0.0;
-            last_sampling_time = 0.0;
+            last_active_time = 0.0;
 
             // reset observables
             QS_samples.clear();
@@ -166,7 +166,7 @@ class QS_SIS
             }
         }
 
-        void set_node_configuration( vector < size_t > &_node_status )
+        void set_initial_configuration( double _t0, vector < size_t > &_node_status )
         {
             infected.clear();
             node_status.clear();
@@ -177,12 +177,12 @@ class QS_SIS
                 node_status.push_back(_node_status[node]);
             }
 
-            set_initial_time(last_sampling_time);
+            set_initial_time(t0);
         }
 
         void set_initial_time(double t0)
         {
-            last_sampling_time = t0;
+            last_active_time = t0;
             next_sampling_time = t0 + sampling_time_distribution(generator);
         }
 

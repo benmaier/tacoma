@@ -7,6 +7,8 @@ measurement of epidemics.
 import numpy as np
 import tacoma as tc
 
+from _tacoma import gillespie_QS_SIS_on_EdgeActivityModel
+
 
 def simulate_and_measure_i_inf(temporal_network_or_model,epidemic_object,t_equilibrate,is_static=False,verbose=False):
     """Get the equilibrium ratio of infected. 
@@ -69,6 +71,22 @@ def simulate_and_measure_i_inf(temporal_network_or_model,epidemic_object,t_equil
     result = ( i_inf, i_inf_std, R0 )
 
     return result
+
+def simulate_quasi_stationary_SIS(model, qs_sis, verbose=False):
+
+    t = 0.0
+
+    while True:
+        gillespie_QS_SIS_on_EdgeActivityModel(model, qs_sis, verbose)
+        if qs_sis.ended_in_absorbing_state():
+            node_status, G = qs_sis.get_random_configuration()
+            qs_sis.set_node_configuration(qs_sis.last_active_time, node_status)
+            model.set_initial_configuration(qs_sis.last_active_time, G)
+        else:
+            break
+
+    return qs_sis.get_infection_observables()
+        
 
 
 if __name__ == "__main__":

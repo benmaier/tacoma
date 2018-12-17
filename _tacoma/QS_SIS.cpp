@@ -242,13 +242,17 @@ void QS_SIS::update_observables(
         }
         QS_samples.push_back( make_pair( this_node_status, this_G ) );
 
-        last_sampling_time = t;
+        last_active_time = t;
 
         // advance next sampling time
         do
         {
             next_sampling_time += sampling_time_distribution(generator);
         } while (next_sampling_time < t);
+    }
+    else
+    {
+        last_active_time = t;
     }
 
 }
