@@ -49,6 +49,7 @@
 #include "edge_trajectories.h"
 #include "verify_formats.h"
 #include "SIS.h"
+#include "QS_SIS.h"
 #include "eSIS.h"
 #include "SIS_node_based.h"
 #include "SIR.h"
@@ -732,36 +733,42 @@ PYBIND11_MODULE(_tacoma, m)
           "Perform a Gillespie SIS simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SIS"),
+          py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
     m.def("gillespie_eSIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,eSIS>,
           R"pbdoc(Perform a Gillespie :math:`\varepsilon`-SIS simulation on the edge activity model.)pbdoc",
           py::arg("activity_model"),
           py::arg("eSIS"),
+          py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
     m.def("gillespie_SIR_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SIR>,
           "Perform a Gillespie SIR simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SIR"),
+          py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
     m.def("gillespie_SIRS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SIRS>,
           "Perform a Gillespie SIRS simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SIRS"),
+          py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
     m.def("gillespie_SI_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SI>,
           "Perform a Gillespie SIRS simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SI"),
+          py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
     m.def("gillespie_node_based_SIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,node_based_SIS>,
           "Perform a node-based Gillespie SIS simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SI"),
+          py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
 
@@ -1010,6 +1017,66 @@ PYBIND11_MODULE(_tacoma, m)
                        R"pbdoc(The initial time)pbdoc")
         .def_readwrite("tmax", &edge_trajectories::tmax,
                        R"pbdoc(The final time)pbdoc");
+
+    py::class_<QS_SIS>(m, "QS_SIS", R"pbdoc(Base class for the simulation of an quasi-stationary SIS 
+                                            compartmental infection model on a temporal network. Pass 
+                                            this to :func:`tacoma.api.quasistationary_simulation` 
+                                            to simulate and retrieve the simulation results.)pbdoc")
+        .def(py::init<size_t, double, double, double, size_t, double, size_t, size_t, size_t, bool>(),
+             py::arg("N"),
+             py::arg("t_simulation"),
+             py::arg("infection_rate"),
+             py::arg("recovery_rate"),
+             py::arg("N_QS_samples"),
+             py::arg("sampling_rate"),
+             py::arg("number_of_initially_infected") = 1,
+             py::arg("number_of_initially_vaccinated") = 0,
+             py::arg("seed") = 0,
+             py::arg("verbose") = false,
+             R"pbdoc(
+                    Parameters
+                    ----------
+                    N : int
+                        Number of nodes in the temporal network.
+                    t_simulation : float
+                        Maximum time for the simulation to run. Can possibly be greater than the maximum time of the temporal
+                        network in which case the temporal network is looped.
+                    infection_rate : float
+                        Infection rate per :math:`SI`-link (expected number of reaction events :math:`SI\rightarrow II`
+                        for a single :math:`SI`-link per dimension of time).
+                    recovery_rate : float
+                        Recovery rate per infected (expected number of reaction events :math:`I\rightarrow S`
+                        for a single infected node per dimension of time).
+                    N_QS_samples : int
+                        Number of quasi-stationary configuration samples to be saved during the simulation.
+                    sampling_rate : float
+                        Rate with which to sample for the quasi-stationary configuration collection.
+                    number_of_initially_infected : int, default = 1
+                        Number of nodes which will be in the infected compartment at :math:`t = t_0`. Note that the default
+                        value 1 is not an ideal initial value as fluctuations may lead to a quick end of the simulation
+                        skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
+                    number_of_initially_vaccinated : int, default = 0
+                        Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc")
+        .def("get_random_configuration",
+             &QS_SIS::get_random_configuration,
+             R"pbdoc(Get a random configuration from the quasi-stationary
+                     collection. Returns an `N`-length vector filled with 
+                     the node stati and the Graph of the configuration.
+             )pbdoc"
+            )
+        .def("get_infection_observables",
+             &QS_SIS::get_random_configuration,
+             R"pbdoc(Returns :math:`\left\langle I \right\rangle` and 
+                     :math:`\left\langle I^2 \right\rangle` where the 
+                     average is taken over the collection of quasi-stationary 
+                     configurations.
+             )pbdoc"
+            );
 
     py::class_<SIS>(m, "SIS", "Base class for the simulation of an SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIS` to simulate and retrieve the simulation results.")
         .def(py::init<size_t, double, double, double, size_t, size_t, bool, double, size_t, bool>(),

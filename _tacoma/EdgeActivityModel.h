@@ -103,8 +103,61 @@ class EdgeActivityModel
             if (omega <= 0.0)
                 throw domain_error("omega has to be omega > 0");
 
+            reset();
 
+        }
 
+        void set_graph( vector < set < size_t > > &_G )
+        {
+            // reset observables
+            edg_chg.N = N;
+
+            edg_chg.t.clear();
+            edg_chg.edges_in.clear();
+            edg_chg.edges_out.clear();
+
+            // seed engine
+            if (seed == 0)
+                randomly_seed_engine(*generator);
+            else
+                generator->seed(seed);
+
+            G.clear();
+            for(size_t node=0; node<N; node++)
+            {
+                set < size_t > neigh = _G[node];
+                G.push_back(neigh);
+            }
+
+            if (save_temporal_network)
+                edgelist_from_graph(edg_chg.edges_initial, G);
+
+            edges_on = 0;
+            m_max = (N * (N-1)) / 2;
+
+            k.clear();
+            complementary_k.clear();
+
+            for(size_t node=0; node<N; node++)
+            {
+                size_t this_k = G[node].size();
+                k.push_back(this_k);
+                complementary_k.push_back(N - 1 - this_k);
+
+                edges_on += this_k;
+
+                if (verbose)
+                {
+                    cout << "k[node]   = " << this_k << endl;
+                    cout << "c_k[node] = " << complementary_k.back() << endl;
+                }
+            }
+
+            edges_on /= 2;
+
+            if (verbose)
+                cout << "edges_on = " << edges_on << endl;
+    
         }
 
         void reset() 

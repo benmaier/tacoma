@@ -49,6 +49,7 @@ void
     gillespie_on_model(
             T1 & this_model_object,
             T2 & this_gillespie_object,
+            bool reset_simulation_objects = true,
             bool verbose = false
             )
 {
@@ -62,8 +63,11 @@ void
     this_model_object.set_generator(this_gillespie_object.generator);
 
     // reset the simulation objects
-    this_gillespie_object.reset();
-    this_model_object.reset();
+    if (reset_simulation_objects)
+    {
+        this_gillespie_object.reset();
+        this_model_object.reset();
+    }
 
     // initialize time variables
     double t0 = this_model_object.t0;
