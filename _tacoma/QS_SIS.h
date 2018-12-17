@@ -177,7 +177,7 @@ class QS_SIS
                 node_status.push_back(_node_status[node]);
             }
 
-            set_initial_time(t0);
+            set_initial_time(_t0);
         }
 
         void set_initial_time(double t0)
