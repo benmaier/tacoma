@@ -56,6 +56,7 @@ class QS_SIS
         size_t seed;
         bool verbose;
         double last_active_time;
+        bool sample_network_state;
 
         mt19937_64 generator;
         uniform_real_distribution<double> randuni;
@@ -80,8 +81,9 @@ class QS_SIS
             double _sampling_rate,
             size_t _number_of_initially_infected = 1,
             size_t _number_of_initially_vaccinated = 0,
+            bool   _sample_network_state = true,
             size_t _seed = 0,
-            bool _verbose = false
+            bool   _verbose = false
         )
         {
             N = _N;
@@ -90,7 +92,6 @@ class QS_SIS
             recovery_rate = _recovery_rate;
             number_of_initially_vaccinated = _number_of_initially_vaccinated;
             number_of_initially_infected = _number_of_initially_infected;
-            N_QS_samples = _N_QS_samples;
             verbose = _verbose;
             seed = _seed;
 
@@ -98,6 +99,8 @@ class QS_SIS
 
             randuni = uniform_real_distribution < double > (0.0, 1.0);
 
+            sample_network_state = _sample_network_state;
+            N_QS_samples = _N_QS_samples;
             sampling_rate = _sampling_rate;
             sampling_time_distribution = exponential_distribution < double >(_sampling_rate);
 
@@ -231,8 +234,8 @@ class QS_SIS
                     if (stat == EPI::I)
                         this_I++;
                 }
-                mean_I += this_I;
-                mean_I2 += this_I*this_I;
+                mean_I += (double) this_I;
+                mean_I2 += (double) this_I*this_I;
             }
             mean_I /= N;
             mean_I2 /= N;

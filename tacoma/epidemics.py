@@ -7,7 +7,7 @@ measurement of epidemics.
 import numpy as np
 import tacoma as tc
 
-from _tacoma import gillespie_QS_SIS_on_EdgeActivityModel
+from _tacoma import gillespie_QS_SIS_on_EdgeActivityModel, gillespie_QS_SIS_on_edge_lists
 
 
 def simulate_and_measure_i_inf(temporal_network_or_model,epidemic_object,t_equilibrate,is_static=False,verbose=False):
@@ -72,12 +72,12 @@ def simulate_and_measure_i_inf(temporal_network_or_model,epidemic_object,t_equil
 
     return result
 
-def simulate_quasi_stationary_SIS(model, qs_sis, verbose=False):
-
-    t = 0.0
+def simulate_quasi_stationary_SIS_on_model(model, qs_sis, verbose=False):
 
     while True:
-        gillespie_QS_SIS_on_EdgeActivityModel(model, qs_sis, verbose)
+
+        gillespie_QS_SIS_on_EdgeActivityModel(model, qs_sis, verbose=verbose)
+
         if qs_sis.ended_in_absorbing_state():
             node_status, G = qs_sis.get_random_configuration()
             qs_sis.set_node_configuration(qs_sis.last_active_time, node_status)
@@ -88,6 +88,35 @@ def simulate_quasi_stationary_SIS(model, qs_sis, verbose=False):
     return qs_sis.get_infection_observables()
         
 
+import sys
+
+def simulate_quasi_stationary_SIS_on_static_network(network, qs_sis, verbose=False):
+
+    t = float(qs_sis.last_active_time)
+
+    while True:
+
+        gillespie_QS_SIS_on_edge_lists(network, qs_sis, is_static=True, verbose=verbose)
+
+        if qs_sis.ended_in_absorbing_state():
+
+            delta_t = qs_sis.last_active_time - t
+
+            node_status, G = qs_sis.get_random_configuration()
+            qs_sis.set_initial_configuration(qs_sis.last_active_time, node_status)
+
+
+            qs_sis.t_simulation -= delta_t
+            #print(qs_sis.last_active_time, t, qs_sis.t_simulation)
+            #sys.exit(1)
+            new_t = [qs_sis.last_active_time]
+            network.t = new_t
+            t = qs_sis.last_active_time
+            print("t = ", t,": died")
+        else:
+            break
+
+    return qs_sis.get_infection_observables()
 
 if __name__ == "__main__":
 

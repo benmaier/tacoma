@@ -30,6 +30,7 @@ SIRS = _tc.SIRS
 node_based_SIS = _tc.node_based_SIS
 eSIS = _tc.eSIS
 EdgeActivityModel = _tc.EdgeActivityModel
+QS_SIS = _tc.QS_SIS
 
 
 def _get_raw_temporal_network(temporal_network):

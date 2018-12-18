@@ -227,33 +227,34 @@ void QS_SIS::update_observables(
         vector < size_t > this_node_status = node_status;
         vector < set < size_t > > this_G;
 
-        for(auto const &neigh: *G)
+        if (sample_network_state) 
         {
-            set < size_t > this_neigh = neigh;
-            this_G.push_back(this_neigh);
+            for(auto const &neigh: *G)
+            {
+                set < size_t > this_neigh = neigh;
+                this_G.push_back(this_neigh);
+            }
         }
 
         if (QS_samples.size() == N_QS_samples)
         {
             uniform_int_distribution < size_t > random_sample(0,QS_samples.size()-1);
             size_t sample_index = random_sample(generator);
-            swap(QS_samples[sample_index], QS_samples.back());
+            //swap(QS_samples[sample_index], QS_samples.back());
             QS_samples.pop_back();
         }
-        QS_samples.push_back( make_pair( this_node_status, this_G ) );
-
-        last_active_time = t;
+        //QS_samples.push_front( make_pair( this_node_status, this_G ) );
+        QS_samples.insert(QS_samples.begin(), make_pair( this_node_status, this_G ));
 
         // advance next sampling time
+        //cout << "sampling new time ..." << endl; 
         do
         {
             next_sampling_time += sampling_time_distribution(generator);
+            //cout << "      new sampling time = " << next_sampling_time << endl; 
         } while (next_sampling_time < t);
     }
-    else
-    {
-        last_active_time = t;
-    }
 
+    last_active_time = t;
 }
 

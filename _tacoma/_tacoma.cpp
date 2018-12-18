@@ -664,6 +664,19 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("SIS"),
           py::arg("verbose") = false);
 
+    m.def("gillespie_QS_SIS_on_edge_lists", &gillespie_on_edge_lists<QS_SIS>,
+          "Perform a quasi-stationary Gillespie SIS simulation on edge lists.",
+          py::arg("edge_lists"),
+          py::arg("QS_SIS"),
+          py::arg("is_static") = false,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_QS_SIS_on_edge_changes", &gillespie_on_edge_changes<QS_SIS>,
+          "Perform a quasi-stationary Gillespie SIS simulation on edge changes.",
+          py::arg("edge_changes"),
+          py::arg("QS_SIS"),
+          py::arg("verbose") = false);
+
     m.def("gillespie_eSIS_on_edge_lists", &gillespie_on_edge_lists<eSIS>,
           R"pbdoc(Perform a Gillespie :math:`\varepsilon`-SIS simulation on edge lists.)pbdoc",
           py::arg("edge_lists"),
@@ -1029,7 +1042,7 @@ PYBIND11_MODULE(_tacoma, m)
                                             compartmental infection model on a temporal network. Pass 
                                             this to :func:`tacoma.api.quasistationary_simulation` 
                                             to simulate and retrieve the simulation results.)pbdoc")
-        .def(py::init<size_t, double, double, double, size_t, double, size_t, size_t, size_t, bool>(),
+        .def(py::init<size_t, double, double, double, size_t, double, size_t, size_t, bool, size_t, bool>(),
              py::arg("N"),
              py::arg("t_simulation"),
              py::arg("infection_rate"),
@@ -1038,6 +1051,7 @@ PYBIND11_MODULE(_tacoma, m)
              py::arg("sampling_rate"),
              py::arg("number_of_initially_infected") = 1,
              py::arg("number_of_initially_vaccinated") = 0,
+             py::arg("sample_network_state") = true,
              py::arg("seed") = 0,
              py::arg("verbose") = false,
              R"pbdoc(
@@ -1064,16 +1078,26 @@ PYBIND11_MODULE(_tacoma, m)
                         skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
                     number_of_initially_vaccinated : int, default = 0
                         Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    sample_network_state : bool, default = True
+                        Do not only sample the node stati but also the current network structure.
                     seed : int, default = 0
                         Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
                     verbose : bool, default = False
                         Be talkative.
                 )pbdoc")
+        .def_readwrite("configurations", &QS_SIS::QS_samples,
+                R"pbdoc(Sampled collection. 
+                )pbdoc"
+            )
         .def_readwrite("last_active_time", &QS_SIS::last_active_time,
                 R"pbdoc(The last time the model was active. 
                 )pbdoc"
             )
-        .def("ended_in_absorbing_state()",
+        .def_readwrite("t_simulation", &QS_SIS::t_simulation,
+                R"pbdoc(Time to simulate from :t0:.
+                )pbdoc"
+            )
+        .def("ended_in_absorbing_state",
              &QS_SIS::simulation_ended,
              R"pbdoc(Return whether or not the simulation ended in an absorbing state.
              )pbdoc"
@@ -1085,8 +1109,13 @@ PYBIND11_MODULE(_tacoma, m)
                      the node stati and the Graph of the configuration.
              )pbdoc"
             )
+        .def("set_initial_configuration",
+             &QS_SIS::set_initial_configuration,
+             R"pbdoc(Set a time and node statii.
+             )pbdoc"
+            )
         .def("get_infection_observables",
-             &QS_SIS::get_random_configuration,
+             &QS_SIS::get_infection_observables,
              R"pbdoc(Returns :math:`\left\langle I \right\rangle` and 
                      :math:`\left\langle I^2 \right\rangle` where the 
                      average is taken over the collection of quasi-stationary 
