@@ -12,7 +12,7 @@ rewiring_rate = [ (0.0,1.0) ]
 t_run_total = 500.0
 tmax = 1000.0
 seed = 7925
-infection_rate = 0.5
+infection_rate = 0.1
 recovery_rate = 0.1
 
 E = flockwork_P_equilibrium_configuration(N,P[0])
@@ -54,6 +54,17 @@ _tc.markov_SIS_on_edge_lists(fwP_el,mv_SIS,1.0)
 #print(mv_SIS.time, mv_SIS.I)
 end = time.time()
 print("Markov on edge_lists took", end-start,"seconds")
+
+pl.plot(mv_SIS.time, mv_SIS.I)
+
+FW = tc.FlockworkPModel(E, N, rewiring_rate[0][1], P[0])
+mv_SIS = tc.MARKOV_SIS(N,t_run_total*2,infection_rate,recovery_rate,0.01,N//2,seed = seed)
+
+start = time.time()
+_tc.markov_SIS_on_FlockworkPModel(FW, mv_SIS,max_dt = 0.001)
+end = time.time()
+print("Markov on Model took", end-start,"seconds")
+
 
 pl.plot(mv_SIS.time, mv_SIS.I)
 

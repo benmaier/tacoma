@@ -65,6 +65,7 @@
 #include "flockwork_parameter_estimation.h"
 #include "activity_model.h"
 #include "EdgeActivityModel.h"
+#include "FlockworkPModel.h"
 #include "slice.h"
 
 using namespace std;
@@ -817,6 +818,63 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
+    m.def("gillespie_SIS_on_FlockworkPModel", &gillespie_on_model<FlockworkPModel,SIS>,
+          "Perform a Gillespie SIS simulation on the Flockwork P-model.",
+          py::arg("model"),
+          py::arg("SIS"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_QS_SIS_on_FlockworkPModel", &gillespie_on_model<FlockworkPModel,QS_SIS>,
+          "Perform a quasi-stationary Gillespie SIS simulation on the Flockwork P-model.",
+          py::arg("model"),
+          py::arg("QS_SIS"),
+          py::arg("reset_simulation_objects") = false,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_eSIS_on_FlockworkPModel", &gillespie_on_model<FlockworkPModel,eSIS>,
+          R"pbdoc(Perform a Gillespie :math:`\varepsilon`-SIS simulation on the Flockwork P-model.)pbdoc",
+          py::arg("model"),
+          py::arg("eSIS"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_SIR_on_FlockworkPModel", &gillespie_on_model<FlockworkPModel,SIR>,
+          "Perform a Gillespie SIR simulation on the Flockwork P-model.",
+          py::arg("model"),
+          py::arg("SIR"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_SIRS_on_FlockworkPModel", &gillespie_on_model<FlockworkPModel,SIRS>,
+          "Perform a Gillespie SIRS simulation on the Flockwork P-model.",
+          py::arg("model"),
+          py::arg("SIRS"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_SI_on_FlockworkPModel", &gillespie_on_model<FlockworkPModel,SI>,
+          "Perform a Gillespie SI simulation on the Flockwork P-model.",
+          py::arg("model"),
+          py::arg("SI"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_node_based_SIS_on_FlockworkPModel", &gillespie_on_model<FlockworkPModel,node_based_SIS>,
+          "Perform a node-based Gillespie SIS simulation on the Flockwork P-model.",
+          py::arg("model"),
+          py::arg("SI"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("markov_SIS_on_FlockworkPModel", &markov_on_model<FlockworkPModel,MARKOV_SIS>,
+          "Perform a mixed Markov-Gillespie SIS simulation on the Flockwork P-model.",
+          py::arg("model"),
+          py::arg("MARKOV_SIS"),
+          py::arg("max_dt"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);    
+
 
     py::class_<edge_changes>(m, "edge_changes", R"pbdoc(Description of a temporal network by listing the changes of edges at a certain time.)pbdoc")
         .def(py::init<>())
@@ -1532,6 +1590,47 @@ PYBIND11_MODULE(_tacoma, m)
                     R"pbdoc(An instance of :class:`_tacoma.edge_changes` with the saved temporal network (only if
                     `save_temporal_network` is `True`).)pbdoc")
         .def_readwrite("N", &EdgeActivityModel::N, 
+                    R"pbdoc(Number of nodes.)pbdoc");
+
+    py::class_<FlockworkPModel>(m, "FlockworkPModel", "Base class for the simulation of a simple Flockwork-P model. Pass this to :func:`tacoma.api.gillespie_epidemics`")
+        .def(py::init< vector < pair < size_t, size_t > > , size_t, double, double, double, bool, size_t, bool>(),
+             py::arg("E"),
+             py::arg("N"),
+             py::arg("gamma"),
+             py::arg("P"),
+             py::arg("t0") = 0.0,
+             py::arg("save_temporal_network") = false,
+             py::arg("seed") = 0,
+             py::arg("verbose") = false,
+             R"pbdoc(
+                    Parameters
+                    ----------
+                    E : list of pair of int
+                        Initial edge list.
+                    N : int
+                        Number of nodes in the temporal network.
+                    gamma : float
+                        The probability per unit time per node that any event happens.
+                    P : float
+                        The probability to reconnect when an event happened.
+                    t0 : float, default = 0.0
+                        initial time
+                    save_temporal_network : bool, default: False
+                        If this is `True`, the changes are saved in an instance of 
+                        :func:`_tacoma.edge_changes` (in the attribute `edge_changes`.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                        However, the generator will be rewritten 
+                        in :func:`tacoma.api.gillespie_SIS_EdgeActivityModel` anyway.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc")
+        .def("set_initial_configuration",&FlockworkPModel::set_initial_configuration,
+             R"pbdoc(Reset the state of the network to a certain graph (:obj:`list` of :obj:`set` of :obj:`int`))pbdoc")
+        .def_readwrite("edge_changes", &FlockworkPModel::edg_chg, 
+                    R"pbdoc(An instance of :class:`_tacoma.edge_changes` with the saved temporal network (only if
+                    `save_temporal_network` is `True`).)pbdoc")
+        .def_readwrite("N", &FlockworkPModel::N, 
                     R"pbdoc(Number of nodes.)pbdoc");
 
 }

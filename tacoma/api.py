@@ -31,6 +31,8 @@ node_based_SIS = _tc.node_based_SIS
 eSIS = _tc.eSIS
 EdgeActivityModel = _tc.EdgeActivityModel
 QS_SIS = _tc.QS_SIS
+FlockworkPModel = _tc.FlockworkPModel
+MARKOV_SIS = _tc.MARKOV_SIS
 
 
 def _get_raw_temporal_network(temporal_network):
@@ -334,7 +336,7 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
 
     Parameters
     ----------
-    temporal_network_or_model : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, :class:`_tacoma.edge_lists_with_histograms`, or :class:`_tacoma.EdgeActivityModel`.
+    temporal_network_or_model : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, :class:`_tacoma.edge_lists_with_histograms`, :class:`_tacoma.EdgeActivityModel`, or :class:`_tacoma.FlockworkPModel`.
         An instance of a temporal network or network model.
     epidemic_object : :class:`_tacoma.SI`, :class:`_tacoma.SIS`, :class:`_tacoma.SIR`, :class:`_tacoma.SIRS`, :class:`_tacoma.node_based_SIS`, :class:`_tacoma.eSIS`
         An initialized epidemic object.
@@ -398,6 +400,22 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
             _tc.gillespie_node_based_SIS_on_EdgeActivityModel(temporal_network, epidemic_object, verbose)
         elif type(epidemic_object) == eSIS:
             _tc.gillespie_eSIS_on_EdgeActivityModel(temporal_network, epidemic_object, verbose)
+        else:
+            raise ValueError('Invalid epidemic object type: ' + str(type(tn_or_mdl)))
+    elif type(tn_or_mdl) in [FlockworkPModel]:
+        temporal_network = tn_or_mdl
+        if type(epidemic_object) == SI:
+            _tc.gillespie_SI_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == SIS:
+            _tc.gillespie_SIS_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == SIR:
+            _tc.gillespie_SIR_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == SIRS:
+            _tc.gillespie_SIRS_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == node_based_SIS:
+            _tc.gillespie_node_based_SIS_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == eSIS:
+            _tc.gillespie_eSIS_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
         else:
             raise ValueError('Invalid epidemic object type: ' + str(type(tn_or_mdl)))
     else:
