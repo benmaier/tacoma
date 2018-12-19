@@ -103,6 +103,14 @@ PYBIND11_MODULE(_tacoma, m)
             node_based_SIS
             eSIS
 
+        Markov integraion models
+        ------------------------
+
+        .. autosummary::
+            :toctree: _generate
+
+            MARKOV_SIS
+
         Temporal network model classes
         ------------------------------
 
@@ -110,6 +118,7 @@ PYBIND11_MODULE(_tacoma, m)
             :toctree: _generate
 
             EdgeActivityModel
+            FlockworkPModel
 
         Analysis classes
         ----------------
@@ -1553,7 +1562,11 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("R", &SIRS::R, "A list containing the number of recovered at time :math:`t`.")
         .def_readwrite("t_simulation", &SIRS::t_simulation, "Absolute run time of the simulation.");
 
-    py::class_<EdgeActivityModel>(m, "EdgeActivityModel", "Base class for the simulation of an edge activity model. Pass this to :func:`tacoma.api.gillespie_epidemics`")
+    py::class_<EdgeActivityModel>(m, "EdgeActivityModel",
+            R"pbdoc(
+                Base class for the simulation of a simple Flockwork-P model. Pass this to :func:`tacoma.api.gillespie_epidemics` or
+                :func:`tacoma.api.markov_epidemics`.
+            )pbdoc")
         .def(py::init<size_t, double, double, double, bool, size_t, bool>(),
              py::arg("N"),
              py::arg("rho"),
@@ -1592,7 +1605,11 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("N", &EdgeActivityModel::N, 
                     R"pbdoc(Number of nodes.)pbdoc");
 
-    py::class_<FlockworkPModel>(m, "FlockworkPModel", "Base class for the simulation of a simple Flockwork-P model. Pass this to :func:`tacoma.api.gillespie_epidemics`")
+    py::class_<FlockworkPModel>(m, "FlockworkPModel", 
+            R"pbdoc(
+                Base class for the simulation of a simple Flockwork-P model. Pass this to :func:`tacoma.api.gillespie_epidemics` or
+                :func:`tacoma.api.markov_epidemics`.
+            )pbdoc")
         .def(py::init< vector < pair < size_t, size_t > > , size_t, double, double, double, bool, size_t, bool>(),
              py::arg("E"),
              py::arg("N"),

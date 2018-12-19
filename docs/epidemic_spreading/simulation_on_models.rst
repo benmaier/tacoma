@@ -6,7 +6,7 @@ in a simulation there's many events which then have to be passed
 to the Gillespie simulation function. This is rather heavy on memory.
 Instead, one can simulate directly on the model without saving the
 generated temporal network. So far, this is implemented for the
-edge activity model only. It works as follows.
+edge activity model and the Flockwork-P model only. It works as follows.
 
 First, you create an instance of the model, e.g. 
 :class:`_tacoma.EdgeActivityModel` as
@@ -48,4 +48,16 @@ started and plotted as
 
     pl.step(SIS.time, SIS.I)
 
+
+The corresponding Flockwork-P model would be created as
+
+.. code:: python
+    
+    FW = tc.FlockworkPModel(
+                          E  # initial edge list (list of tuple of ints)
+                          N, # number of nodes
+                          gamma, # rate with which anything happens
+                          P,     # probability to reconnect
+                          save_temporal_network=False
+                          )
 

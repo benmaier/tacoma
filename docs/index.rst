@@ -42,6 +42,7 @@ Temporal contact modeling and analysis
 
    epidemic_spreading/gillespie
    epidemic_spreading/epidemic_classes
+   epidemic_spreading/markov
    epidemic_spreading/simulation_on_models
 
 .. toctree::
