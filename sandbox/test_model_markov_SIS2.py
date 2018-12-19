@@ -6,7 +6,7 @@ import numpy as np
 
 import _tacoma as _tc
 
-N = 100
+N = 1000
 
 t_run_total = 10000/N
 recovery_rate = 1.0
@@ -15,11 +15,10 @@ seed = 12
 
 R0s = [0.5,1.0,1.2,1.5,2,4,6]
 
-for k in range(1,8,3):
-    pl.figure()
-    pl.title('$k={0:d}$'.format(k))
-    for omega in np.logspace(-2,0,4,base=N):
+for k in [1]:
+    for omega in np.logspace(-2,-1,2,base=N):
         pl.figure()
+        pl.title('$k={0:d}, \omega={1:4.2f}$'.format(k, omega))
         curve_1 = []
         curve_2 = []
         for R0 in R0s:
@@ -45,7 +44,7 @@ for k in range(1,8,3):
             t = np.array(SIS.time)
             I = np.array(SIS.I)
 
-            this_pl, = pl.plot(t,I,'s',ms=2,alpha=0.5,mfc='None')
+            this_pl, = pl.plot(t,I,'-s',ms=2,alpha=0.5,mfc='None')
             mean_I_1 = tc.time_average(t, I, tmax=t_run_total)
 
             AM = _tc.EdgeActivityModel(N,
@@ -54,7 +53,6 @@ for k in range(1,8,3):
                                    verbose =False,
                                   )
 
-            print("generated new AM")
 
             SIS = _tc.MARKOV_SIS(N,
                           t_run_total,
@@ -62,9 +60,7 @@ for k in range(1,8,3):
                           recovery_rate,
                           minimum_I=0.01,
                           number_of_initially_infected=N,
-                          sampling_dt=1)
-
-            print("starting integration")
+                          )
 
             _tc.markov_SIS_on_EdgeActivityModel(AM,SIS,max_dt=0.001,verbose=False)
 

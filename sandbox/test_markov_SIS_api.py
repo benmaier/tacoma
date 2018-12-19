@@ -6,14 +6,14 @@ import _tacoma as _tc
 import time
 
 
-N = 100
-P = [ 0.5 ] 
+N = 200
+P = [ 0.05 ] 
 rewiring_rate = [ (0.0,1.0) ]
 t_run_total = 500.0
-tmax = 1000.0
+tmax = 2000.0
 seed = 7925
-infection_rate = 0.1
-recovery_rate = 0.1
+infection_rate = 1.0
+recovery_rate = 0.03
 
 E = flockwork_P_equilibrium_configuration(N,P[0])
 
