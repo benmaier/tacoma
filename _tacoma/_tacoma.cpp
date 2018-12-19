@@ -51,6 +51,8 @@
 #include "SIS.h"
 #include "QS_SIS.h"
 #include "eSIS.h"
+#include "Markov_SIS.h"
+#include "markov_dynamics.h"
 #include "SIS_node_based.h"
 #include "SIR.h"
 #include "SI.h"
@@ -664,6 +666,21 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("SIS"),
           py::arg("verbose") = false);
 
+    m.def("markov_SIS_on_edge_lists", &markov_on_edge_lists<MARKOV_SIS>,
+          "Perform a Markov SIS simulation on edge lists.",
+          py::arg("edge_lists"),
+          py::arg("MARKOV_SIS"),
+          py::arg("dt"),
+          py::arg("is_static") = false,
+          py::arg("verbose") = false);
+
+    m.def("markov_SIS_on_edge_changes", &markov_on_edge_changes<MARKOV_SIS>,
+          "Perform a Markov SIS simulation on edge changes.",
+          py::arg("edge_changes"),
+          py::arg("MARKOV_SIS"),
+          py::arg("dt"),
+          py::arg("verbose") = false);
+
     m.def("gillespie_QS_SIS_on_edge_lists", &gillespie_on_edge_lists<QS_SIS>,
           "Perform a quasi-stationary Gillespie SIS simulation on edge lists.",
           py::arg("edge_lists"),
@@ -1122,6 +1139,56 @@ PYBIND11_MODULE(_tacoma, m)
                      configurations.
              )pbdoc"
             );
+
+    py::class_<MARKOV_SIS>(m, "MARKOV_SIS", "Base class for the markov integration of an SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.markov_SIS` to simulate and retrieve the simulation results.")
+        .def(py::init<size_t, double, double, double, double, size_t, size_t, double, size_t, bool>(),
+             py::arg("N"),
+             py::arg("t_simulation"),
+             py::arg("infection_rate"),
+             py::arg("recovery_rate"),
+             py::arg("minimum_I"),
+             py::arg("number_of_initially_infected") = 1,
+             py::arg("number_of_initially_vaccinated") = 0,
+             py::arg("sampling_dt") = 0.0,
+             py::arg("seed") = 0,
+             py::arg("verbose") = false,
+             R"pbdoc(
+                    Parameters
+                    ----------
+                    N : int
+                        Number of nodes in the temporal network.
+                    t_simulation : float
+                        Maximum time for the simulation to run. Can possibly be greater than the maximum time of the temporal
+                        network in which case the temporal network is looped.
+                    infection_rate : float
+                        Infection rate per :math:`SI`-link (expected number of reaction events :math:`SI\rightarrow II`
+                        for a single :math:`SI`-link per dimension of time).
+                    recovery_rate : float
+                        Recovery rate per infected (expected number of reaction events :math:`I\rightarrow S`
+                        for a single infected node per dimension of time).
+                    minimum_I : float
+                        If the total sum of infection probability over all nodes is below this threshold, the disease
+                        is considered to be died out.
+                    number_of_initially_infected : int, default = 1
+                        Number of nodes which will be in the infected compartment at :math:`t = t_0`. Note that the default
+                        value 1 is not an ideal initial value as fluctuations may lead to a quick end of the simulation
+                        skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
+                    number_of_initially_vaccinated : int, default = 0
+                        Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    sampling_dt : float, default = 0.0
+                        If this is ``>0.0``, save observables roughly every sampling_dt instead of on every change.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc")
+        .def_readwrite("time", &MARKOV_SIS::time, "A list containing the time points at which one or more of the observables changed.")
+        .def_readwrite("R0", &MARKOV_SIS::R0, R"pbdoc(
+                   A list containing the basic reproduction number defined as :math:`R_0(t) = \eta\left\langle k \right\rangle(t) / \rho`
+                   where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
+                   )pbdoc")
+        .def_readwrite("I", &MARKOV_SIS::I, "A list containing accumulated probability to be infected at time :math:`t`.")
+        .def_readwrite("t_simulation", &MARKOV_SIS::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<SIS>(m, "SIS", "Base class for the simulation of an SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIS` to simulate and retrieve the simulation results.")
         .def(py::init<size_t, double, double, double, size_t, size_t, bool, double, size_t, bool>(),
