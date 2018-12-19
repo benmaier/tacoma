@@ -61,10 +61,6 @@ void MARKOV_SIS::step(
     double P_INF = dt * infection_rate;
     double P_REC = dt * recovery_rate;
 
-    //cout << "P_INF = " << P_INF << endl;
-    //cout << "P_REC = " << P_REC << endl;
-
-
     current_I = 0.0;
     for(auto const &neighbors: *G)
     {
@@ -85,6 +81,11 @@ void MARKOV_SIS::step(
                          + _p * (1 - P_REC);
 
             //cout << "node_status : " << stat << endl;
+            if (this_new_p < 0.0)
+                this_new_p = 0.0;
+            else if (this_new_p > 1.0)
+                this_new_p = 1.0;
+            
         }
 
         new_p->push_back(this_new_p);
@@ -110,7 +111,7 @@ void MARKOV_SIS::update_observables(
 {
     if (sampling_dt > 0.0)
     {
-        if ((t >= next_sampling_time) and (time.back()!=t))
+        if ((t >= next_sampling_time))
         {
             double _R0 = infection_rate * mean_degree / recovery_rate;
             R0.push_back(_R0);

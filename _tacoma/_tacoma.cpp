@@ -53,6 +53,7 @@
 #include "eSIS.h"
 #include "Markov_SIS.h"
 #include "markov_dynamics.h"
+#include "model_markov.h"
 #include "SIS_node_based.h"
 #include "SIR.h"
 #include "SI.h"
@@ -795,7 +796,7 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("verbose") = false);
 
     m.def("gillespie_SI_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SI>,
-          "Perform a Gillespie SIRS simulation on the edge activity model.",
+          "Perform a Gillespie SI simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SI"),
           py::arg("reset_simulation_objects") = true,
@@ -805,6 +806,14 @@ PYBIND11_MODULE(_tacoma, m)
           "Perform a node-based Gillespie SIS simulation on the edge activity model.",
           py::arg("activity_model"),
           py::arg("SI"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("markov_SIS_on_EdgeActivityModel", &markov_on_model<EdgeActivityModel,MARKOV_SIS>,
+          "Perform a mixed Markov-Gillespie SIS simulation on the edge activity model.",
+          py::arg("activity_model"),
+          py::arg("MARKOV_SIS"),
+          py::arg("max_dt"),
           py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 

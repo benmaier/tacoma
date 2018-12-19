@@ -63,11 +63,6 @@ void
     // reset the simulation object
     this_markov_object.reset();
 
-    // deal with random numbers
-    mt19937_64 &generator = this_markov_object.generator;
-    exponential_distribution<double> randexp(1.0);
-    uniform_real_distribution<double> randuni(0.0,1.0);
-
     // initialize time variables
     double t0 = edg_lst.t[0];
     double tmax = edg_lst.tmax;
@@ -83,17 +78,10 @@ void
     size_t N = edg_lst.N;
     vector < set < size_t > > G(N);
 
-    // inititalize rate containers
-    vector < double > rates;
-    double Lambda;
-
     // create iterators
     auto next_edges = (edg_lst.edges).end();
     auto next_time = (edg_lst.t).end();
     long loop_count = -1;
-
-    // draw time to first event
-    double tau = randexp(generator);
 
     if (verbose)
     {
@@ -194,8 +182,8 @@ void
         if ((t-t0+dt_to_next_change < t_simulation) and (not this_markov_object.simulation_ended()))
         {
             this_markov_object.step(t, dt_to_next_change);
-            t += dt_to_next_change;
         }
+        t += dt_to_next_change;
 
         if (verbose)
         {
@@ -224,11 +212,6 @@ void
     // reset the simulation object
     this_markov_object.reset();
 
-    // deal with random numbers
-    mt19937_64 &generator = this_markov_object.generator;
-    exponential_distribution<double> randexp(1.0);
-    uniform_real_distribution<double> randuni(0.0,1.0);
-
     // initialize time variables
     double t0 = edg_chg.t0;
     double tmax = edg_chg.tmax;
@@ -244,18 +227,11 @@ void
     size_t N = edg_chg.N;
     vector < set < size_t > > G(N);
 
-    // inititalize rate containers
-    vector < double > rates;
-    double Lambda;
-
     // create iterators
     auto next_edges_in = (edg_chg.edges_in).end();
     auto next_edges_out = (edg_chg.edges_out).end();
     auto next_time = (edg_chg.t).end();
     long loop_count = -1;
-
-    // draw time to first event
-    double tau = randexp(generator);
 
     while ( (t-t0 < t_simulation) and (not this_markov_object.simulation_ended()) )
     {
@@ -376,8 +352,8 @@ void
         if ((t-t0+dt_to_next_change < t_simulation) and (not this_markov_object.simulation_ended()))
         {
             this_markov_object.step(t, dt_to_next_change);
-            t += dt_to_next_change;
         }
+        t += dt_to_next_change;
     }
 }
 
