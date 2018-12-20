@@ -6,19 +6,21 @@ import numpy as np
 
 import _tacoma as _tc
 
-N = 1000
+N = 2000
 
-t_run_total = 10000/N
+t_run_total = 100000/N
 recovery_rate = 1.0
 
 seed = 12
 
 R0s = [0.5,1.0,1.2,1.5,2,4,6]
 
-for k in [1]:
+count = 0
+
+for k in [10]:
     for omega in np.logspace(-2,-1,2,base=N):
-        pl.figure()
-        pl.title('$k={0:d}, \omega={1:4.2f}$'.format(k, omega))
+        fig = pl.figure()
+        pl.title('$k={0:d}, \omega={1:4.2e}$'.format(k, omega))
         curve_1 = []
         curve_2 = []
         for R0 in R0s:
@@ -62,7 +64,7 @@ for k in [1]:
                           number_of_initially_infected=N,
                           )
 
-            _tc.markov_SIS_on_EdgeActivityModel(AM,SIS,max_dt=0.001,verbose=False)
+            _tc.markov_SIS_on_EdgeActivityModel(AM,SIS,max_dt=0.01,verbose=False)
 
             t = np.array(SIS.time)
             I = np.array(SIS.I)
@@ -75,6 +77,8 @@ for k in [1]:
 
         #this_pl, = pl.plot(R0s,curve_1,'s',ms=2,alpha=0.5,mfc='None')
         #this_pl, = pl.plot(R0s,curve_2,'-',lw=1,alpha=0.5,c=this_pl.get_color())
+        fig.savefig('markov_{0:d}.png'.format(count),dpi=150)
+        count += 1
 
 pl.show()
 
