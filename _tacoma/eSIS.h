@@ -178,7 +178,7 @@ class eSIS
 
         bool simulation_ended() 
         {
-            return (infected.size() == 0);
+            return false;
         };
 
         void get_rates_and_Lambda(vector < double > &rates,
