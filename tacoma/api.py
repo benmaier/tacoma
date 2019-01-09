@@ -20,6 +20,9 @@ edge_changes_with_histograms = _tc.edge_changes_with_histograms
 edge_trajectories = _tc.edge_trajectories
 edge_trajectory_entry = _tc.edge_trajectory_entry
 
+from tacoma.network_formats import adjacency_matrices
+from tacoma.network_formats import sparse_adjacency_matrices
+
 edge_weight = _tc.edge_weight
 social_trajectory_entry = _tc.social_trajectory_entry
 

@@ -88,8 +88,6 @@ def simulate_quasi_stationary_SIS_on_model(model, qs_sis, verbose=False):
     return qs_sis.get_infection_observables()
         
 
-import sys
-
 def simulate_quasi_stationary_SIS_on_static_network(network, qs_sis, verbose=False):
 
     t = float(qs_sis.last_active_time)
@@ -117,6 +115,24 @@ def simulate_quasi_stationary_SIS_on_static_network(network, qs_sis, verbose=Fal
             break
 
     return qs_sis.get_infection_observables()
+
+def get_SIS_critical_infection_rate(tn, recovery_rate):
+
+    pass
+
+def get_SIS_critical_recovery_rate(tn, infection_rate):
+    pass
+
+"""
+def get_SIS_epidemic_threshold(tn, infection_rate=None, recovery_rate=None):
+
+    if infection_rate is None and recovery_rate is None:
+        raise ValueError('Please provide either an infection rate (to find the critical recovery rate) (x)or a recovery rate (to find the critical infection rate).')
+    elif infection_rate is not None and recovery_rate is not None:
+        raise ValueError('Please provide either an infection rate (to find the critical recovery rate) (x)or a recovery rate (to find the critical infection rate), not both.')
+"""
+
+    
 
 if __name__ == "__main__":
 

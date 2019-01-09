@@ -220,6 +220,30 @@ The network described in the figure above would be recorded as
                          7 : 'Harriett',
                        }
 
+List of adjacency matrices
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For some cases it might be useful to actually have matrices in memory (e.g. to
+compute the epidemic threshold in SIS-models). ``tacoma`` offers the possibility to 
+convert instances of :class:`_tacoma.edge_lists` and :class:`_tacoma.edge_changes` 
+to :class:`tacoma.network_formats.sparse_adjacency_matrices` or 
+:class:`tacoma.network_formats.adjacency_matrices`.
+These classes have the same attributes as :class:`_tacoma.edge_lists`, but
+instead of the attribute ``edges`` they have the attribute ``adjacency_matrices``.
+
+Convert a temporal network ``tn`` as follows
+
+.. code:: python
+
+    A = tc.adjacency_matrices(tn)
+    A = tc.sparse_adjacency_matrices(tn)
+
+Note that you can pass any desired ``scipy.sparse``-matrix class and ``dtype``
+to :class:`tacoma.network_formats.sparse_adjacency_matrices` for matrix construction.
+
+    
+
+
 Which class to use
 ~~~~~~~~~~~~~~~~~~
 

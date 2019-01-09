@@ -752,4 +752,3 @@ def fit_contact_coverage(N, time, contact_coverage, intervals_to_discard_for_fit
 
     return fit, popt, np.sqrt(np.diag(pcov))
 
-
