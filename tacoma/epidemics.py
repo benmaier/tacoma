@@ -9,6 +9,12 @@ import tacoma as tc
 
 from _tacoma import gillespie_QS_SIS_on_EdgeActivityModel, gillespie_QS_SIS_on_edge_lists
 
+from scipy.sparse import csr_matrix
+from scipy.sparse import eye
+from scipy.linalg import expm
+from scipy.sparse.linalg import eigs
+from scipy.optimize import minimize
+
 
 def simulate_and_measure_i_inf(temporal_network_or_model,epidemic_object,t_equilibrate,is_static=False,verbose=False):
     """Get the equilibrium ratio of infected. 
@@ -116,12 +122,37 @@ def simulate_quasi_stationary_SIS_on_static_network(network, qs_sis, verbose=Fal
 
     return qs_sis.get_infection_observables()
 
-def get_SIS_critical_infection_rate(tn, recovery_rate):
+def get_SIS_critical_infection_rate(tn, recovery_rate, method='Powell', arpackmaxiter=10000, arpacktol=1e-9):
 
-    pass
+    res = minimize(lambda eta: (1-get_SIS_max_eigenvalue(tn, 
+                                                         eta[0], 
+                                                         recovery_rate,
+                                                         maxiter=arpackmaxiter,
+                                                         tol=arpacktol,
+                                                         ))**2, 
+                   [1], 
+                   method=method
+                   )
+    res = res.x
 
-def get_SIS_critical_recovery_rate(tn, infection_rate):
-    pass
+    return res, get_SIS_max_eigenvalue(tn, res, recovery_rate)
+
+
+def get_SIS_critical_recovery_rate(tn, infection_rate, method='Powell', arpackmaxiter=10000, arpacktol=1e-9):
+
+    res = minimize(lambda rho: (1-get_SIS_max_eigenvalue(tn, 
+                                                         infection_rate,
+                                                         rho[0], 
+                                                         maxiter=arpackmaxiter,
+                                                         tol=arpacktol,
+                                                         ))**2, 
+                   [1], 
+                   method=method
+                   )
+    res = res.x
+
+    return res, get_SIS_max_eigenvalue(tn, infection_rate, res)
+
 
 """
 def get_SIS_epidemic_threshold(tn, infection_rate=None, recovery_rate=None):
@@ -131,6 +162,40 @@ def get_SIS_epidemic_threshold(tn, infection_rate=None, recovery_rate=None):
     elif infection_rate is not None and recovery_rate is not None:
         raise ValueError('Please provide either an infection rate (to find the critical recovery rate) (x)or a recovery rate (to find the critical infection rate), not both.')
 """
+def get_SIS_max_eigenvalue(tn, infection_rate, recovery_rate, maxiter=10000, tol=1e-9):
+
+    if type(tn) != tc.sparse_adjacency_matrices:
+        raise ValueError('Please provide an instance of tacoma.sparse_adjacency_matrices')
+
+    I = eye(tn.N, format=tn.adjacency_matrices[0].format)
+    this_matrix = I.copy()
+    rho = recovery_rate
+    eta = infection_rate
+
+    i = 0
+
+    for A in tn.adjacency_matrices:
+        t0 = tn.t[i]
+        if i+1 < len(tn.t):
+            t1 = tn.t[i+1]
+        else:
+            t1 = tn.tmax
+        dt = t1 - t0
+
+        this_matrix = expm((eta*A - rho*I)*dt).dot(this_matrix)
+
+    T = this_matrix.tocsc()
+
+    mus, _ = eigs(T, k=2, which='LR', maxiter=maxiter, tol=tol)
+
+    mu_max = max(np.real(mus))
+
+    return mu_max
+
+
+
+
+
 
     
 
