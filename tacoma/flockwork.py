@@ -468,7 +468,7 @@ def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flock
     return mean_distro
 
 
-def flockwork_P(N, P, t_run_total, initial_edges = None, seed = 0, return_edge_changes_with_histograms=False):
+def flockwork_P(N, P, t_run_total, rewiring_rate = 1.0, initial_edges = None, seed = 0, return_edge_changes_with_histograms=False):
     r"""
     Simulate a flockwork P-model where the disconnection rate is 
     :math:`\gamma=1` and reconnection probability is :math:`P`.
@@ -484,6 +484,8 @@ def flockwork_P(N, P, t_run_total, initial_edges = None, seed = 0, return_edge_c
         The reconnection probability. Has to be :math:`0\leq P\leq 1`
     t_run_total : float
         The total run time in units of :math:`\gamma^{-1}=1`.
+    rewiring_rate : float
+        Event rate :math:`\gamma` per node per unit of time.
     initial_edges : list of tuple of int
         The initial state of the network as an edge list.
         If `None` is provided, the initial state will be taken
@@ -508,7 +510,7 @@ def flockwork_P(N, P, t_run_total, initial_edges = None, seed = 0, return_edge_c
         initial_edges = flockwork_P_equilibrium_configuration(N, P)
 
     Ps = [ P ]
-    rewiring_rate = [ (0.0, 1.0) ]
+    rewiring_rate = [ (0.0, rewiring_rate) ]
     tmax = t_run_total
 
     fw = flockwork_P_varying_rates(

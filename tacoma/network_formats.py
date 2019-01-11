@@ -6,7 +6,7 @@ This module provides additional temporal network classes only available in the P
 from copy import deepcopy
 import numpy as np
 
-from scipy.sparse import csr_matrix
+from scipy.sparse import csc_matrix
 from scipy.sparse import coo_matrix
 import scipy
 
@@ -26,7 +26,7 @@ class sparse_adjacency_matrices():
     ----------
     temporal_network : :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         An instance of a temporal network.
-    sparse_generator : instance of ``scipy.sparse`` matrix, default : ``scipy.sparse.csr_matrix``
+    sparse_generator : instance of ``scipy.sparse`` matrix, default : ``scipy.sparse.csc_matrix``
         The sparse matrix class with which to construct all adjacency matrices.
     dtype : numpy.dtype, default=float
         Data type of the matrix entries.
@@ -34,7 +34,7 @@ class sparse_adjacency_matrices():
 
 
 
-    def __init__(self,temporal_network,sparse_generator=csr_matrix,dtype=float):
+    def __init__(self,temporal_network,sparse_generator=csc_matrix,dtype=float):
 
 
         if type(temporal_network) in [ec, ec_h]:
@@ -61,11 +61,12 @@ class sparse_adjacency_matrices():
 
         for this_el in iter(edges):
             coords = np.array(this_el,dtype=int)
-            data = np.ones((coords.shape[0],),dtype=float)
             i, j = coords[:,0], coords[:,1]
+            iall = np.concatenate((i,j))
+            jall = np.concatenate((j,i)) 
+            data = np.ones_like(iall,dtype=float)
 
-            A = self.sparse_generator((data, (i, j)), shape=(self.N, self.N))
-            A += A.T
+            A = self.sparse_generator((data, (iall, jall)), shape=(self.N, self.N))
 
             self.adjacency_matrices.append(A)
 
@@ -108,10 +109,12 @@ class adjacency_matrices():
 
         for this_el in iter(edges):
             coords = np.array(this_el,dtype=int)
-            data = np.ones((coords.shape[0],),dtype=self.dtype)
             i, j = coords[:,0], coords[:,1]
-            A = coo_matrix((data, (i, j)), shape=(self.N, self.N))
-            A += A.T
+            iall = np.concatenate((i,j))
+            jall = np.concatenate((j,i)) 
+            data = np.ones_like(iall,dtype=float)
+
+            A = coo_matrix((data, (iall, jall)), shape=(self.N, self.N))
 
             self.adjacency_matrices.append(A.toarray())
 
