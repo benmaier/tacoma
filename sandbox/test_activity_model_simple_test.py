@@ -29,11 +29,11 @@ print(tc.verify(tn))
 t, k = tc.mean_degree(temporal_network)
 #print(t)
 
-C = tc.number_of_discovered_edges(temporal_network)
-#print(t, C)
+tC, C = tc.contact_coverage(temporal_network)
+print(tC, C)
 
 fig, ax = pl.subplots(1,2)
 
 ax[0].plot(t,k)
-#ax[1].plot(t,C)
+ax[1].plot(tC,C)
 pl.show()

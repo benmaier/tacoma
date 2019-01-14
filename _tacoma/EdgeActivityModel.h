@@ -59,6 +59,7 @@ class EdgeActivityModel
         size_t seed;
         bool verbose;
         bool save_temporal_network;
+        bool use_rejection_sampling_of_non_neighbor;
 
         vector < set < size_t > > G;
 
@@ -72,6 +73,7 @@ class EdgeActivityModel
             double _rho,
             double _omega,
             double _t0 = 0.0, 
+            bool _use_rejection_sampling_of_non_neighbor = true,
             bool _save_temporal_network = false,
             size_t _seed = 0,
             bool _verbose = false
@@ -87,6 +89,7 @@ class EdgeActivityModel
             omega_minus = omega / rho;
             omega_plus = omega / (1.0 - rho);
 
+            use_rejection_sampling_of_non_neighbor = _use_rejection_sampling_of_non_neighbor;
 
             generator = new mt19937_64;
             randuni = uniform_real_distribution < double > (0.0, 1.0);
@@ -178,7 +181,6 @@ class EdgeActivityModel
                 generator->seed(seed);
 
             G = get_random_graph(N, rho, *generator);
-
 
             if (save_temporal_network)
                 edgelist_from_graph(edg_chg.edges_initial, G);

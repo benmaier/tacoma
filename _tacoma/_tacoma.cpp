@@ -794,6 +794,20 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
+    m.def("simulate_EdgeActivityModel", &gillespie_model_simulation<EdgeActivityModel>,
+          "Perform a Gillespie simulation of the edge activity model.",
+          py::arg("model"),
+          py::arg("t_simulation"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("simulate_FlockworkPModel", &gillespie_model_simulation<FlockworkPModel>,
+          "Perform a Gillespie simulation of the Flockwork P-model.",
+          py::arg("model"),
+          py::arg("t_simulation"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
     m.def("gillespie_coverage_SIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,coverage_SIS>,
           "Perform a Gillespie coverage SIS simulation on the edge activity model.",
           py::arg("edge_activity_model"),
@@ -817,35 +831,35 @@ PYBIND11_MODULE(_tacoma, m)
 
     m.def("gillespie_SIR_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SIR>,
           "Perform a Gillespie SIR simulation on the edge activity model.",
-          py::arg("activity_model"),
+          py::arg("edge_activity_model"),
           py::arg("SIR"),
           py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
     m.def("gillespie_SIRS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SIRS>,
           "Perform a Gillespie SIRS simulation on the edge activity model.",
-          py::arg("activity_model"),
+          py::arg("edge_activity_model"),
           py::arg("SIRS"),
           py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
     m.def("gillespie_SI_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SI>,
           "Perform a Gillespie SI simulation on the edge activity model.",
-          py::arg("activity_model"),
+          py::arg("edge_activity_model"),
           py::arg("SI"),
           py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
     m.def("gillespie_node_based_SIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,node_based_SIS>,
           "Perform a node-based Gillespie SIS simulation on the edge activity model.",
-          py::arg("activity_model"),
+          py::arg("edge_activity_model"),
           py::arg("SI"),
           py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
     m.def("markov_SIS_on_EdgeActivityModel", &markov_on_model<EdgeActivityModel,MARKOV_SIS>,
           "Perform a mixed Markov-Gillespie SIS simulation on the edge activity model.",
-          py::arg("activity_model"),
+          py::arg("edge_activity_model"),
           py::arg("MARKOV_SIS"),
           py::arg("max_dt"),
           py::arg("reset_simulation_objects") = true,
@@ -1653,11 +1667,12 @@ PYBIND11_MODULE(_tacoma, m)
                 Base class for the simulation of a simple Flockwork-P model. Pass this to :func:`tacoma.api.gillespie_epidemics` or
                 :func:`tacoma.api.markov_epidemics`.
             )pbdoc")
-        .def(py::init<size_t, double, double, double, bool, size_t, bool>(),
+        .def(py::init<size_t, double, double, double, bool, bool, size_t, bool>(),
              py::arg("N"),
              py::arg("rho"),
              py::arg("omega"),
              py::arg("t0") = 0.0,
+             py::arg("use_rejection_sampling_of_non_neighbor") = true,
              py::arg("save_temporal_network") = false,
              py::arg("seed") = 0,
              py::arg("verbose") = false,
@@ -1673,6 +1688,11 @@ PYBIND11_MODULE(_tacoma, m)
                         :math:`\omega^{-1}=(\omega^-)^{-1} + (\omega^+)^{-1}`.
                     t0 : float, default = 0.0
                         initial time
+                    use_rejection_sampling_of_non_neighbor : bool, default: True
+                        If this is `True`, the edges to be turned on are sampled 
+                        by drawing random edges until one is found which is turned
+                        off. If `False`, there's a more sophisticated but probably
+                        slower method (use this option for dense networks).
                     save_temporal_network : bool, default: False
                         If this is `True`, the changes are saved in an instance of 
                         :func:`_tacoma.edge_changes` (in the attribute `edge_changes`.

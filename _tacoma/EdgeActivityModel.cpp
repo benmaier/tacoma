@@ -99,8 +99,11 @@ void EdgeActivityModel::make_event(
 
         k[reacting_node]--;
         k[reacting_neighbor]--;
-        complementary_k[reacting_node]++;
-        complementary_k[reacting_neighbor]++;
+        if (not (use_rejection_sampling_of_non_neighbor))
+        {
+            complementary_k[reacting_node]++;
+            complementary_k[reacting_neighbor]++;
+        }
 
         G[reacting_node].erase(reacting_neighbor);
         G[reacting_neighbor].erase(reacting_node);
@@ -109,50 +112,68 @@ void EdgeActivityModel::make_event(
     {
         //find a turned off edge and turn it on.
         
-        // find a reacting node (probability proportional to degree)
-        size_t reacting_node = arg_choose_from_vector(complementary_k, *generator, randuni);
-        set < size_t > &neighs =  G[reacting_node];
+        size_t reacting_node;
+        size_t reacting_neighbor;
 
-        if (verbose)
+        if (use_rejection_sampling_of_non_neighbor)
         {
-            cout << "found node " << reacting_node << " with complementary degree " << complementary_k[reacting_node] << endl;
-            cout << "neighs = ";
-            for(auto const &neigh : neighs)
-                cout << neigh << " ";
-            cout << endl;
-            cout << "inserting temporary self-link to avoid picking it" << endl;
+
+            uniform_int_distribution < size_t > random_node(0,N-1);
+            uniform_int_distribution < size_t > random_neighbor(0,N-2);
+            do
+            {
+                reacting_node = random_node(*generator);
+                reacting_neighbor = random_neighbor(*generator);
+                if (reacting_neighbor >= reacting_node)
+                    reacting_neighbor++;
+            } while (G[reacting_node].find(reacting_neighbor) != G[reacting_node].end());
         }
-
-        neighs.insert(reacting_node);
-
-
-        // find a random non-neighbor index of this node
-        uniform_int_distribution < size_t > random_neighbor(0,complementary_k[reacting_node]-1);
-        size_t reacting_neighbor = random_neighbor(*generator);
-        if (verbose)
-            cout << "   current reacting non-neighbor candidate = " << reacting_neighbor << endl;
-
-        // find an index of a random non-neighbor
-        auto it_neighbor = neighs.begin();
-
-        // iterate through neighbors
-        while ( (it_neighbor != neighs.end()) and 
-                (*it_neighbor <= reacting_neighbor)
-              )
+        else
         {
+            // find a reacting node (probability proportional to degree)
+            reacting_node = arg_choose_from_vector(complementary_k, *generator, randuni);
+            set < size_t > &neighs = G[reacting_node];
+
             if (verbose)
             {
-                cout << "   current neighbor = " << *it_neighbor << endl;
-                cout << "   current reacting non-neighbor candidate = " << reacting_neighbor << endl;
+                cout << "found node " << reacting_node << " with complementary degree " << complementary_k[reacting_node] << endl;
+                cout << "neighs = ";
+                for(auto const &neigh : neighs)
+                    cout << neigh << " ";
+                cout << endl;
+                cout << "inserting temporary self-link to avoid picking it" << endl;
             }
-            // while the index of the non-neighbor is larger than the index of the current_neighbor,
-            // increase the index of the non-neighbor by one and look at the next neighbor
-            reacting_neighbor++;
-            ++it_neighbor;
 
+            neighs.insert(reacting_node);
+
+            // find a random non-neighbor index of this node
+            uniform_int_distribution < size_t > random_neighbor(0,complementary_k[reacting_node]-1);
+            reacting_neighbor = random_neighbor(*generator);
+            if (verbose)
+                cout << "   current reacting non-neighbor candidate = " << reacting_neighbor << endl;
+
+            // find an index of a random non-neighbor
+            auto it_neighbor = neighs.begin();
+
+            // iterate through neighbors
+            while ( (it_neighbor != neighs.end()) and 
+                    (*it_neighbor <= reacting_neighbor)
+                  )
+            {
+                if (verbose)
+                {
+                    cout << "   current neighbor = " << *it_neighbor << endl;
+                    cout << "   current reacting non-neighbor candidate = " << reacting_neighbor << endl;
+                }
+                // while the index of the non-neighbor is larger than the index of the current_neighbor,
+                // increase the index of the non-neighbor by one and look at the next neighbor
+                reacting_neighbor++;
+                ++it_neighbor;
+
+            }
+
+            neighs.erase(reacting_node);
         }
-
-        neighs.erase(reacting_node);
 
         if (verbose)
             cout << "found reacting non-neighbor = " << reacting_neighbor << endl;
@@ -165,8 +186,11 @@ void EdgeActivityModel::make_event(
 
         k[reacting_node]++;
         k[reacting_neighbor]++;
-        complementary_k[reacting_node]--;
-        complementary_k[reacting_neighbor]--;
+        if (not (use_rejection_sampling_of_non_neighbor))
+        {
+            complementary_k[reacting_node]--;
+            complementary_k[reacting_neighbor]--;
+        }
 
         G[reacting_node].insert(reacting_neighbor);
         G[reacting_neighbor].insert(reacting_node);
