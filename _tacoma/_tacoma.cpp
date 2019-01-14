@@ -55,6 +55,7 @@
 #include "markov_dynamics.h"
 #include "model_markov.h"
 #include "SIS_node_based.h"
+#include "coverage_SIS.h"
 #include "SIR.h"
 #include "SI.h"
 #include "SIRS.h"
@@ -102,6 +103,8 @@ PYBIND11_MODULE(_tacoma, m)
             SIRS
             node_based_SIS
             eSIS
+            QS_SIS
+            coverage_SIS
 
         Markov integraion models
         ------------------------
@@ -718,6 +721,20 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("eSIS"),
           py::arg("verbose") = false);
 
+    m.def("gillespie_coverage_SIS_on_edge_changes", &gillespie_on_edge_changes<coverage_SIS>,
+          R"pbdoc(Perform a Gillespie coverage-SIS simulation on edge changes.)pbdoc",
+          py::arg("edge_changes"),
+          py::arg("coverage_SIS"),
+          py::arg("verbose") = false);
+
+    m.def("gillespie_coverage_SIS_on_edge_lists", &gillespie_on_edge_lists<coverage_SIS>,
+          R"pbdoc(Perform a Gillespie coverage-SIS simulation on edge lists.)pbdoc",
+          py::arg("edge_lists"),
+          py::arg("coverage_SIS"),
+          py::arg("is_static") = false,
+          py::arg("verbose") = false);
+
+
     m.def("gillespie_node_based_SIS_on_edge_changes", &gillespie_on_edge_changes<node_based_SIS>,
           "Perform a Gillespie SIS simulation on edge changes.",
           py::arg("edge_changes"),
@@ -777,6 +794,13 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
+    m.def("gillespie_coverage_SIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,coverage_SIS>,
+          "Perform a Gillespie coverage SIS simulation on the edge activity model.",
+          py::arg("edge_activity_model"),
+          py::arg("coverage_SIS"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
     m.def("gillespie_QS_SIS_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,QS_SIS>,
           "Perform a quasi-stationary Gillespie SIS simulation on the edge activity model.",
           py::arg("edge_activity_model"),
@@ -831,6 +855,13 @@ PYBIND11_MODULE(_tacoma, m)
           "Perform a Gillespie SIS simulation on the Flockwork P-model.",
           py::arg("model"),
           py::arg("SIS"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_coverage_SIS_on_FlockworkPModel", &gillespie_on_model<FlockworkPModel,coverage_SIS>,
+          "Perform a Gillespie SIS simulation on the Flockwork P-model.",
+          py::arg("model"),
+          py::arg("coverage_SIS"),
           py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
@@ -1315,6 +1346,61 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("SI", &SIS::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
         .def_readwrite("I", &SIS::I, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("t_simulation", &SIS::t_simulation, "Absolute run time of the simulation.");
+
+    py::class_<coverage_SIS>(m, "coverage_SIS", R"pbdoc(Base class for the simulation of an SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIS` to simulate and retrieve the simulation results. This simulation runs until a certain amount of nodes have been infected at least once, which is useful to fifind the epidemic threshold and thus, only the lifetime of the process is measured. If you want to sample the standard observables, set ``sampling_dt>=0.0``.)pbdoc")
+        .def(py::init<size_t, double, double, double, size_t, size_t, double, double, size_t, bool>(),
+             py::arg("N"),
+             py::arg("t_simulation"),
+             py::arg("infection_rate"),
+             py::arg("recovery_rate"),
+             py::arg("number_of_initially_infected") = 1,
+             py::arg("number_of_initially_vaccinated") = 0,
+             py::arg("critical_coverage") = 0.5,
+             py::arg("sampling_dt") = -1.0,
+             py::arg("seed") = 0,
+             py::arg("verbose") = false,
+             R"pbdoc(
+                    Parameters
+                    ----------
+                    N : int
+                        Number of nodes in the temporal network.
+                    t_simulation : float
+                        Maximum time for the simulation to run. Can possibly be greater than the maximum time of the temporal
+                        network in which case the temporal network is looped.
+                    infection_rate : float
+                        Infection rate per :math:`SI`-link (expected number of reaction events :math:`SI\rightarrow II`
+                        for a single :math:`SI`-link per dimension of time).
+                    recovery_rate : float
+                        Recovery rate per infected (expected number of reaction events :math:`I\rightarrow S`
+                        for a single infected node per dimension of time).
+                    number_of_initially_infected : int, default = 1
+                        Number of nodes which will be in the infected compartment at :math:`t = t_0`. Note that the default
+                        value 1 is not an ideal initial value as fluctuations may lead to a quick end of the simulation
+                        skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
+                    number_of_initially_vaccinated : int, default = 0
+                        Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    critical_coverage : float, default = 0.5
+                        The simulation ends if the total number of nodes which were infected at least once exceeds
+                        this ratio.
+                    sampling_dt : float, default = -1.0
+                        If it is negative, do not save any observables but the life time of the process.
+                        If this is ``>0.0``, save observables roughly every sampling_dt instead of on every change.
+                        If it is 0.0, sample at every change.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc")
+        .def_readwrite("time", &coverage_SIS::time, "A list containing the time points at which one or more of the observables changed.")
+        .def_readwrite("lifetime", &coverage_SIS::lifetime, "The lifetime of the process.")
+        .def_readwrite("number_of_events", &coverage_SIS::number_of_events, "The number of events happened during the process.")
+        .def_readwrite("R0", &coverage_SIS::R0, R"pbdoc(
+                   A list containing the basic reproduction number defined as :math:`R_0(t) = \eta\left\langle k \right\rangle(t) / \rho`
+                   where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
+                   )pbdoc")
+        .def_readwrite("SI", &coverage_SIS::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
+        .def_readwrite("I", &coverage_SIS::I, "A list containing the number of infected at time :math:`t`.")
+        .def_readwrite("t_simulation", &coverage_SIS::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<eSIS>(m, "eSIS", R"pbdoc(Base class for the simulation of an :math:`\varepsilon`-SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_epidemics` to simulate and retrieve the simulation results.)pbdoc")
         .def(py::init<size_t, double, double, double, double, size_t, size_t, bool, double, size_t, bool>(),
