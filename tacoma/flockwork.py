@@ -483,10 +483,10 @@ def flockwork_P(N, P, t_run_total, rewiring_rate = 1.0, initial_edges = None, se
     P : float
         The reconnection probability. Has to be :math:`0\leq P\leq 1`
     t_run_total : float
-        The total run time in units of :math:`\gamma^{-1}=1`.
-    rewiring_rate : float
+        The total run time in units of :math:`\gamma^{-1}`.
+    rewiring_rate : float, default : 1.0
         Event rate :math:`\gamma` per node per unit of time.
-    initial_edges : list of tuple of int
+    initial_edges : list of tuple of int, default : None
         The initial state of the network as an edge list.
         If `None` is provided, the initial state will be taken
         from an equilibrium configuration generated with
