@@ -402,3 +402,48 @@ Plot the results as
     - The simulation works on both :class:`_tacoma.edge_lists` and
       :class:`_tacoma.edge_changes`.
 
+coverage-SIS
+------------
+
+This class behaves similar to the SIS dynamics introduced above. However,
+it comes with an additional condition to end the simulation. The coverage
+:math:`\mathcal C(t)` is defined as the ratio of nodes which have been infected
+at least once during simulation. The simulation ends as soon as a critical
+coverage :math:`\mathcal C_c(t)` is reached or the number of infected is zero. 
+This variation of the SIS process
+is usually used to measure the life time of the process as a susceptibility
+parameter to find the epidemic threshold.
+
+.. code:: python
+
+    cSIS = tc.coverage_SIS(
+                   N, #number of nodes
+                   t_simulation, # maximum time of the simulation (set this to a high value)
+                   infection_rate, 
+                   recovery_rate,
+                   number_of_initially_infected = 1, # optional, default: 1
+                   number_of_initially_vaccinated = 0, # optional, default: 0
+                   critical_coverage = 0.75, # optional, default: 0.75
+                   seed = 792, # optional, default: randomly initiated
+                  )
+
+
+The instance of the `coverage_SIS` class is then passed to the corresponding
+Gillespie function :func:`tacoma.api.gillespie_epidemics` for the simulation.
+
+.. code:: python
+
+    tc.gillespie_epidemics(temporal_network, cSIS)
+
+Note that per default, observables are not saved during simulation, since
+this kind of simulation is usually only performed to measure the lifetime
+as a susceptibility parameter. Access the following observables after
+simulation.
+
+- ``coverage_SIS.lifetime`` : The time it took to reach either of the termination
+  conditions
+- ``coverage_SIS.number_of_events`` : The total number of events (infection, recovery)
+  it took to reach either of the termination
+  conditions.
+
+

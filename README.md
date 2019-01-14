@@ -76,7 +76,7 @@ for drawing and drawing is not essential. If you want to use `tacoma.drawing`, p
 
 ## Documentation
 
-The documentation is currently available at http://rocs.hu-berlin.de/~tacoma. It is full of
+The documentation is currently available at http://tacoma.benmaier.org . It is full of
 typos and non-exhaustive but I think the important points are in there.
 
 

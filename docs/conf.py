@@ -30,7 +30,7 @@ class Mock(MagicMock):
 MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'matplotlib.collections',
                 'lmfit', 'networkx', 'community', 
                 'scipy.optimize', 'scipy.stats', 'scipy.special', 'scipy.integrate',
-                'scipy.sparse',
+                'scipy.sparse', 'scipy.sparse.linalg', 'scipy.linalg',
                 'numpy.polynomial', 'numpy.polynomial.polynomial', 'wget',
                 'lmfit',
                ]
