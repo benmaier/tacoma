@@ -247,6 +247,20 @@ void SIS::update_observables(
                 next_sampling_time += sampling_dt;
             } while (next_sampling_time < t);
         }
+        else if (simulation_ended())
+        {
+            double _R0 = infection_rate * mean_degree / recovery_rate;
+            R0.push_back(_R0);
+
+            // compute SI
+            SI.push_back(SI_edges.size());
+
+            // compute I
+            I.push_back(infected.size());
+
+            // push back time
+            time.push_back(t);
+        }
     }
     else
     {
@@ -263,7 +277,5 @@ void SIS::update_observables(
         time.push_back(t);
 
     }
-
-
 }
 
