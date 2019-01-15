@@ -488,11 +488,11 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
         elif type(epidemic_object) == node_based_SIS:
             _tc.gillespie_node_based_SIS_on_FlockworkPModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
         elif type(epidemic_object) == eSIS:
-            _tc.gillespie_eSIS_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
+            _tc.gillespie_eSIS_on_FlockworkPModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
         elif type(epidemic_object) == coverage_SIS:
-            _tc.gillespie_coverage_SIS_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
+            _tc.gillespie_coverage_SIS_on_FlockworkPModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
         elif type(epidemic_object) == cluster_size_SIS:
-            _tc.gillespie_cluster_size_SIS_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
+            _tc.gillespie_cluster_size_SIS_on_FlockworkPModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
         else:
             raise ValueError('Invalid epidemic object type: ' + str(type(epidemic_object)))
     else:
