@@ -30,6 +30,7 @@ ext_modules = [
             '_tacoma/FlockworkPModel.cpp', 
             '_tacoma/slice.cpp', 
             '_tacoma/coverage_SIS.cpp', 
+            '_tacoma/cluster_size_SIS.cpp', 
             '_tacoma/eSIS.cpp', 
             '_tacoma/QS_SIS.cpp', 
             '_tacoma/Markov_SIS.cpp', 

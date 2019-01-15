@@ -35,6 +35,7 @@ eSIS = _tc.eSIS
 EdgeActivityModel = _tc.EdgeActivityModel
 QS_SIS = _tc.QS_SIS
 coverage_SIS = _tc.coverage_SIS
+cluster_size_SIS = _tc.cluster_size_SIS
 FlockworkPModel = _tc.FlockworkPModel
 MARKOV_SIS = _tc.MARKOV_SIS
 
@@ -430,6 +431,8 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
             _tc.gillespie_eSIS_on_edge_changes(temporal_network, epidemic_object, verbose)
         elif type(epidemic_object) == coverage_SIS:
             _tc.gillespie_coverage_SIS_on_edge_changes(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == cluster_size_SIS:
+            _tc.gillespie_cluster_size_SIS_on_edge_changes(temporal_network, epidemic_object, verbose)
         else:
             raise ValueError('Invalid epidemic object type: ' + str(type(epidemic_object)))
     elif type(tn_or_mdl) in [el, el_h]:
@@ -448,6 +451,8 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
             _tc.gillespie_eSIS_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
         elif type(epidemic_object) == coverage_SIS:
             _tc.gillespie_coverage_SIS_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
+        elif type(epidemic_object) == cluster_size_SIS:
+            _tc.gillespie_cluster_size_SIS_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
         else:
             raise ValueError('Invalid epidemic object type: ' + str(type(epidemic_object)))
     elif type(tn_or_mdl) in [EdgeActivityModel]:
@@ -466,6 +471,8 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
             _tc.gillespie_eSIS_on_EdgeActivityModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
         elif type(epidemic_object) == coverage_SIS:
             _tc.gillespie_coverage_SIS_on_EdgeActivityModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
+        elif type(epidemic_object) == cluster_size_SIS:
+            _tc.gillespie_cluster_size_SIS_on_EdgeActivityModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
         else:
             raise ValueError('Invalid epidemic object type: ' + str(type(epidemic_object)))
     elif type(tn_or_mdl) in [FlockworkPModel]:
@@ -484,6 +491,8 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
             _tc.gillespie_eSIS_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
         elif type(epidemic_object) == coverage_SIS:
             _tc.gillespie_coverage_SIS_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == cluster_size_SIS:
+            _tc.gillespie_cluster_size_SIS_on_FlockworkPModel(temporal_network, epidemic_object, verbose)
         else:
             raise ValueError('Invalid epidemic object type: ' + str(type(epidemic_object)))
     else:

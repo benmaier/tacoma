@@ -23,8 +23,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef __COVERAGE_SIS_H__
-#define __COVERAGE_SIS_H__
+#ifndef __CLUSTER_SIZE_SIS_H__
+#define __CLUSTER_SIZE_SIS_H__
 
 #include "Utilities.h"
 #include "ResultClasses.h"
@@ -44,7 +44,7 @@
 
 using namespace std;
 
-class coverage_SIS 
+class cluster_size_SIS 
 {
     public:
         size_t N;
@@ -56,9 +56,10 @@ class coverage_SIS
         size_t seed;
         bool verbose;
         double sampling_dt;
-        size_t critical_coverage;
         double lifetime;
         size_t number_of_events;
+        size_t coverage;
+        size_t cluster_size;
 
 
         mt19937_64 generator;
@@ -69,14 +70,13 @@ class coverage_SIS
         vector < size_t > SI;
         vector < size_t > I;
 
-        coverage_SIS(
+        cluster_size_SIS(
             size_t _N,
             double _t_simulation,
             double _infection_rate,
             double _recovery_rate,
             size_t _number_of_initially_infected = 1,
             size_t _number_of_initially_vaccinated = 0,
-            double _critical_coverage = 0.5,
             double _sampling_dt = 0.0,
             size_t _seed = 0,
             bool _verbose = false
@@ -88,7 +88,6 @@ class coverage_SIS
             recovery_rate = _recovery_rate;
             number_of_initially_vaccinated = _number_of_initially_vaccinated;
             number_of_initially_infected = _number_of_initially_infected;
-            critical_coverage = (size_t) (_critical_coverage * (double) _N);
             verbose = _verbose;
             seed = _seed;
             sampling_dt = _sampling_dt;
@@ -108,6 +107,7 @@ class coverage_SIS
             SI.clear();
             I.clear();
             covered_nodes.clear();
+            initially_infected.clear();
             lifetime = -1;
             number_of_events = 0;
 
@@ -158,6 +158,7 @@ class coverage_SIS
                 node_status[node_ints[node]] = EPI::I;
                 infected.push_back( node_ints[node] );
                 covered_nodes.insert( node_ints[node] );
+                initially_infected.insert( node_ints[node] );
             }
 
             if (verbose)
@@ -174,9 +175,7 @@ class coverage_SIS
 
         bool simulation_ended() 
         {
-            if(verbose)
-                cout << "coverage = " << covered_nodes.size() << "/" << critical_coverage << endl;
-            return ((infected.size() == 0) or (covered_nodes.size() >= critical_coverage));
+            return (initially_infected.size() == 0);
         };
 
         void get_rates_and_Lambda(vector < double > &rates,
@@ -213,6 +212,7 @@ class coverage_SIS
         vector < set < size_t > > * G;
         
         set < size_t > covered_nodes;
+        set < size_t > initially_infected;
 
         double next_sampling_time;
 
