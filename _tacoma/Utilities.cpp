@@ -226,20 +226,20 @@ void get_gillespie_tau_and_event_with_varying_gamma(
     //tau = ( m_log_1mU - S_i + g_i*t_i + t0*beta0 ) / (beta0 + g_i) - t0;
     //
     tau = (m_log_1mU - S_i + g_i * (t_i-t0) ) / (beta0 + g_i);
-    double Lambda = g_i * (tau+(t0-t_i)) + S_i;
 
     if ((t0+tau) == t_iP1)
         i_t++;
 
 
     //================ FIND EVENT ========================
+    // now, find the event (probability p_j = rate_j / total_rate) 
+    double Lambda = g_i;
+
     size_t N = standard_rates.size();
     double a0 = Lambda;
 
-    //get the mean number of events happened per channel
     for(size_t rate=0; rate<N; rate++)
     {
-        standard_rates[rate] *= tau;
         a0 += standard_rates[rate];
     }
 
@@ -295,16 +295,10 @@ void get_gillespie_tau_and_event_with_varying_gamma_for_each_node(
 
     size_t N_nodes = gamma_single_nodes[0].second.size();
 
-    vector < double > S_i_single_nodes( N_nodes, 0.0 );
-
     double next_limit = (t_iP1 - t0) * beta0 + S_iP1;
 
     while (m_log_1mU > next_limit) 
     {
-        //fill the total amount of events happened per node
-        for(size_t node=0; node<N_nodes; ++node)
-            S_i_single_nodes[node] += (t_iP1 - t_i) * gamma_single_nodes[i_t % N_gamma].second[node];
-
         i_t++;
         t_basic = (i_t / N_gamma) * t_max;
 
@@ -332,10 +326,9 @@ void get_gillespie_tau_and_event_with_varying_gamma_for_each_node(
     size_t N = standard_rates.size();
     double a0 = 0.0;
 
-    //get the mean number of events happened per channel
+    //accumulate standard rates
     for(size_t rate=0; rate<N; rate++)
     {
-        standard_rates[rate] *= tau;
         a0 += standard_rates[rate];
     }
 
@@ -343,9 +336,8 @@ void get_gillespie_tau_and_event_with_varying_gamma_for_each_node(
     for(size_t node=0; node<N_nodes; ++node)
     {
         double g_ = gamma_single_nodes[i_t % N_gamma].second[node];
-        S_i_single_nodes[node] += g_ * (tau+(t0-t_i));
-        standard_rates.push_back(S_i_single_nodes[node]);
-        a0 += S_i_single_nodes[node];
+        standard_rates.push_back(g_);
+        a0 += g_;
         N++;
     }
 
