@@ -130,9 +130,16 @@ def group_size_distribution_asymptotics(N, P, mmax=None, simple_pochhammer_appro
 
     return ms, N*np.array(dist)
 
-
-
-def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histogram=False, seed=0, shuffle_group_sizes=True):
+def flockwork_P_equilibrium_configuration(N, 
+                                          P, 
+                                          shuffle_nodes=True, 
+                                          return_histogram=False, 
+                                          seed=0, 
+                                          shuffle_group_sizes=False,
+                                          dist=None,
+                                          use_binomial=True,
+                                          construct_edges=True,
+                                          ):
     """Get an equilibrium configuration of a Flockwork-P model
     given node number N and probability to reconnect P.
 
@@ -150,9 +157,17 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histo
         of size :math:`g`.
     seed : int, default : 0
         The random seed. RNG is initialized randomly if ``seed = 0``.
-    shuffle_group_sizes : bool, default : True
+    shuffle_group_sizes : bool, default : False
         Shuffle the order of group sizes in which nodes are distributed
         to groups. 'True' is recommended.
+    dist : np.array, default : None
+        Is computed from N and P if `None` is provided
+    use_binomial : bool, default : True
+        whether to draw from a Binomial instead of a Poisson
+        (conceptually more sound)
+    construct_edgelist : bool, default : True
+        if to actually construct the edgelist.
+        
     
     Returns
     -------
@@ -166,9 +181,10 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histo
     if seed > 0:
         random.seed(seed)
 
-    dist = flockwork_P_equilibrium_group_size_distribution(N, P)
+    if dist is None:
+        dist = flockwork_P_equilibrium_group_size_distribution(N, P)
 
-    dist = dist[1:]
+        dist = dist[1:]
 
     total_group_number = sum(dist)
     size_dist = dist / total_group_number
@@ -192,7 +208,10 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histo
         # loop through group sizes in descending order.
         # start with the smallest group size that
         # may contain all of the nodes left
-        group_sizes = 1 + random.permutation(N)
+        if shuffle_group_sizes:
+            group_sizes = 1 + random.permutation(N)
+        else:
+            group_sizes = np.arange(1,N+1)[::-1]
         for m in group_sizes:
 
             if (nodes_left-m) < 0:
@@ -205,7 +224,12 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histo
                 # dist carries the expected number of m-groups in equilibrium,
                 # so we draw a number of m groups from a Poisson distribution
                 # with mean dist[m-1]
-                new_C_m = random.poisson(dist[m-1])
+                if use_binomial:
+                    max_draws = N // m
+                    p = dist[m-1] / max_draws
+                    new_C_m = random.binomial(max_draws,p)
+                else:
+                    new_C_m = random.poisson(dist[m-1])
 
                 # if the new number of groups of size m is larger than the previously drawn number
                 if new_C_m > C_m[m-1]:
@@ -224,10 +248,11 @@ def flockwork_P_equilibrium_configuration(N, P, shuffle_nodes=True, return_histo
                     #        edges.append((node_ints[u],node_ints[v]))
 
                     # add fully connected clusters to the edge set
-                    if m > 1 and nodes_left-m >= 0:
-                        edges.extend([tuple(sorted((int(node_ints[u]), int(node_ints[v]))))
-                                      for u in range(nodes_left-m, nodes_left-1)
-                                      for v in range(u+1, nodes_left)])
+                    if construct_edges:
+                        if m > 1 and nodes_left-m >= 0:
+                            edges.extend([tuple(sorted((int(node_ints[u]), int(node_ints[v]))))
+                                          for u in range(nodes_left-m, nodes_left-1)
+                                          for v in range(u+1, nodes_left)])
                     elif nodes_left - m < 0:
                         break
 
@@ -470,11 +495,14 @@ def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flock
 
 def flockwork_P(N, P, t_run_total, rewiring_rate = 1.0, initial_edges = None, seed = 0, return_edge_changes_with_histograms=False):
     r"""
-    Simulate a flockwork P-model where the disconnection rate is 
-    :math:`\gamma=1` and reconnection probability is :math:`P`.
+    Simulate a flockwork P-model where the disconnection rate per 
+    node is :math:`\gamma` and reconnection probability is :math:`P`.
     In order to start with an equilibrated initial state, use
     :func:`tacoma.flockwork.flockwork_P_equilibrium_configuration`
     or just pass ``initial_edges = None`` to this function.
+    The total event rate is :math:`N\gamma` such that in
+    one unit of time there's an expected number of
+    :math:`N` events.
 
     Parameters
     ----------
