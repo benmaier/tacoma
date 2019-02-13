@@ -209,9 +209,9 @@ def flockwork_P_equilibrium_configuration(N,
         # start with the smallest group size that
         # may contain all of the nodes left
         if shuffle_group_sizes:
-            group_sizes = 1 + random.permutation(N)
+            group_sizes = 1 + random.permutation(nodes_left)
         else:
-            group_sizes = np.arange(1,N+1)[::-1]
+            group_sizes = np.arange(1,nodes_left+1)[::-1]
         for m in group_sizes:
 
             if (nodes_left-m) < 0:
@@ -246,6 +246,8 @@ def flockwork_P_equilibrium_configuration(N,
                     # for u in xrange(nodes_left-1,nodes_left-m,-1):
                     #    for v in xrange(u-1,nodes_left-m-1,-1):
                     #        edges.append((node_ints[u],node_ints[v]))
+                    if nodes_left - m < 0:
+                        break
 
                     # add fully connected clusters to the edge set
                     if construct_edges:
@@ -253,8 +255,8 @@ def flockwork_P_equilibrium_configuration(N,
                             edges.extend([tuple(sorted((int(node_ints[u]), int(node_ints[v]))))
                                           for u in range(nodes_left-m, nodes_left-1)
                                           for v in range(u+1, nodes_left)])
-                    elif nodes_left - m < 0:
-                        break
+                    #    elif nodes_left - m < 0:
+                    #        break
 
                     # remove the grouped nodes from the pool of remaining nodes
                     nodes_left -= m
@@ -263,10 +265,12 @@ def flockwork_P_equilibrium_configuration(N,
                     # and increment the group count
                     C_m[m-1] += 1
 
+                    """
                     # if there's no nodes left to distribute,
                     # N_m was chosen too large and we abandon
                     if nodes_left <= 0.:
                         break
+                    """
 
             # go to next smaller group size
 
