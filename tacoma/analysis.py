@@ -37,6 +37,8 @@ def temporal_network_group_analysis(result,
                                     plot_step=False,
                                     fit_power_law=False,
                                     ax=None,
+                                    bins=100,
+                                    use_logarithmic_histogram=True,
                                     ):
     """Analyze the result of 
     :func:`measure_group_sizes_and_durations`
@@ -92,6 +94,8 @@ def temporal_network_group_analysis(result,
                                           time_unit=time_unit,
                                           plot_step=plot_step,
                                           fit_power_law=fit_power_law,
+                                          use_logarithmic_histogram=use_logarithmic_histogram,
+                                          bins=bins,
                                           )
     res_dur = plot_group_durations(result,
                                    ax[2],
@@ -100,6 +104,8 @@ def temporal_network_group_analysis(result,
                                    time_unit=time_unit,
                                    plot_step=plot_step,
                                    fit_power_law=fit_power_law,
+                                   use_logarithmic_histogram=use_logarithmic_histogram,
+                                   bins=bins,
                                    )
 
     res.update(res_sizes)
@@ -136,7 +142,7 @@ def plot_group_size_histogram(result,
                 mfc='None'
                 )
     ax.set_xlabel(xlabel)
-    ax.set_ylabel(r'average number of $g$-sized groups $\overline{N_g}$')
+    ax.set_ylabel(r'average number of $g$-sized groups $\overline{n_g}$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     res = {'size_histogram': (x_group, y_group)}
@@ -151,9 +157,16 @@ def plot_contact_durations(result,
                            bins=100,  # number of bins
                            time_normalization_factor=1.,
                            time_unit=None,
+                           bin_dt=None,
                            plot_step=False,
                            fit_power_law=False,
+                           use_logarithmic_histogram=True,
                            ):
+
+    if bin_dt is not None:
+        use_discrete_dt = True
+    else:
+        use_discrete_dt = False
 
     durs = [np.array(result.contact_durations, dtype=float),
             np.array(result.group_durations[1], dtype=float)]
@@ -162,18 +175,46 @@ def plot_contact_durations(result,
 
     for i, dur in enumerate(durs):
         if not plot_step:
-            x, y = get_logarithmic_histogram(
-                time_normalization_factor*dur, bins)
-            ax.plot(x, y, ls='', marker=markers[i], label=labels[i],
+            if use_logarithmic_histogram:
+                x, y = get_logarithmic_histogram(
+                    time_normalization_factor*dur, bins)
+            elif use_discrete_dt:
+                c = Counter(dur / bin_dt)
+                total = sum(c.values())
+                x = []
+                y = []
+                for x_, y_ in c.items():
+                    x.append(x_* bin_dt)
+                    y.append(y_/total / bin_dt)
+            else:
+                y, x = np.histogram(dur*time_normalization_factor,bins=bins,density=True)
+                x = 0.5*(x[1:]+x[:-1])
+                print(x.shape,y.shape)
+
+            ax.plot(x, y, ls='', marker=markers[i], 
+                    label=labels[i],
                     ms=4,
                     mew=1,
                     mfc='None'
                     )
         else:
-            x, y = get_logarithmic_histogram(
-                time_normalization_factor*dur, bins, return_bin_means=False)
+            if use_logarithmic_histogram:
+                x, y = get_logarithmic_histogram(
+                    time_normalization_factor*dur, bins, return_bin_means=False)
+            elif use_discrete_dt:
+                c = Counter(dur / bin_dt)
+                total = sum(c.values())
+                x = []
+                y = []
+                for x_, y_ in c.items():
+                    x.append(x_* bin_dt)
+                    y.append(y_/total / bin_dt)
+                x.append(x[-1]+1)
+            else:
+                y, x = np.histogram(dur*time_normalization_factor,bins=bins,density=True)
             ax.step(x, np.append(y, y[-1]),
-                    where='post'
+                    where='post',
+                    label=labels[i],
                     )
 
         res[labels[i]] = (x, y)
@@ -204,6 +245,7 @@ def plot_group_durations(result,
                          time_unit=None,
                          plot_step=False,
                          fit_power_law=False,
+                         use_logarithmic_histogram=True,
                          ):
 
     if bin_dt is not None:
@@ -218,9 +260,9 @@ def plot_group_durations(result,
             data = time_normalization_factor * \
                 np.array(result.group_durations[size], dtype=float)
             if not plot_step:
-                if not use_discrete_dt:
+                if use_logarithmic_histogram:
                     x, y = get_logarithmic_histogram(data, bins)
-                else:
+                elif use_discrete_dt:
                     c = Counter(data / bin_dt)
                     total = sum(c.values())
                     x = []
@@ -228,6 +270,10 @@ def plot_group_durations(result,
                     for x_, y_ in c.items():
                         x.append(x_* bin_dt)
                         y.append(y_/total / bin_dt)
+                else:
+                    y, x = np.histogram(data*time_normalization_factor,bins=bins,density=True)
+                    x = 0.5*(x[1:]+x[:-1])
+
 
 
                 ax.plot(x, y,
@@ -239,10 +285,24 @@ def plot_group_durations(result,
                         mfc='None'
                         )
             else:
-                x, y = get_logarithmic_histogram(
-                    data, bins, return_bin_means=False)
+                if use_logarithmic_histogram:
+                    x, y = get_logarithmic_histogram(
+                        data, bins, return_bin_means=False)
+                elif use_discrete_dt:
+                    c = Counter(data / bin_dt)
+                    total = sum(c.values())
+                    x = []
+                    y = []
+                    for x_, y_ in c.items():
+                        x.append(x_* bin_dt)
+                        y.append(y_/total / bin_dt)
+                    x.append(x[-1]+1)
+                else:
+                    y, x = np.histogram(data*time_normalization_factor,bins=bins,density=True)
+
                 ax.step(x, np.append(y, y[-1]),
                         where='post',
+                        label='$g=%d$' % size,
                         )
             res[size] = (x, y)
 
