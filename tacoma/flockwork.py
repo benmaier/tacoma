@@ -255,8 +255,8 @@ def flockwork_P_equilibrium_configuration(N,
                             edges.extend([tuple(sorted((int(node_ints[u]), int(node_ints[v]))))
                                           for u in range(nodes_left-m, nodes_left-1)
                                           for v in range(u+1, nodes_left)])
-                    #    elif nodes_left - m < 0:
-                    #        break
+                        elif nodes_left - m < 0:
+                            break
 
                     # remove the grouped nodes from the pool of remaining nodes
                     nodes_left -= m
