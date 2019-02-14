@@ -584,6 +584,55 @@ def get_edge_probability_and_rate(temporal_network):
 
     return connection_probability, activity_rate
 
+def get_edge_life_times(temporal_network):
+    r"""
+    For each edge compute the probability that it is active and the rate
+    with which it is activated.
+
+    Parameters
+    ==========
+    temporal_network : :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes` or :class:`_tacoma.edge_trajectories`
+
+    Returns
+    =======
+    p : numpy.ndarray
+        The probability to be switched on for each observed edge of the network 
+        (the remaining un-observed edges have probability p = 0).
+    omega : numpy.ndarray
+        The rate with which the observed edges are switched on 
+        :math:`\omega = \left(\frac{1}{\tau^+} + \frac{1}{\tau^{-}}\right)^{-1}`
+        (the remaining un-observed edges have rate :math:`\omega = 0`).
+    """
+
+    if type(temporal_network) in [ ec, el, el_h, ec_h ]:
+        traj = tc.get_edge_trajectories(temporal_network)
+        tmax = temporal_network.tmax
+        if type(temporal_network) in [ ec, ec_h ]:
+            t0 = temporal_network.t0
+        else:
+            t0 = temporal_network.t[0]
+    elif type(temporal_network) == edge_trajectories:
+        traj = temporal_network.trajectories
+        tmax = temporal_network.tmax
+        t0 = temporal_network.t0
+    else:
+        raise ValueError("Unknown type for temporal network:", type(temporal_network))
+
+    T = tmax - t0
+
+    connection_probability = np.empty(len(traj))
+    activity_rate = np.empty(len(traj))
+
+    life_times = []
+
+    for iedge, entry in enumerate(traj):
+
+        for pair in entry.time_pairs:
+            if pair[0] != t0 and pair[0] != tmax:
+                life_times.append(pair[1]-pair[0])
+
+    return np.array(life_times)
+
 def get_reduced_time(t, intervals_to_discard):
     """
     Reduce the provided time in a way that intervals
