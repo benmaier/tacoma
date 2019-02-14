@@ -260,7 +260,9 @@ def visualize(temporal_networks,
             config = dict(ht09_config)
         else:
             raise ValueError("config", config, "is unknown.")
-    this_config.update(config)
+
+    if config is not None:
+        this_config.update(config)
 
     # print(titles)
 
