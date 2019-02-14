@@ -1832,6 +1832,14 @@ PYBIND11_MODULE(_tacoma, m)
                 )pbdoc")
         .def("set_initial_configuration",&FlockworkPModel::set_initial_configuration,
              R"pbdoc(Reset the state of the network to a certain graph (:obj:`list` of :obj:`set` of :obj:`int`))pbdoc")
+        .def("get_current_edgelist",&FlockworkPModel::get_current_edgelist,
+             R"pbdoc(Get an edge list of the current network state.)pbdoc")
+        .def("simulate",&FlockworkPModel::simulate,
+             py::arg("t_run_total"), 
+             py::arg("reset") = true,
+             py::arg("save_temporal_network") = true,
+             R"pbdoc(Simulate a Flockwork model until ``t_run_total``.
+                     Obtain the result via ``FlockworkPModel.edge_changes``.)pbdoc")
         .def_readwrite("edge_changes", &FlockworkPModel::edg_chg, 
                     R"pbdoc(An instance of :class:`_tacoma.edge_changes` with the saved temporal network (only if
                     `save_temporal_network` is `True`).)pbdoc")

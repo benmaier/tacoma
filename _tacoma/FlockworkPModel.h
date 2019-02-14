@@ -174,6 +174,19 @@ class FlockworkPModel
                         vector < pair < size_t, size_t > > &e_out
                        );
 
+        void simulate(
+                      double t_run_total, 
+                      bool reset_all = true,
+                      bool save_network = false
+                     );
+
+        vector < pair < size_t, size_t > > get_current_edgelist()
+        {
+            vector < pair < size_t, size_t > > E;
+            edgelist_from_graph(E, G);
+            return E;
+        }
+
         void print()
         {
         }

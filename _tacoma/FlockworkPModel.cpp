@@ -35,10 +35,19 @@ void
             )
 {
     //choose two nodes
-    double r1 = randuni(*generator);
-    double r2 = randuni(*generator);
+    //double r1 = randuni(*generator);
+    //double r2 = randuni(*generator);
     size_t i,j;
-    choose(N,i,j,r1,r2);
+    //choose(N,i,j,r1,r2);
+
+    uniform_int_distribution<size_t> node_1(0,N-1); 
+    uniform_int_distribution<size_t> node_2(0,N-2);
+
+    i = node_1(*generator);
+    j = node_2(*generator);
+
+    if (j>=i)
+        j++;
 
     bool do_rewiring = randuni(*generator) < _P;
 
@@ -108,3 +117,49 @@ void FlockworkPModel::make_event(
     else if (event == 1)
         rewire(0.0,e_in,e_out);
 }
+
+void FlockworkPModel::simulate(
+                      double t_run_total, 
+                      bool reset_all,
+                      bool save_network
+                      )
+{
+    if (reset_all)
+        reset();
+
+    double t = t0;
+
+    edg_chg.t0 = t0;
+
+
+
+    while ( t < t_run_total )
+    {
+       // Draw random number from exponential distribution with mean 1/gamma
+       exponential_distribution<double> delta_t(N*gamma); 
+       double tau = delta_t(*generator);
+       t += tau;
+
+       // let the event happen
+       if ( t < t_run_total )
+       {
+           vector < pair < size_t, size_t > > e_in;
+           vector < pair < size_t, size_t > > e_out;
+            
+           rewire(P,e_in,e_out);
+
+           if (save_network)
+           {
+               edg_chg.t.push_back(t);
+               edg_chg.edges_in.push_back(e_in);
+               edg_chg.edges_out.push_back(e_out);
+           }
+       }
+    }
+
+    if (save_network)
+    {
+        edg_chg.tmax = t_run_total;
+    }
+}
+
