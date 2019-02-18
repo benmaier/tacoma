@@ -100,12 +100,11 @@ def load_json_taco(fp):
 
     if file_is_string:
         fp = os.path.abspath(os.path.expanduser(fp))
-        fp = open(fp, 'r')
+        with open(fp, 'r') as f:
+            this_data = json.load(f)
 
+    else:
         this_data = json.load(fp)
-
-    if file_is_string:
-        fp.close()
 
     if this_data['type'] == 'edge_changes':
         temporal_network = tc.edge_changes()
