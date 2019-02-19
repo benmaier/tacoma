@@ -38,6 +38,7 @@ def temporal_network_group_analysis(result,
                                     fit_power_law=False,
                                     ax=None,
                                     bins=100,
+                                    bin_dt=None,
                                     use_logarithmic_histogram=True,
                                     ):
     """Analyze the result of 
@@ -96,6 +97,7 @@ def temporal_network_group_analysis(result,
                                           fit_power_law=fit_power_law,
                                           use_logarithmic_histogram=use_logarithmic_histogram,
                                           bins=bins,
+                                          bin_dt=bin_dt,
                                           )
     res_dur = plot_group_durations(result,
                                    ax[2],
@@ -106,6 +108,7 @@ def temporal_network_group_analysis(result,
                                    fit_power_law=fit_power_law,
                                    use_logarithmic_histogram=use_logarithmic_histogram,
                                    bins=bins,
+                                   bin_dt=bin_dt,
                                    )
 
     res.update(res_sizes)
