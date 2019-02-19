@@ -36,10 +36,16 @@ void flockwork_timestep(
 {
     //choose two nodes
     size_t N = G.size();
-    double r1 = distribution(generator);
-    double r2 = distribution(generator);
     size_t i,j;
-    choose(N,i,j,r1,r2);
+
+    uniform_int_distribution<size_t> node1(0,N-1);
+    uniform_int_distribution<size_t> node2(0,N-2);
+
+    i = node1(generator);
+    j = node2(generator);
+
+    if (j>=i)
+        j++;
 
     //loop through the neighbors of i
     for(auto neigh_i : *G[i] )
@@ -76,10 +82,16 @@ void flockwork_P_timestep(
 {
     //choose two nodes
     size_t N = G.size();
-    double r1 = distribution(generator);
-    double r2 = distribution(generator);
     size_t i,j;
-    choose(N,i,j,r1,r2);
+
+    uniform_int_distribution<size_t> node1(0,N-1);
+    uniform_int_distribution<size_t> node2(0,N-2);
+
+    i = node1(generator);
+    j = node2(generator);
+
+    if (j>=i)
+        j++;
 
     //loop through the neighbors of i
     for(auto neigh_i : *G[i] )
@@ -118,10 +130,16 @@ size_t flockwork_P_timestep_monitoring_groups(
 {
     //choose two nodes
     size_t N = G.size();
-    double r1 = distribution(generator);
-    double r2 = distribution(generator);
     size_t i,j;
-    choose(N,i,j,r1,r2);
+
+    uniform_int_distribution<size_t> node1(0,N-1);
+    uniform_int_distribution<size_t> node2(0,N-2);
+
+    i = node1(generator);
+    j = node2(generator);
+
+    if (j>=i)
+        j++;
 
     size_t lifetime = 0;
     bool is_reconnection_event = (distribution(generator) < P);

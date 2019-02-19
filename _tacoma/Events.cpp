@@ -43,10 +43,17 @@ void rewire(
 {
     //choose two nodes
     size_t N = G.size();
-    double r1 = distribution(generator);
-    double r2 = distribution(generator);
     size_t i,j;
-    choose(N,i,j,r1,r2);
+
+    uniform_int_distribution<size_t> node1(0,N-1);
+    uniform_int_distribution<size_t> node2(0,N-2);
+
+    i = node1(generator);
+    j = node2(generator);
+
+    if (j>=i)
+        j++;
+
 
     size_t number_of_old_edges = 0;
     size_t number_of_new_edges = 0;
@@ -121,10 +128,16 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
 {
     //choose two nodes
     size_t N = G.size();
-    double r1 = distribution(generator);
-    double r2 = distribution(generator);
     size_t i,j;
-    choose(N,i,j,r1,r2);
+
+    uniform_int_distribution<size_t> node1(0,N-1);
+    uniform_int_distribution<size_t> node2(0,N-2);
+
+    i = node1(generator);
+    j = node2(generator);
+
+    if (j>=i)
+        j++;
 
     bool do_rewiring = distribution(generator) < P;
 
@@ -184,10 +197,16 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
 {
     //choose two nodes
     size_t N = G.size();
-    double r1 = distribution(generator);
-    double r2 = distribution(generator);
     size_t i,j;
-    choose(N,i,j,r1,r2);
+
+    uniform_int_distribution<size_t> node1(0,N-1);
+    uniform_int_distribution<size_t> node2(0,N-2);
+
+    i = node1(generator);
+    j = node2(generator);
+
+    if (j>=i)
+        j++;
 
     bool do_rewiring = distribution(generator) < P;
 
@@ -394,10 +413,16 @@ pair < vector < pair < size_t, size_t > >, vector < pair < size_t, size_t > > >
 {
     //choose two nodes
     size_t N = G.size();
-    double r1 = distribution(generator);
-    double r2 = distribution(generator);
     size_t i,j;
-    choose(N,i,j,r1,r2);
+
+    uniform_int_distribution<size_t> node1(0,N-1);
+    uniform_int_distribution<size_t> node2(0,N-2);
+
+    i = node1(generator);
+    j = node2(generator);
+
+    if (j>=i)
+        j++;
 
     bool do_rewiring = distribution(generator) < P;
 
