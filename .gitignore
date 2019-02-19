@@ -17,6 +17,7 @@ a.out
 /build/
 /tmp/
 /dist/
+/tests/
 
 /jupyter_notebooks/.ipynb_checkpoints/
 
