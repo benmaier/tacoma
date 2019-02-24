@@ -349,6 +349,76 @@ def flockwork_P_mean_degree_for_varying_rates(flockwork_P_params, N=None):
 
     return np.array(new_t), np.array(k)
 
+def flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax):
+    r"""Compute the mean group size distribution for a Flockwork-P system with varying rates.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    k_initial : float
+        initial mean degree
+    t : numpy.ndarray of float
+        time points at which :math:`\alpha(t)` and 
+        :math:`\beta(t)` change
+    alpha : numpy.ndarray of float
+        active reconnection rate associated with
+        the time points in ``t``
+    beta : numpy.ndarray of float
+        active disconnection rate associated with
+        the time points in ``t``
+    tmax : float
+        final time
+
+    Returns
+    -------
+    t : numpy.array
+        An array of times at which the mean degree was evaluated
+    k : numpy.array
+        An array of mean degree values corresponding to the times in t.
+    """
+
+    # compute the initial mean degree
+    k0 = k_initial
+
+    # get arrays for rewiring
+    t = np.append(t, tmax)
+    alphas = np.append(alpha, alpha[-1])
+    betas = np.append(beta,beta[-1])
+
+    # define the linear ODE describing the mean degree evolution
+    def dkdt(t, k, a_, b_):
+        return 2 * a_ - 2*k * (b_)
+
+    # intialize the integrator
+    r = ode(dkdt)
+    r.set_integrator('dopri5')
+
+    k = [k0]
+    new_t = [t[0]]
+
+    i = 0
+    for t_, a_, b_ in zip(t[:-1], alphas[:-1], betas[:-1]):
+
+        # for every interval set the initial mean degree
+        # and new parameters
+        r.set_initial_value(k[-1], t_)
+        r.set_f_params(a_, b_)
+
+        # for 10 time points within this interval,
+        # compute the expected mean degree
+        this_t = np.linspace(t_, t[i+1], 10)
+        for t__ in this_t[1:]:
+            new_t.append(t__)
+            this_k = r.integrate(t__)
+            k.append(this_k)
+
+        # increase interval
+        i += 1
+
+    return np.array(new_t), np.array(k)
+
+
 
 def flockwork_P_mean_group_size_distribution_for_varying_rates(flockwork_P_params, N=None):
     """Compute the mean group size distribution for a Flockwork-P system with varying rates.
