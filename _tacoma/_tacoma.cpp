@@ -580,8 +580,7 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("beta_scaling") = 1.0,
           py::arg("aggregated_network") = map<pair<size_t, size_t>, double>(),
           py::arg("ensure_empty_network") = false,
-          py::arg("adjust_last_bin_if_dt_does_not_fit") = true,
-          py::arg("use_integral_method") = true,
+          py::arg("consider_looped_network_to_get_final_events") = false,
           py::arg("verbose") = false);
 
     m.def("get_flockwork_P_node_parameters_gamma_and_P", get_node_gamma_and_P,

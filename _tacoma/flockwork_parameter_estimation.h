@@ -118,8 +118,7 @@ flockwork_alpha_beta_args
              double beta_scaling,
              map < pair < size_t, size_t >, double > &aggregated_network,
              const bool ensure_empty_network,
-             const bool adjust_last_bin_if_dt_does_not_fit,
-             const bool use_integral_method,
+             const bool consider_looped_network_to_get_final_events,
              const bool verbose
              );
 

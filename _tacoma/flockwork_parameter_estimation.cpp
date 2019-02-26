@@ -869,8 +869,7 @@ flockwork_alpha_beta_args
              double beta_scaling,
              map < pair < size_t, size_t >, double > &aggregated_network,
              const bool ensure_empty_network,
-             const bool adjust_last_bin_if_dt_does_not_fit,
-             const bool use_integral_method,
+             const bool consider_looped_network_to_get_final_events,
              const bool verbose
              )
 {
@@ -902,17 +901,14 @@ flockwork_alpha_beta_args
         // check if this yielded a nice round number
         // by checking the rest after the period
         if (modf(_N_t,&intpart) != 0.0)
-            if (adjust_last_bin_if_dt_does_not_fit)
-            {
+        {
                 // if it did not, change the time of the network
                 // to be larger than originally.
                 // This will be changed back later when 
                 // computing gamma and P
                 N_time_steps = (size_t) ceil(_N_t);
                 tmax = t0 + N_time_steps * dt;
-            }
-            else
-                throw domain_error("dt does not nicely divide time interval (tmax - t0) in integer parts");
+        }
         else
             N_time_steps = (size_t) _N_t;
     }
@@ -1024,31 +1020,34 @@ flockwork_alpha_beta_args
 
 
     // get a sorted edge list
-    vector < pair < size_t, size_t > > last_edge_list;
-    edgelist_from_graph(last_edge_list,G);
+    if (consider_looped_network_to_get_final_events)
+    {
+        vector < pair < size_t, size_t > > last_edge_list;
+        edgelist_from_graph(last_edge_list,G);
 
-    set < size_t > last_edge_integers = get_edge_integer_set(last_edge_list, N);
-    set < size_t > edge_integers = get_edge_integer_set(list_of_edge_changes.edges_initial, N);
+        set < size_t > last_edge_integers = get_edge_integer_set(last_edge_list, N);
+        set < size_t > edge_integers = get_edge_integer_set(list_of_edge_changes.edges_initial, N);
 
-    vector < size_t > incoming_edge_integers;
-    vector < size_t > outgoing_edge_integers;
+        vector < size_t > incoming_edge_integers;
+        vector < size_t > outgoing_edge_integers;
 
-    // incoming edges are from the set (edges - last_edges) 
-    set_difference(
-                   edge_integers.begin(), edge_integers.end(),
-                   last_edge_integers.begin(), last_edge_integers.end(),
-                   back_inserter(incoming_edge_integers)
-                  );
+        // incoming edges are from the set (edges - last_edges) 
+        set_difference(
+                       edge_integers.begin(), edge_integers.end(),
+                       last_edge_integers.begin(), last_edge_integers.end(),
+                       back_inserter(incoming_edge_integers)
+                      );
 
-    // outgoing edges are from the set (last_edges - edges) 
-    set_difference(
-                   last_edge_integers.begin(), last_edge_integers.end(),
-                   edge_integers.begin(), edge_integers.end(),
-                   back_inserter(outgoing_edge_integers)
-                  );
+        // outgoing edges are from the set (last_edges - edges) 
+        set_difference(
+                       last_edge_integers.begin(), last_edge_integers.end(),
+                       edge_integers.begin(), edge_integers.end(),
+                       back_inserter(outgoing_edge_integers)
+                      );
 
-    m_in.back() += incoming_edge_integers.size();
-    m_out.back() += outgoing_edge_integers.size();
+        m_in.back() += incoming_edge_integers.size();
+        m_out.back() += outgoing_edge_integers.size();
+    }
 
     // ==================== SHOW ALL THOSE VALUES ===========================
     if (verbose)
