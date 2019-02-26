@@ -1050,7 +1050,7 @@ flockwork_alpha_beta_args
     m_in.back() += incoming_edge_integers.size();
     m_out.back() += outgoing_edge_integers.size();
 
-    //
+    // ==================== SHOW ALL THOSE VALUES ===========================
     if (verbose)
     {
         cout << "the number of demanded time steps was " << N_time_steps << endl;
@@ -1098,14 +1098,13 @@ flockwork_alpha_beta_args
         size_t & this_m_in = *it_m_in;
         size_t & this_m_out = *it_m_out;
 
-        // if tmax was shifted because dt did not fit, rescale the last
-        // time dt to the appropriate dt
-        if (it_m_in + 1 == m_in.end())
-        {
-            double this_time = *it_time;
-            double next_time = original_tmax;
-            dt = next_time - this_time;
-        }
+        
+        double this_time = *it_time;
+        double next_time = *(it_time+1);
+        dt = next_time - this_time;
+
+        if (verbose)
+            cout << "dt = " << dt << endl;
 
 
         if ( (this_M == 0.0) and ( this_m_out > 0) )
