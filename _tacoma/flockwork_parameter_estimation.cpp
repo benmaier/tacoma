@@ -882,6 +882,7 @@ flockwork_alpha_beta_args
     // set initial and final time
     double t0 = list_of_edge_changes.t0;
     double tmax = list_of_edge_changes.tmax;
+    double original_tmax = tmax;
 
     // create graph
     size_t N = list_of_edge_changes.N;
@@ -927,11 +928,9 @@ flockwork_alpha_beta_args
     vector < double > new_time;
     vector < size_t > m_in;
     vector < size_t > m_out;
-    vector < size_t > m;
     vector < double > M;
 
     size_t number_of_edges = list_of_edge_changes.edges_initial.size();
-    m.push_back(number_of_edges);
 
 
     new_time.push_back( t0 );
@@ -946,8 +945,8 @@ flockwork_alpha_beta_args
 
     double last_time = t0;
 
-    // start at new_time = t0 + dt because t0 was already taken care of
-    for(size_t t_i = 1; t_i < N_time_steps; t_i++)
+    // the demanded new time bin is next one new_time = t0 + dt
+    for(size_t t_i = 1; t_i < N_time_steps+1; t_i++)
     {
         double this_new_time = dt * t_i + t0;
 
@@ -989,6 +988,12 @@ flockwork_alpha_beta_args
                 G[ j ].erase( i );
             }
 
+            if (verbose)
+            {
+                cout << "edges going in = " << it_edges_in->size() << endl;
+                cout << "edges going out = " << it_edges_out->size() << endl;
+            }
+
             m_in.back() += it_edges_in->size();
             m_out.back() += it_edges_out->size();
 
@@ -1009,12 +1014,14 @@ flockwork_alpha_beta_args
             it_edges_out++;
         }
 
+        if ( (this_new_time == tmax) and original_tmax < tmax)
+            this_new_time = original_tmax;
+
+        M.back() += (this_new_time - last_time) * number_of_edges;
+
         new_time.push_back( this_new_time );
-        m.push_back(number_of_edges);
     }
 
-    // ============== add the last time frame for looping ================
-    new_time.push_back( dt * N_time_steps + t0 );
 
     // get a sorted edge list
     vector < pair < size_t, size_t > > last_edge_list;
@@ -1040,15 +1047,41 @@ flockwork_alpha_beta_args
                    back_inserter(outgoing_edge_integers)
                   );
 
-    m_in.push_back(incoming_edge_integers.size());
-    m_out.push_back(outgoing_edge_integers.size());
-    number_of_edges += (incoming_edge_integers.size() - outgoing_edge_integers.size());
-    M.push_back( (tmax - last_time) * (number_of_edges));
-    m.push_back( m.front() );
+    m_in.back() += incoming_edge_integers.size();
+    m_out.back() += outgoing_edge_integers.size();
+
+    //
+    if (verbose)
+    {
+        cout << "the number of demanded time steps was " << N_time_steps << endl;
+        cout << "the number of covered times in `new_time` was " << new_time.size() << endl << "    new_time = [ ";
+        for(auto const & this_time: new_time)
+        {            
+            cout << this_time << ", ";
+        }
+        cout << "]" << endl;
+        cout << "the number of covered M values in `M` was " << M.size() << endl << "    M = [ ";
+        for(auto const & _M: M)
+        {            
+            cout << _M << ", ";
+        }
+        cout << "]" << endl;
+        cout << "the number of covered m_in values in `m_in` was " << m_in.size() << endl << "    m_in = [ ";
+        for(auto const & _m_in: m_in)
+        {            
+            cout << _m_in << ", ";
+        }
+        cout << "]" << endl;
+        cout << "the number of covered m_out values in `m_out` was " << m_out.size() << endl << "    m_out = [ ";
+        for(auto const & _m_out: m_out)
+        {            
+            cout << _m_out << ", ";
+        }
+        cout << "]" << endl;
+    }
 
     // ========= now go through the observables and compute the parameters =============
     auto it_M = M.begin();
-    auto it_m = m.begin();
     auto it_m_in = m_in.begin();
     auto it_m_out = m_out.begin();
     it_time = new_time.begin();
@@ -1062,7 +1095,6 @@ flockwork_alpha_beta_args
     while(it_m_in != m_in.end())
     {
         double & this_M = *it_M;
-        size_t & this_m = *it_m;
         size_t & this_m_in = *it_m_in;
         size_t & this_m_out = *it_m_out;
 
@@ -1071,7 +1103,7 @@ flockwork_alpha_beta_args
         if (it_m_in + 1 == m_in.end())
         {
             double this_time = *it_time;
-            double next_time = list_of_edge_changes.tmax;
+            double next_time = original_tmax;
             dt = next_time - this_time;
         }
 
@@ -1099,21 +1131,13 @@ flockwork_alpha_beta_args
         double _m_out = (double) this_m_out;
         double _m_in = (double) this_m_in;
         double _M = this_M / k_over_k_real_scaling;
-        double _m = ( (double) this_m ) / k_over_k_real_scaling;
 
-        double edge_observable;
+        _a = _m_in / (N*dt+2.0*_M);
 
-        if (use_integral_method)
-            edge_observable = _M;
-        else
-            edge_observable = _m * dt;
-
-        _a = _m_in / (N*dt+2.0*edge_observable);
-
-        if ( (_m_out == 0.0) and (edge_observable == 0.0) )
+        if ( (_m_out == 0.0) and (_M == 0.0) )
             _b = 0.0;
         else
-            _b = (_m_out / 2.0 / edge_observable) - _a;
+            _b = (_m_out / 2.0 / _M) - _a;
 
         if (_b < 0.0)
             _b = 0.0;
@@ -1152,7 +1176,6 @@ flockwork_alpha_beta_args
         beta.push_back( _b );
 
         it_M++; 
-        it_m++; 
         it_m_in++;
         it_m_out++; 
         it_time++;
@@ -1169,7 +1192,6 @@ flockwork_alpha_beta_args
     fw_args.m_in = m_in;
     fw_args.m_out = m_out;
     fw_args.M = M;
-    fw_args.m = m;
 
     if (aggregated_network.size() > 0)
     {
