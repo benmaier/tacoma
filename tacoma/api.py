@@ -832,14 +832,14 @@ def convert(temporal_network, verbose=False):
     return result
 
 
-def concatenate(list_of_temporal_networks, verbose):
+def concatenate(list_of_temporal_networks, verbose = False):
     """Concatenates a list of either :class:`_tacoma.edge_changes` or :class:`_tacoma.edge_lists` to a single instance of :class:`_tacoma.edge_changes` or :class:`_tacoma.edge_lists`, respectively.
 
     Parameters
     ----------
     temporal_network : :obj:`list` of :class:`_tacoma.edge_changes`, :class:`_tacoma.edge_lists`, :class:`_tacoma.edge_changes_with_histograms`, or :class:`_tacoma.edge_lists_with_histograms`
         A list of a temporal networks.
-    verbose: bool, optional
+    verbose: bool, default : False
         Be chatty.
 
     Returns

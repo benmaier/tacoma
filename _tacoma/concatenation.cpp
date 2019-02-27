@@ -117,7 +117,7 @@ edge_changes
 
                 
         vector < set < size_t > > G(N);
-        vector < pair < size_t, size_t > > these_edges_initial((ec_it->edges_initial).begin(), (ec_it->edges_initial).begin()); 
+        vector < pair < size_t, size_t > > these_edges_initial((ec_it->edges_initial).begin(), (ec_it->edges_initial).end()); 
 
         if (remap_nodes)
         {
@@ -202,6 +202,11 @@ edge_changes
         // calculate edge changes between last state and next initial edge list
         if (ec_it + 1 != ec_lists.end())
         {
+            if (verbose)
+            {
+                cout << "next concatenation; ";
+                cout << "remapping? : " << remap_nodes << endl;
+            }
             vector < pair < size_t, size_t > > this_edge_list;
             edgelist_from_graph(this_edge_list,G);
 
@@ -254,6 +259,11 @@ edge_changes
                 size_t j = e % N;
                 size_t i = e / N;
                 these_edges_in.push_back( make_pair(i, j) );
+
+                if (verbose)
+                {
+                    cout << "    edge (" << i << ", " << j << ") will be created" << endl;
+                }
             }
 
             for(auto const &e: outgoing_edge_integers)
@@ -261,6 +271,11 @@ edge_changes
                 size_t j = e % N;
                 size_t i = e / N;
                 these_edges_out.push_back( make_pair(i, j) );
+
+                if (verbose)
+                {
+                    cout << "    edge (" << i << ", " << j << ") will be deleted" << endl;
+                }
             }
 
             new_edges_in.push_back( these_edges_in );

@@ -566,6 +566,46 @@ def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flock
 
     return mean_distro
 
+from copy import deepcopy
+
+def naive_varying_rate_flockwork_simulation(N, t, reconnection_rates, disconnection_rates, tmax):
+
+    if len(t) != len(reconnection_rates) or len(reconnection_rates) != len(disconnection_rates):
+        raise ValueError('The arrays `t`, `reconnection_rates` and `disconnection_rates` must have the same length' )
+
+    t = np.append(t,tmax)
+
+    all_networks = []
+    it = 0
+
+    result = None
+    for a_, b_ in zip(reconnection_rates, disconnection_rates):
+
+        dt = t[it+1] - t[it]
+        P = a_ / (a_+b_)
+        g = (a_+b_)
+
+        if it == 0:
+            initial_edges = flockwork_P_equilibrium_configuration(N,P)
+
+
+        FW = tc.FlockworkPModel(initial_edges, N, g, P, save_temporal_network = True)
+        FW.simulate(dt)
+        this_result = FW.edge_changes
+
+        if it < len(reconnection_rates) - 1:
+            this_el_result = tc.convert(this_result)
+            initial_edges = deepcopy(this_el_result.edges[-1])
+
+        all_networks.append(this_result)
+
+        it += 1
+
+    result = tc.concatenate(all_networks)
+
+    return result
+        
+
 
 def flockwork_P(N, P, t_run_total, rewiring_rate = 1.0, initial_edges = None, seed = 0, return_edge_changes_with_histograms=False):
     r"""

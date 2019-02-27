@@ -80,6 +80,16 @@ C2.edges_out = [
 
 new = tc.concatenate([C,C2,C])
 
+import matplotlib.pyplot as pl
+from tacoma.drawing import edge_activity_plot
+
+edge_activity_plot(C)
+edge_activity_plot(C2)
+edge_activity_plot(C)
+edge_activity_plot(new)
+
+pl.show()
+
 print(new.N)
 print(new.t0)
 print(new.t)
