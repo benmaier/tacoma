@@ -3,6 +3,7 @@
 This module provides functions related to the flockwork
 temporal network model.
 """
+from copy import deepcopy
 
 import numpy as np
 from numpy import random
@@ -566,7 +567,6 @@ def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flock
 
     return mean_distro
 
-from copy import deepcopy
 
 def naive_varying_rate_flockwork_simulation(N, t, reconnection_rates, disconnection_rates, tmax):
 
