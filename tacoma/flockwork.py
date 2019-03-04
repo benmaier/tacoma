@@ -611,7 +611,10 @@ def naive_varying_rate_flockwork_simulation(N, t, reconnection_rates, disconnect
     for a_, b_ in zip(reconnection_rates, disconnection_rates):
 
         dt = t[it+1] - t[it]
-        P = a_ / (a_+b_)
+        if a_ == 0.0 and b_ == 0.0:
+            P = 0
+        else:
+            P = a_ / (a_+b_)
         g = (a_+b_)
 
         if it == 0:
