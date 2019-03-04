@@ -569,10 +569,39 @@ def flockwork_P_mean_group_size_distribution_from_mean_degree_distribution(flock
 
 
 def naive_varying_rate_flockwork_simulation(N, t, reconnection_rates, disconnection_rates, tmax):
+    r"""
+    Do a naive simulation of a Flockwork systems where the reconnection and disconnection rate
+    vary over time as step functions. It is called `naive` because the rate change will not
+    be considered when evaluating the inter-event time at time points when the rates change.
+    I.e. at a rate change at time `t`, the new Flockwork model will be initiated as if the 
+    last event happened at time `t`. This error is neglibile if the upper bounded mean inter-event time
+    at rate changes is 
+    :math:`\tau=(N(\alpha_{\mathrm{min}}+\beta_{\mathrm{min}})^{-1}\ll \Deltat_\mathrm{min}`
+    where :math:`\Deltat_\mathrm{min}` is the minimal time between two rate changes.
+
+    Parameters
+    ----------
+    N : int
+        number of nodes
+    t : numpy.ndarray of float
+        time points at which :math:`\alpha` and :math`\beta` change
+    reconnection_rates : numpy.ndarray of float
+        values of :math:`\alpha` for the corresponding time values in ``t``.
+    disconnection_rates : numpy.ndarray of float
+        values of :math:`\beta` for the corresponding time values in ``t``.
+    tmax : float
+        time at which the simulation is supposed to end.
+
+    Returns
+    -------
+    edge_changes : :class:`_tacoma.edge_changes`
+        The simulated Flockwork instance.
+    """
 
     if len(t) != len(reconnection_rates) or len(reconnection_rates) != len(disconnection_rates):
         raise ValueError('The arrays `t`, `reconnection_rates` and `disconnection_rates` must have the same length' )
 
+    assert(t[-1]<tmax)
     t = np.append(t,tmax)
 
     all_networks = []
@@ -588,14 +617,12 @@ def naive_varying_rate_flockwork_simulation(N, t, reconnection_rates, disconnect
         if it == 0:
             initial_edges = flockwork_P_equilibrium_configuration(N,P)
 
-
         FW = tc.FlockworkPModel(initial_edges, N, g, P, save_temporal_network = True)
         FW.simulate(dt)
         this_result = FW.edge_changes
 
         if it < len(reconnection_rates) - 1:
-            this_el_result = tc.convert(this_result)
-            initial_edges = deepcopy(this_el_result.edges[-1])
+            initial_edges = FW.get_current_edgelist()
 
         all_networks.append(this_result)
 
@@ -651,25 +678,11 @@ def flockwork_P(N, P, t_run_total, rewiring_rate = 1.0, initial_edges = None, se
     if initial_edges is None:
         initial_edges = flockwork_P_equilibrium_configuration(N, P)
 
-    Ps = [ P ]
-    rewiring_rate = [ (0.0, rewiring_rate) ]
-    tmax = t_run_total
+    FW = tc.FlockworkPModel(initial_edges, N, rewiring_rate, P, save_temporal_network = True)
+    FW.simulate(dt)
+    this_result = FW.edge_changes
 
-    fw = flockwork_P_varying_rates(
-                                    initial_edges,
-                                    N,
-                                    Ps,
-                                    t_run_total,
-                                    rewiring_rate,
-                                    tmax,
-                                    use_random_rewiring=False,
-                                    seed=seed
-                                  )
-
-    if not return_edge_changes_with_histograms:
-        fw = _get_raw_temporal_network(fw)
-
-    return fw
+    return this_result
 
 def degree_distribution(N,P):
     """Get the equilibrium degree distribution of a Flockwork-P model
