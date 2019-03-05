@@ -97,8 +97,8 @@ class temporalNetworkFigure {
 
                 for(var i = 0; i < temporal_network_files.length; i++)
                 {
-                    next_queue.defer(d3.json, temporal_network_files[i]);
-                    next_queue.defer(d3.json, edges_coordinate_files[i]);
+                    next_queue.defer(d3.json, "./"+temporal_network_files[i]);
+                    next_queue.defer(d3.json, "./"+edges_coordinate_files[i]);
                 }
 
                 // load temporal_network data

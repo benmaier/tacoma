@@ -20,7 +20,7 @@ import wget
 import shutil
 
 import json
-from distutils.dir_util import copy_tree
+from distutils.dir_util import copy_tree, mkpath
 
 import tacoma as tc
 from tacoma.data_io import mkdirp_customdir
@@ -119,6 +119,27 @@ def prepare_visualization_directory():
     # always copy source files to the subdirectory
     copy_tree(src, dst)
 
+def prepare_export_directory(d,subdir):
+    """Move all files from the tacoma/interactive directory to directory ``d``"""
+    src = html_source_path
+    dst = os.path.abspath(os.path.expanduser(d))
+
+    # make directory and subdirectory
+    mkpath(os.path.join(dst, subdir))
+
+    # always copy source files to the subdirectory
+    copy_tree(src, dst)
+
+    d3file = os.path.abspath(os.path.expanduser("~/.tacoma/web/d3.v4/d3.v4.min.js"))
+    new_dst = os.path.join(dst,"d3.v4")
+    if not os.path.exists(d3file):
+        raise FileNotFoundError('D3 has not been downloaded yet. Please call `tacoma.interactive.download_d3()`.')
+
+
+    # copy d3 from the tacoma directory
+    src = os.path.abspath(os.path.expanduser("~/.tacoma/web/d3.v4/"))
+    copy_tree(src, new_dst)
+
 
 class StoppableHTTPServer(http.server.HTTPServer):
     """Taken from https://stackoverflow.com/questions/268629/how-to-stop-basehttpserver-serve-forever-in-a-basehttprequesthandler-subclass """
@@ -181,7 +202,9 @@ def visualize(temporal_networks,
               time_unit=None,
               titles=None,
               config=None,
-              port=8226):
+              port=8226,
+              export_path=None,
+              ):
     """
     Visualize a temporal network or a list of temporal networks interactively.
     This routine starts up an HTTP server, bins the networks according to the
@@ -216,6 +239,10 @@ def visualize(temporal_networks,
         the appropriate configuration is loaded.
     port : int, default : 8226
         Port of the started HTTP server.
+    export_path : string, default : None
+        path to a directory to which the whole visualization is copied.
+        Use ``os.get_cwd()`` for the current working directory (after
+        ``import os``).
 
     Notes
     -----
@@ -268,8 +295,8 @@ def visualize(temporal_networks,
 
     # define the server address
     # server_address = ('127.0.0.1', port)
+    path = '~/.tacoma/web/'
 
-    path = "~/.tacoma/web/"
     web_dir = os.path.abspath(os.path.expanduser(path))
 
     # download d3 if that did not happen yet
@@ -283,6 +310,11 @@ def visualize(temporal_networks,
     mkdirp_customdir(directory=web_dir)
     subdir_path = os.path.join(web_dir, subdir)
     mkdirp_customdir(directory=subdir_path)
+
+    # in case an export is demanded, prepare the export directory
+    if export_path is not None:
+        export_path = os.path.abspath(os.path.expanduser(export_path))
+        prepare_export_directory(export_path, subdir)
 
     # change directory to this directory
     print("changing directory to", web_dir)
@@ -312,6 +344,13 @@ def visualize(temporal_networks,
 
     with open(os.path.join(web_dir, subdir+'_config.json'), 'w') as f:
         json.dump(this_config, f)
+
+    if export_path is not None:
+        copy_tree(subdir_path, os.path.join(export_path, subdir))
+        with open(os.path.join(export_path, 'default_config.json'), 'w') as f:
+            json.dump(this_config, f)
+
+
 
     # ========= start server ============
     thread = threading.Thread(None, server.run)
