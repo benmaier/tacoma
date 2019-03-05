@@ -1,6 +1,13 @@
 Interactive
 ===========
 
+.. note::
+
+    The visualization is currently buggy in Safari.
+
+Start visualization
+-------------------
+
 `tacoma` offers the possibility to interactively visualize temporal networks.
 The visualization process works comparable to a video, where the temporal network
 is binned to a certain duration ``dt``, called a frame. Then the visualization ticks
@@ -78,3 +85,40 @@ The standard configuration is
         # precision of time label
         "d3_format_string": ".3f",
     }
+
+
+Export visualization
+--------------------
+
+It's also possible to concurrently visualize **and** export the visualization to
+a directory. Say you want to export to ``~/Websites/HT09_visualization``. You can
+simply do
+
+.. code:: python
+
+   import tacoma as tc
+   from tacoma.interactive import visualize
+   visualize(temporal_network, frame_dt = 20, export_path='~/Websites/HT09_visualization')
+
+Now the directory ``~/Websites/HT09_visualization`` holds all files necessary to
+reproduce the visualization. You could, e.g., use the terminal to do the following
+
+.. code:: bash
+
+    cd ~/Websites/HT09_visualization
+    python -m "http.server" 1313
+
+Then the visualization is reachable on your machine at ``http://localhost:1313/``.
+The directory does not have to be the webpage's root directory though -- it
+works as any subdirectory, too, e.g.
+
+.. code:: bash
+
+    cd ~/Websites
+    python -m "http.server" 1313
+
+would give you the same visualization, but this time at ``http://localhost:1313/HT09_visualization``.
+
+Of course you can copy the files to your webserver, too, which will make it possible to explore the
+visualization online.
+

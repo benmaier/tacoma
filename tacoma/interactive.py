@@ -241,8 +241,13 @@ def visualize(temporal_networks,
         Port of the started HTTP server.
     export_path : string, default : None
         path to a directory to which the whole visualization is copied.
-        Use ``os.get_cwd()`` for the current working directory (after
+        Use ``os.get_cwd()+'/export_dir/'`` for the current working directory (after
         ``import os``).
+
+        .. warning::
+            
+            No subdirectory will be made for the export. All visualization files
+            will be exported to ``export_path`` directly.
 
     Notes
     -----

@@ -14,7 +14,9 @@
    .. autosummary::
    
       ~FlockworkPModel.__init__
+      ~FlockworkPModel.get_current_edgelist
       ~FlockworkPModel.set_initial_configuration
+      ~FlockworkPModel.simulate
    
    
 
