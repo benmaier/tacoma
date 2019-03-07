@@ -420,49 +420,183 @@ def flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax
     return np.array(new_t), np.array(k)
 
 
-
-def flockwork_P_mean_group_size_distribution_for_varying_rates(flockwork_P_params, N=None):
-    """Compute the mean group size distribution for a Flockwork-P system with varying rates.
+def flockwork_P_group_life_time_distributions_for_varying_alpha_beta(tau,max_group_size,N,k_initial,t,alpha,beta,tmax,min_group_size=2):
+    r"""Compute the mean group size distribution for a Flockwork-P system with varying rates.
 
     Parameters
     ----------
-    flockwork_P_params : :obj:`dict`
-        Contains all parameters necessary for a Flockwork-P simulation, especially the 
-        time-dependent rewiring rate and time-dependent reconnection probability
-    N : int, default : None
-        If given, compute everything for `N` nodes, where `N` is different from 
-        `N` in `flockwork_P_params`.
+    tau : numpy.ndarray of float
+        durations for which to evaluate the probability density
+    max_group_size : int
+        until which group size the life time distribution should be computed
+    N : int
+        Number of nodes
+    k_initial : float
+        initial mean degree
+    t : numpy.ndarray of float
+        time points at which :math:`\alpha(t)` and 
+        :math:`\beta(t)` change
+    alpha : numpy.ndarray of float
+        active reconnection rate associated with
+        the time points in ``t``
+    beta : numpy.ndarray of float
+        active disconnection rate associated with
+        the time points in ``t``
+    tmax : float
+        final time
+    min_group_size : int, default : 2
+        min group size the life time distribution should be computed for
 
     Returns
     -------
-    mean_distribution : numpy.array
-        An array of length `N` with its `i`-th entry containing the mean number of
-        groups of size `m = i + 1`.
+    P_taus : list of numpy.ndarray
+        list of Mean probability density of values at ``tau`` (contact duration)
     """
 
-    if N is None:
-        N = flockwork_P_params['N']
+    # estimate mean degree from integrating ODE
+    new_t, k = flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax)
+
+    # from equilibrium assumption k = P/(1-P) compute adjusted P
+    new_P = k / (k+1)
+    gamma = alpha + beta
+    new_gamma = tc.sample_a_function(t, gamma, new_t)
+
+    distros = [[] for m in range(min_group_size, max_group_size+1) ]
+
+    ks = np.arange(N)
+    # for every time point and adjusted P, compute the equilibrium group size distribution
+    for g_, P_ in zip(new_gamma, new_P):
+
+        for m in range(min_group_size, max_group_size+1): 
+            lambda_m = m*g_*(1-P_)+2*g_*P_*m*(N-m)/(N-1.0)
+            y = lambda_m * np.exp(-lambda_m*tau)
+            distros[m-min_group_size].append(y)
+
+    mean_distros = []
+    for m in range(min_group_size, max_group_size+1): 
+        dist = np.array(distros[m-min_group_size])
+        mean_distros.append( np.trapz(dist, x=new_t, axis=0) / (new_t[-1] - new_t[0]) );
+
+    return mean_distros
+
+
+def flockwork_P_contact_time_distributions_for_varying_alpha_beta(tau,N,k_initial,t,alpha,beta,tmax):
+    r"""Compute the mean group size distribution for a Flockwork-P system with varying rates.
+
+    Parameters
+    ----------
+    tau : numpy.ndarray of float
+        durations for which to evaluate the probability density
+    N : int
+        Number of nodes
+    k_initial : float
+        initial mean degree
+    t : numpy.ndarray of float
+        time points at which :math:`\alpha(t)` and 
+        :math:`\beta(t)` change
+    alpha : numpy.ndarray of float
+        active reconnection rate associated with
+        the time points in ``t``
+    beta : numpy.ndarray of float
+        active disconnection rate associated with
+        the time points in ``t``
+    tmax : float
+        final time
+
+    Returns
+    -------
+    P_tau_c : numpy.array
+        Mean probability density of values at ``tau`` (contact duration)
+    P_tau_ic : numpy.array
+        Mean probability density of values at ``tau`` (inter-contact duration)
+    """
 
     # estimate mean degree from integrating ODE
-    new_t, k = flockwork_P_mean_degree_for_varying_rates(flockwork_P_params, N)
+    new_t, k = flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax)
+
+    # from equilibrium assumption k = P/(1-P) compute adjusted P
+    new_P = k / (k+1)
+    gamma = alpha + beta
+    new_gamma = tc.sample_a_function(t, gamma, new_t)
+
+    distro_c = []
+    distro_ic = []
+
+    ks = np.arange(N)
+    # for every time point and adjusted P, compute the equilibrium group size distribution
+    for g_, P_ in zip(new_gamma, new_P):
+        p_k = degree_distribution(N,P_)
+        _k_ = p_k.dot(ks)
+        _k2_ = p_k.dot(ks**2)
+        omega = 2*g_*(1-P_/(N-1)*_k2_/_k_) 
+        lambda_1 = 2*g_*P_
+        this_distro_c = omega*np.exp(-tau*omega)
+        this_distro_ic = lambda_1 * np.exp(-lambda_1*tau)
+        distro_c.append(this_distro_c)
+        distro_ic.append(this_distro_ic)
+
+    # compute the mean group size distribution as a time integral over the
+    # group size distribution
+    distro_c = np.array(distro_c)
+    distro_ic = np.array(distro_ic)
+    mean_distro_c = np.trapz(distro_c, x=new_t, axis=0) / (new_t[-1] - new_t[0])
+    mean_distro_ic = np.trapz(distro_ic, x=new_t, axis=0) / (new_t[-1] - new_t[0])
+
+    return mean_distro_c, mean_distro_ic
+
+def flockwork_P_mean_degree_and_group_size_distribution_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax):
+    r"""Compute the mean group size distribution for a Flockwork-P system with varying rates.
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes
+    k_initial : float
+        initial mean degree
+    t : numpy.ndarray of float
+        time points at which :math:`\alpha(t)` and 
+        :math:`\beta(t)` change
+    alpha : numpy.ndarray of float
+        active reconnection rate associated with
+        the time points in ``t``
+    beta : numpy.ndarray of float
+        active disconnection rate associated with
+        the time points in ``t``
+    tmax : float
+        final time
+
+    Returns
+    -------
+    P_g : numpy.array
+        An array of times at which the mean degree was evaluated
+    P_k : numpy.array
+        An array of mean degree values corresponding to the times in t.
+    """
+
+    # estimate mean degree from integrating ODE
+    new_t, k = flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax)
 
     # from equilibrium assumption k = P/(1-P) compute adjusted P
     new_P = k / (k+1)
 
-    distro = []
+    distro_groups = []
+    distro_degrees = []
 
     # for every time point and adjusted P, compute the equilibrium group size distribution
     for P_ in new_P:
-        this_distro = flockwork_P_equilibrium_group_size_distribution(N, P_)
-        distro.append(this_distro[1:])
+        this_distro_groups = flockwork_P_equilibrium_group_size_distribution(N, P_)
+        this_distro_degrees = degree_distribution(N, P_)
+        distro_groups.append(this_distro_groups[1:])
+        distro_degrees.append(this_distro_degrees)
 
     # compute the mean group size distribution as a time integral over the
     # group size distribution
-    distro = np.array(distro)
-    mean_distro = np.trapz(distro, x=new_t, axis=0) / (new_t[-1] - new_t[0])
+    distro_groups = np.array(distro_groups)
+    distro_degrees = np.array(distro_degrees)
+    mean_distro_groups = np.trapz(distro_groups, x=new_t, axis=0) / (new_t[-1] - new_t[0])
+    mean_distro_degrees = np.trapz(distro_degrees, x=new_t, axis=0) / (new_t[-1] - new_t[0])
 
-    return mean_distro
-
+    return mean_distro_groups, mean_distro_degrees
 
 def estimated_mean_group_size_distribution(temporal_network):
     """Compute the mean group size distribution for a temporal network under the assumption

@@ -40,6 +40,8 @@ def temporal_network_group_analysis(result,
                                     bins=100,
                                     bin_dt=None,
                                     use_logarithmic_histogram=True,
+                                    markersize=4,
+
                                     ):
     """Analyze the result of 
     :func:`measure_group_sizes_and_durations`
@@ -66,6 +68,15 @@ def temporal_network_group_analysis(result,
         The axes to plot to (have to be a list of length 3 at least). If 
         set to None, a figure and axes will be created and returned. 
         default : None
+    bins : int, default : 100
+        number of bins for the histogram
+    bin_dt : float, default : None
+        if given, do discrete binning to bins of this time-length
+    use_logarithmic_histogram : bool, default : True
+        if True, use logarithmicly growing bin sizes, otherwise use
+        constant bin size
+    markersize : int, default : 4,
+        markersize for the plots
 
     Returns
     -------
@@ -88,6 +99,7 @@ def temporal_network_group_analysis(result,
                                           ax[0],
                                           plot_step=plot_step,
                                           fit_power_law=fit_power_law,
+                                          markersize=markersize,
                                           )
     res_contacts = plot_contact_durations(result,
                                           ax[1],
@@ -98,6 +110,7 @@ def temporal_network_group_analysis(result,
                                           use_logarithmic_histogram=use_logarithmic_histogram,
                                           bins=bins,
                                           bin_dt=bin_dt,
+                                          markersize=markersize,
                                           )
     res_dur = plot_group_durations(result,
                                    ax[2],
@@ -109,6 +122,7 @@ def temporal_network_group_analysis(result,
                                    use_logarithmic_histogram=use_logarithmic_histogram,
                                    bins=bins,
                                    bin_dt=bin_dt,
+                                          markersize=markersize,
                                    )
 
     res.update(res_sizes)
@@ -117,14 +131,184 @@ def temporal_network_group_analysis(result,
 
     return fig, ax, res
 
+def detailed_temporal_network_group_analysis(result,
+                                    P_k,
+                                    max_group=5,
+                                    time_normalization_factor=1.,
+                                    time_unit=None,
+                                    plot_step=False,
+                                    fit_power_law=False,
+                                    ax=None,
+                                    bins=100,
+                                    bin_dt=None,
+                                    use_logarithmic_histogram=True,
+                                    marker=None,
+                                    markersize=4,
+                                    label=None,
+                                    ):
+    """Analyze the result of 
+    :func:`measure_group_sizes_and_durations`
+    and plot it.
+
+    Parameters
+    ----------
+    result : :mod:`tacoma.group_sizes_and_durations`
+        The result of the temporal network analysis provided by
+        :mod:`tacoma.measure_group_sizes_and_durations`
+    P_k : list or numpy.ndarray of float
+        average degree distribution
+        entry the :math:`k`-th entry of ``P_k`` contains the average
+        probability that a node has degree :math:`k`
+    max_group : int, optional
+        The maximum group size for which to plot the duration distribution.
+        default: 5
+    time_normalization_factor : float, optional
+        Factor with which the time in the duration lists are rescaled
+        default: 1.0
+    time_unit : :obj:`str`, optional
+        Time unit to put on the axes. default : None
+    plot_step : bool, optional
+        If True, plot step functions instead of markers. default : False
+    fit_power_law : bool, optional
+        If True, fit and plot a power law to the distributions. default: False
+    ax : :obj:`list` of matplotlib axes objects
+        The axes to plot to (have to be a list of length 3 at least). If 
+        set to None, a figure and axes will be created and returned. 
+        default : None
+    bins : int, default : 100
+        number of bins for the histogram
+    bin_dt : float, default : None
+        if given, do discrete binning to bins of this time-length
+    use_logarithmic_histogram : bool, default : True
+        if True, use logarithmicly growing bin sizes, otherwise use
+        constant bin size
+    marker : str, default : None,
+        if set, all curves will be drawn using this marker
+    markersize : int, default : 4,
+        markersize for the plots
+    label : str, default : None,
+        if set, all curves will be associated with this label
+
+    Returns
+    -------
+    matplotlib figure
+        A matplotlib figure object.
+    array_like of matplotlib axes
+        As the name says.
+    :obj:`dict`
+        The results of the analysis (the distributions).
+    """
+
+    if ax is None:
+        fig, ax = pl.subplots(int(np.ceil((max_group-1)/4))+1, 4)
+        ax = ax.flatten()
+    else:
+        fig = None
+
+    res = {}
+
+    res_degree = plot_degree_distribution(P_k,
+                                          ax[0],
+                                          plot_step=plot_step,
+                                          marker=marker,
+                                          markersize=markersize,
+                                          label=label,
+                                          )
+    res_sizes = plot_group_size_histogram(result,
+                                          ax[1],
+                                          plot_step=plot_step,
+                                          fit_power_law=fit_power_law,
+                                          marker=marker,
+                                          markersize=markersize,
+                                          label=label,
+                                          )
+    res_contacts = plot_contact_durations(result,
+                                          ax[2:4],
+                                          time_normalization_factor=time_normalization_factor,
+                                          time_unit=time_unit,
+                                          plot_step=plot_step,
+                                          fit_power_law=fit_power_law,
+                                          use_logarithmic_histogram=use_logarithmic_histogram,
+                                          bins=bins,
+                                          bin_dt=bin_dt,
+                                          marker=marker,
+                                          markersize=markersize,
+                                          label=label,
+                                          )
+
+    for g in range(2, max_group+1):
+        res_dur = plot_group_durations(result,
+                                       ax[4+g-2],
+                                       time_normalization_factor=time_normalization_factor,
+                                       min_group=g,
+                                       max_group=g,
+                                       time_unit=time_unit,
+                                       plot_step=plot_step,
+                                       fit_power_law=fit_power_law,
+                                       use_logarithmic_histogram=use_logarithmic_histogram,
+                                       bins=bins,
+                                       bin_dt=bin_dt,
+                                       markersize=markersize,
+                                       marker=marker,
+                                       label=label,
+                                       )
+        res.update(res_dur)
+
+    res.update(res_sizes)
+    res.update(res_contacts)
+    res.update(res_dur)
+    res.update(res_degree)
+
+    return fig, ax, res
+
+def plot_degree_distribution(P_k,
+                              ax,
+                              xlabel='node degree $k$',
+                              plot_step=False,
+                              markersize=4,
+                              marker=None,
+                              label=None,
+                              ):
+
+    P = np.array(P_k)
+    k = np.arange(np.max(np.where(P>0)[0])+1)
+    P = P[k]
+
+    if marker is None:
+        marker = 'o'
+
+    if plot_step:
+        ax.step(k, P,
+                where='mid',
+                label=label,
+                )
+    else:
+        ax.plot(k, P, marker,
+                ms=markersize,
+                mew=1,
+                mfc='None',
+                label=label,
+                )
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(r'avg. probability $\overline{P_k}$')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    res = {'degree_distribution': (k, P)}
+
+    return res
 
 def plot_group_size_histogram(result,
                               ax,
-                              marker='.',
                               xlabel='group size $g$',
                               plot_step=False,
                               fit_power_law=False,
+                              markersize=4,
+                              marker = None,
+                              label=None,
                               ):
+
+    if marker is None:
+        marker = 'o'
 
     group_size_histogram = np.array([
         (size, val)
@@ -137,15 +321,17 @@ def plot_group_size_histogram(result,
     if plot_step:
         ax.step(x_group, y_group,
                 where='mid',
+                label=label,
                 )
     else:
-        ax.plot(x_group, y_group, 'o',
-                ms=4,
+        ax.plot(x_group, y_group, marker,
+                ms=markersize,
                 mew=1,
-                mfc='None'
+                mfc='None',
+                label=label,
                 )
     ax.set_xlabel(xlabel)
-    ax.set_ylabel(r'average number of $g$-sized groups $\overline{n_g}$')
+    ax.set_ylabel(r'avg. group-count $\overline{n_g}$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     res = {'size_histogram': (x_group, y_group)}
@@ -155,7 +341,7 @@ def plot_group_size_histogram(result,
 
 def plot_contact_durations(result,
                            ax,
-                           markers=['o', 'd'],
+                           marker=None,
                            xlabel='duration',
                            bins=100,  # number of bins
                            time_normalization_factor=1.,
@@ -164,16 +350,32 @@ def plot_contact_durations(result,
                            plot_step=False,
                            fit_power_law=False,
                            use_logarithmic_histogram=True,
+                           markersize=4,
+                           label=None,
                            ):
+    if marker is None:
+        markers = ['o', 'd']
+    else:
+        markers = [marker] * 2
+
+    if label is None:
+        labels = ['contact', 'inter-contact']
+    else:
+        labels = [label] * 2
+
 
     if bin_dt is not None:
         use_discrete_dt = True
     else:
         use_discrete_dt = False
 
+    if not hasattr(ax,'__len__'):
+        a = [ax, ax]
+    else:
+        a = ax
+
     durs = [np.array(result.contact_durations, dtype=float),
             np.array(result.group_durations[1], dtype=float)]
-    labels = ['contact', 'inter-contact']
     res = {}
 
     for i, dur in enumerate(durs):
@@ -194,9 +396,9 @@ def plot_contact_durations(result,
                 x = 0.5*(x[1:]+x[:-1])
                 print(x.shape,y.shape)
 
-            ax.plot(x, y, ls='', marker=markers[i], 
+            a[i].plot(x, y, ls='', marker=markers[i], 
                     label=labels[i],
-                    ms=4,
+                    ms=markersize,
                     mew=1,
                     mfc='None'
                     )
@@ -215,31 +417,33 @@ def plot_contact_durations(result,
                 x.append(x[-1]+1)
             else:
                 y, x = np.histogram(dur*time_normalization_factor,bins=bins,density=True)
-            ax.step(x, np.append(y, y[-1]),
+            a[i].step(x, np.append(y, y[-1]),
                     where='post',
                     label=labels[i],
                     )
 
         res[labels[i]] = (x, y)
 
-    ax.set_xscale('log')
-    ax.set_yscale('log')
     if time_unit is not None:
         xlabel += ' [' + time_unit + ']'
-    ax.set_xlabel(xlabel)
-
     ylabel = 'probability density'
     if time_unit is not None:
         ylabel += ' [1/' + time_unit + ']'
 
-    ax.set_ylabel(ylabel)
-    ax.legend()
+    for ax in a: 
+ 
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        ax.legend()
 
     return res
 
 
 def plot_group_durations(result,
                          ax,
+                         min_group=2,
                          max_group=5,
                          xlabel='duration',
                          bins=100,
@@ -249,7 +453,20 @@ def plot_group_durations(result,
                          plot_step=False,
                          fit_power_law=False,
                          use_logarithmic_histogram=True,
+                         markersize=4,
+                         marker=None,
+                         label = None,
                          ):
+    if label is None:
+        labels = [ '$g=%d$' % size for size in range(min_group, max_group+1) ]
+    else:
+        labels = [label] * (max_group+1-min_group)
+
+    if marker is None:
+        this_marker_sequence = marker_sequence
+    else:
+        this_marker_sequence = [marker] * max_group
+
 
     if bin_dt is not None:
         use_discrete_dt = True
@@ -258,7 +475,7 @@ def plot_group_durations(result,
 
     res = {}
 
-    for size in range(2, max_group+1):
+    for size in range(min_group, max_group+1):
         if len(result.group_durations[size]) > 6:
             data = time_normalization_factor * \
                 np.array(result.group_durations[size], dtype=float)
@@ -281,9 +498,9 @@ def plot_group_durations(result,
 
                 ax.plot(x, y,
                         ls='',
-                        marker=marker_sequence[size % len(marker_sequence)],
-                        label='$g=%d$' % size,
-                        ms=4,
+                        marker=this_marker_sequence[size % len(this_marker_sequence)],
+                        label=labels[size-min_group],
+                        ms=markersize,
                         mew=1,
                         mfc='None'
                         )
@@ -305,7 +522,7 @@ def plot_group_durations(result,
 
                 ax.step(x, np.append(y, y[-1]),
                         where='post',
-                        label='$g=%d$' % size,
+                        label=labels[size-min_group],
                         )
             res[size] = (x, y)
 
