@@ -459,16 +459,21 @@ def flockwork_P_group_life_time_distributions_for_varying_alpha_beta(tau,max_gro
     # from equilibrium assumption k = P/(1-P) compute adjusted P
     new_P = k / (k+1)
     gamma = alpha + beta
-    new_gamma = tc.sample_a_function(t, gamma, new_t)
+    #new_gamma = tc.sample_a_function(t, gamma, new_t)
+    new_alpha = tc.sample_a_function(t, alpha, new_t)
 
     distros = [[] for m in range(min_group_size, max_group_size+1) ]
 
     ks = np.arange(N)
     # for every time point and adjusted P, compute the equilibrium group size distribution
-    for g_, P_ in zip(new_gamma, new_P):
+    for a_, P_, _k_ in zip(new_alpha, new_P, k):
+        if P_ > 0:
+            g_ = a_ / P_
+        else:
+            g_ = 0
 
         for m in range(min_group_size, max_group_size+1): 
-            lambda_m = m*g_*(1-P_)+2*g_*P_*m*(N-m)/(N-1.0)
+            lambda_m = m*g_*(1-P_)+2*a_*m*(N-m)/(N-1.0)
             y = lambda_m * np.exp(-lambda_m*tau)
             distros[m-min_group_size].append(y)
 
@@ -518,18 +523,24 @@ def flockwork_P_contact_time_distributions_for_varying_alpha_beta(tau,N,k_initia
     new_P = k / (k+1)
     gamma = alpha + beta
     new_gamma = tc.sample_a_function(t, gamma, new_t)
+    new_alpha = tc.sample_a_function(t, alpha, new_t)
+
 
     distro_c = []
     distro_ic = []
 
     ks = np.arange(N)
     # for every time point and adjusted P, compute the equilibrium group size distribution
-    for g_, P_ in zip(new_gamma, new_P):
+    for a_, P_, _k_ in zip(new_alpha, new_P, k):
+        if P_ > 0:
+            g_ = a_ / P_
+        else:
+            g_ = 0
         p_k = degree_distribution(N,P_)
         _k_ = p_k.dot(ks)
         _k2_ = p_k.dot(ks**2)
         omega = 2*g_*(1-P_/(N-1)*_k2_/_k_) 
-        lambda_1 = 2*g_*P_
+        lambda_1 = 2*a_
         this_distro_c = omega*np.exp(-tau*omega)
         this_distro_ic = lambda_1 * np.exp(-lambda_1*tau)
         distro_c.append(this_distro_c)
