@@ -350,7 +350,7 @@ def flockwork_P_mean_degree_for_varying_rates(flockwork_P_params, N=None):
 
     return np.array(new_t), np.array(k)
 
-def flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax):
+def flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax,sampling_points=10):
     r"""Compute the mean group size distribution for a Flockwork-P system with varying rates.
 
     Parameters
@@ -370,6 +370,8 @@ def flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax
         the time points in ``t``
     tmax : float
         final time
+    sampling_points : int, default : 10
+        how many points to sample in between two time points in `t`
 
     Returns
     -------
@@ -408,7 +410,7 @@ def flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax
 
         # for 10 time points within this interval,
         # compute the expected mean degree
-        this_t = np.linspace(t_, t[i+1], 10)
+        this_t = np.linspace(t_, t[i+1], sampling_points)
         for t__ in this_t[1:]:
             new_t.append(t__)
             this_k = r.integrate(t__)
@@ -420,7 +422,7 @@ def flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax
     return np.array(new_t), np.array(k)
 
 
-def flockwork_P_group_life_time_distributions_for_varying_alpha_beta(tau,max_group_size,N,k_initial,t,alpha,beta,tmax,min_group_size=2):
+def flockwork_P_group_life_time_distributions_for_varying_alpha_beta(tau,max_group_size,N,k_initial,t,alpha,beta,tmax,min_group_size=2,sampling_points=10):
     r"""Compute the mean group size distribution for a Flockwork-P system with varying rates.
 
     Parameters
@@ -446,6 +448,9 @@ def flockwork_P_group_life_time_distributions_for_varying_alpha_beta(tau,max_gro
         final time
     min_group_size : int, default : 2
         min group size the life time distribution should be computed for
+    sampling_points : int, default : 10
+        how many points to sample in between two time points in `t`
+
 
     Returns
     -------
@@ -454,7 +459,7 @@ def flockwork_P_group_life_time_distributions_for_varying_alpha_beta(tau,max_gro
     """
 
     # estimate mean degree from integrating ODE
-    new_t, k = flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax)
+    new_t, k = flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax,sampling_points)
 
     # from equilibrium assumption k = P/(1-P) compute adjusted P
     new_P = k / (k+1)
@@ -485,7 +490,7 @@ def flockwork_P_group_life_time_distributions_for_varying_alpha_beta(tau,max_gro
     return mean_distros
 
 
-def flockwork_P_contact_time_distributions_for_varying_alpha_beta(tau,N,k_initial,t,alpha,beta,tmax):
+def flockwork_P_contact_time_distributions_for_varying_alpha_beta(tau,N,k_initial,t,alpha,beta,tmax,sampling_points=10):
     r"""Compute the mean group size distribution for a Flockwork-P system with varying rates.
 
     Parameters
@@ -507,6 +512,8 @@ def flockwork_P_contact_time_distributions_for_varying_alpha_beta(tau,N,k_initia
         the time points in ``t``
     tmax : float
         final time
+    sampling_points : int, default : 10
+        how many points to sample in between two time points in `t`
 
     Returns
     -------
@@ -517,7 +524,7 @@ def flockwork_P_contact_time_distributions_for_varying_alpha_beta(tau,N,k_initia
     """
 
     # estimate mean degree from integrating ODE
-    new_t, k = flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax)
+    new_t, k = flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax,sampling_points)
 
     # from equilibrium assumption k = P/(1-P) compute adjusted P
     new_P = k / (k+1)
@@ -555,7 +562,7 @@ def flockwork_P_contact_time_distributions_for_varying_alpha_beta(tau,N,k_initia
 
     return mean_distro_c, mean_distro_ic
 
-def flockwork_P_mean_degree_and_group_size_distribution_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax):
+def flockwork_P_mean_degree_and_group_size_distribution_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax,sampling_points=10):
     r"""Compute the mean group size distribution for a Flockwork-P system with varying rates.
 
     Parameters
@@ -575,6 +582,8 @@ def flockwork_P_mean_degree_and_group_size_distribution_for_varying_alpha_beta(N
         the time points in ``t``
     tmax : float
         final time
+    sampling_points : int, default : 10
+        how many points to sample in between two time points in `t`
 
     Returns
     -------
@@ -585,7 +594,7 @@ def flockwork_P_mean_degree_and_group_size_distribution_for_varying_alpha_beta(N
     """
 
     # estimate mean degree from integrating ODE
-    new_t, k = flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax)
+    new_t, k = flockwork_P_mean_degree_for_varying_alpha_beta(N,k_initial,t,alpha,beta,tmax,sampling_points=10)
 
     # from equilibrium assumption k = P/(1-P) compute adjusted P
     new_P = k / (k+1)
