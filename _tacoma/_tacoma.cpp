@@ -1602,7 +1602,7 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("t_simulation", &node_based_SIS::t_simulation, "Absolute run time of the simulation.");
 
 
-    py::class_<SI>(m, "SI", "Base class for the simulation of an SI compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SI` to simulate and retrieve the simulation results.")
+    py::class_<SI>(m, "SI", "Base class for the simulation of an SI compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SI` to simulate and retrieve the simulation results. Simulation stops when ``t_simulation`` is reached or if no infected is left.")
         .def(py::init<size_t, double, double, size_t, size_t, double, size_t, bool, bool>(),
              py::arg("N"),
              py::arg("t_simulation"),

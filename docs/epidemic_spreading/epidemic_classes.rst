@@ -27,8 +27,9 @@ the class :class:`_tacoma.SI`
 .. code:: python
 
     SI = tc.SI(N, #number of nodes
-               t_simulation, # maximum time of the simulation
-               infection_rate,
+               t_simulation, # maximum time of the simulation (set really
+                             # high if sim should end when no infected left)
+               infection_rate, # infection events per link per unit time
                number_of_initially_infected = int(N), # optional, default: 1
                number_of_initially_vaccinated = 0, # optional, default: 0
                seed = 792, # optional, default: randomly initiated
@@ -72,6 +73,8 @@ Plot the results as
 
 .. note::
 
+    - The simulation ends if ``t == t_simulation`` or the number of
+      infected is equal to zero.
     - If the time of the epidemic spreading simulation is larger than
       the duration of the temporal network the network is automatically
       looped.
