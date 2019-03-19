@@ -29,6 +29,7 @@
 #include "Utilities.h"
 #include "ResultClasses.h"
 
+#include <iterator>
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>

@@ -30,6 +30,7 @@
 #include "ResultClasses.h"
 #include "social_trajectories.h"
 
+#include <iterator>
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
