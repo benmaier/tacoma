@@ -108,7 +108,6 @@ edge_changes
 
     //simulate
     double t = reconnection_rate[0].first;
-    ssize_t last_event = -1;
     size_t i_t = 0;
 
     while (t < t_run_total)
@@ -131,7 +130,6 @@ edge_changes
                             generator,
                             uni_distribution);
         t = t + tau;
-        last_event = event;
 
         if (t<t_run_total)
         {
@@ -259,7 +257,6 @@ edge_changes
 
     //simulate
     double t = reconnection_rates[0].first;
-    ssize_t last_event = -1;
     size_t i_t = 0;
 
     while (t < t_run_total)
@@ -285,7 +282,6 @@ edge_changes
                             generator,
                             uni_distribution);
         t = t + tau;
-        last_event = channel;
 
         if (t<t_run_total)
         {
@@ -399,7 +395,6 @@ edge_changes
 
     //simulate
     double t = reconnection_rate[0].first;
-    ssize_t last_event = -1;
     size_t i_t = 0;
 
     while (t < t_run_total)
@@ -422,7 +417,6 @@ edge_changes
                             generator,
                             uni_distribution);
         t = t + tau;
-        last_event = event;
 
         if (t<t_run_total)
         {
@@ -562,7 +556,6 @@ edge_changes
 
     //simulate
     double t = reconnection_rates[0].first;
-    ssize_t last_event = -1;
     size_t i_t = 0;
 
     while (t < t_run_total)
@@ -588,7 +581,6 @@ edge_changes
                             generator,
                             uni_distribution);
         t = t + tau;
-        last_event = channel;
 
         if (t<t_run_total)
         {

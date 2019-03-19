@@ -600,7 +600,7 @@ vector < set < size_t > > get_random_graph(
     vector < set < size_t > > G(n);
 
     size_t v = 1;
-    ssize_t w = -1;
+    long w = -1;
     while (v < n)
     {
         double r = distribution(generator);

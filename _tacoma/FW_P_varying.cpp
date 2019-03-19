@@ -96,7 +96,6 @@ edge_changes
 
     //simulate
     double t = get<0>(rewiring_rate[0]);
-    ssize_t last_event = -1;
     size_t i_t = 0;
 
     while (t < t_run_total)
@@ -118,7 +117,6 @@ edge_changes
                             generator,
                             uni_distribution);
         t = t + tau;
-        last_event = event;
 
         if (t<t_run_total)
         {
@@ -210,7 +208,6 @@ edge_changes
 
     //simulate
     double t = get<0>(rewiring_rates[0]);
-    ssize_t last_event = -1;
     size_t i_t = 0;
 
     while (t < t_run_total)
@@ -236,7 +233,6 @@ edge_changes
                             generator,
                             uni_distribution);
         t = t + tau;
-        last_event = event;
 
         if (t<t_run_total)
         {
@@ -352,7 +348,6 @@ edge_changes
 
     //simulate
     double t = get<0>(rewiring_rate[0]);
-    ssize_t last_event = -1;
     size_t i_t = 0;
 
     while (t < t_run_total)
@@ -374,7 +369,6 @@ edge_changes
                             generator,
                             uni_distribution);
         t = t + tau;
-        last_event = event;
 
         if (t<t_run_total)
         {
