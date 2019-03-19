@@ -2,6 +2,7 @@
 
 TemporAl COntact Modeling and Analysis. Provides fast tools to analyze temporal contact networks, 
 produce surrogate networks using qualitative models and simulate Gillespie processes on them.
+Currently only working on OSX and Linux distributions. No Windows support yet!
 
 ## Quick example
 
