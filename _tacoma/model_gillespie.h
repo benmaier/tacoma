@@ -187,15 +187,22 @@ void
     // initialize time variables
     double t0 = this_model_object.t0;
     double t = t0;
+    double Lambda_model = 1.0;
 
     this_model_object.edg_chg.tmax = t_simulation;
 
-    while ( (t-t0 < t_simulation) )
+    if (verbose)
+    {
+        cout << "called gillespie model simulation..." << endl;
+        cout << "t_simulation = " << t_simulation << endl;
+        cout << "t = " << t << endl;
+    }
+
+    while ( (t-t0 < t_simulation) and (t>=t0) and (Lambda_model>0.0) )
     {
 
         // inititalize rate containers
         vector < double > rates_model;
-        double Lambda_model;
 
         // get the updated rates and lambda
         this_model_object.get_rates_and_Lambda(rates_model,Lambda_model);
@@ -207,41 +214,45 @@ void
                 cout << "   rate = " << rate << endl;
         }
 
-        double Lambda = Lambda_model;
-        double rProduct = randuni(generator) * Lambda;
-
-        vector<double>::iterator this_rate;
-        size_t n_rates;
-
-        this_rate = rates_model.begin();
-        n_rates = rates_model.size();
-
-        double sum_event = 0.0;
-        size_t event = 0;
-
-        while ( (event < n_rates) and not ( (sum_event < rProduct) and (rProduct <= sum_event + (*this_rate)) ) )
+        if (Lambda_model>0.0)
         {
-            sum_event += (*this_rate);
-            ++this_rate;
-            ++event;
-        }
 
-        if (verbose)
-        {
-            cout << "rProduct = " << rProduct << endl;
-            cout << "event = " << event << endl;
-            cout << "this_rate = " << *this_rate << endl;
-        }
+            double Lambda = Lambda_model;
+            double rProduct = randuni(generator) * Lambda;
 
-        double tau = log(1.0/randuni(generator)) / Lambda;
+            vector<double>::iterator this_rate;
+            size_t n_rates;
 
-        t += tau;
-        if ((t - t0) < t_simulation)
-        {
-            vector < pair < size_t, size_t > > edges_in;
-            vector < pair < size_t, size_t > > edges_out;
+            this_rate = rates_model.begin();
+            n_rates = rates_model.size();
 
-            this_model_object.make_event(event,t,edges_in,edges_out);
+            double sum_event = 0.0;
+            size_t event = 0;
+
+            while ( (event < n_rates) and not ( (sum_event < rProduct) and (rProduct <= sum_event + (*this_rate)) ) )
+            {
+                sum_event += (*this_rate);
+                ++this_rate;
+                ++event;
+            }
+
+            if (verbose)
+            {
+                cout << "rProduct = " << rProduct << endl;
+                cout << "event = " << event << endl;
+                cout << "this_rate = " << *this_rate << endl;
+            }
+
+            double tau = log(1.0/randuni(generator)) / Lambda;
+
+            t += tau;
+            if ( ((t - t0) < t_simulation) and (t >= t0) )
+            {
+                vector < pair < size_t, size_t > > edges_in;
+                vector < pair < size_t, size_t > > edges_out;
+
+                this_model_object.make_event(event,t,edges_in,edges_out);
+            }
         }
     }
 }

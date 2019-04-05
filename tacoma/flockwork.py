@@ -959,18 +959,73 @@ def convert_to_edge_activity_parameters(N, P, gamma=1.0):
     rho : float
         The network density.
     omega : float
-        The rate with which either 
+        The rate with which a link is either switched on or off. 
     """
 
     k = degree_moment(N, P, 1)
     k2 = degree_moment(N, P, 2)
 
-    omega_minus = 2*gamma*(1-P/(N-1)*k2/k)
-    rho = k / (N-1)
-    omega = omega_minus * rho
+    if k == 0.0:
+        rho = 0.0
+        omega = 2*gamma
+    else:
+
+        omega_minus = 2*gamma*(1-P/(N-1)*k2/k)
+        rho = k / (N-1)
+        omega = omega_minus * rho
 
     return rho, omega
     
+def convert_to_varying_edge_activity_parameters(N, reconnection_rates, disconnection_rates):
+    r"""
+    Convert the Flockwork-P parameters math:`\alpha` and :math:`\beta`
+    to the corresponding parameters in the edge activity model
+    :math:`\rho` and :math:`\omega`.
+
+    Parameters
+    ----------
+    N : int
+        number of nodes
+    t : numpy.ndarray of float
+        time points at which :math:`\alpha` and :math`\beta` change
+    reconnection_rates : numpy.ndarray of float
+        values of :math:`\alpha` for the corresponding time values in ``t``.
+    disconnection_rates : numpy.ndarray of float
+        values of :math:`\beta` for the corresponding time values in ``t``.
+    tmax : float
+        time at which the simulation is supposed to end.
+
+    Returns
+    -------
+    rho : float
+        The network density.
+    omega : float
+        The rate with which a link is either switched on or off. 
+    """
+
+    rho = []
+    omega = []
+
+
+    if len(reconnection_rates) != len(disconnection_rates):
+        raise ValueError('The arrays `reconnection_rates` and `disconnection_rates` must have the same length' )
+
+    all_networks = []
+
+    for a_, b_ in zip(reconnection_rates, disconnection_rates):
+
+        if a_ == 0.0 and b_ == 0.0:
+            P = 0
+        else:
+            P = a_ / (a_+b_)
+        g = (a_+b_)
+
+        rho_, omega_ = convert_to_edge_activity_parameters(N, P, g)
+
+        rho.append(rho_)
+        omega.append(omega_)
+
+    return np.array(rho), np.array(omega)
 
 if __name__ == "__main__":
 

@@ -117,6 +117,7 @@ class EdgeActivityModel
             // reset observables
             edg_chg.N = N;
 
+            edg_chg.t0 = t0;
             edg_chg.t.clear();
             edg_chg.edges_in.clear();
             edg_chg.edges_out.clear();
@@ -165,11 +166,21 @@ class EdgeActivityModel
     
         }
 
+        void set_initial_edgelist( double _t0, vector < pair < size_t, size_t > > _E)
+        {
+            vector < set < size_t > > _G(N);
+            //cout << "trying to get graph" << endl;
+            graph_from_edgelist(_G,_E);
+            //cout << "setting initial configuration" << endl;
+            set_initial_configuration(_t0, _G);
+        }
+
         void reset() 
         {
             // reset observables
             edg_chg.N = N;
 
+            edg_chg.t0 = t0;
             edg_chg.t.clear();
             edg_chg.edges_in.clear();
             edg_chg.edges_out.clear();
@@ -222,6 +233,13 @@ class EdgeActivityModel
                         vector < pair < size_t, size_t > > &e_in,
                         vector < pair < size_t, size_t > > &e_out
                        );
+
+        vector < pair < size_t, size_t > > get_current_edgelist()
+        {
+            vector < pair < size_t, size_t > > _E;
+            edgelist_from_graph(_E, G);
+            return _E;
+        }
 
         void print()
         {

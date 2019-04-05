@@ -1786,6 +1786,10 @@ PYBIND11_MODULE(_tacoma, m)
                 )pbdoc")
         .def("set_initial_configuration",&EdgeActivityModel::set_initial_configuration,
              R"pbdoc(Reset the state of the network to a certain graph (:obj:`list` of :obj:`set` of :obj:`int`))pbdoc")
+        .def("set_initial_edgelist",&EdgeActivityModel::set_initial_edgelist,
+             R"pbdoc(Reset the state of the network to a certain edgelist (:obj:`list` of :obj:`tuple` of :obj:`int`))pbdoc")
+        .def("get_current_edgelist",&EdgeActivityModel::get_current_edgelist,
+             R"pbdoc(Get an edge list of the current network state.)pbdoc")
         .def_readwrite("edge_changes", &EdgeActivityModel::edg_chg, 
                     R"pbdoc(An instance of :class:`_tacoma.edge_changes` with the saved temporal network (only if
                     `save_temporal_network` is `True`).)pbdoc")
