@@ -7,13 +7,15 @@ import time
 
 
 N = 100
-P = [ 0.5 ] 
+P = [ 0.25 ] 
 rewiring_rate = [ (0.0,1.0) ]
-t_run_total = 500.0
+t_run_total = 100000.0/N
 tmax = 1000.0
 seed = 7925
-infection_rate = 0.1
+R0 = 7
 recovery_rate = 0.1
+infection_rate = R0 * (1-P[0]) *recovery_rate
+sampling_dt = 1.0
 
 E = flockwork_P_equilibrium_configuration(N,P[0])
 

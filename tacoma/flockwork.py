@@ -836,7 +836,7 @@ def flockwork_P(N, P, t_run_total, rewiring_rate = 1.0, initial_edges = None, se
         initial_edges = flockwork_P_equilibrium_configuration(N, P)
 
     FW = tc.FlockworkPModel(initial_edges, N, rewiring_rate, P, save_temporal_network = True)
-    FW.simulate(dt)
+    FW.simulate(t_run_total)
     this_result = FW.edge_changes
 
     return this_result
