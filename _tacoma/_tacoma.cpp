@@ -1745,7 +1745,7 @@ PYBIND11_MODULE(_tacoma, m)
 
     py::class_<EdgeActivityModel>(m, "EdgeActivityModel",
             R"pbdoc(
-                Base class for the simulation of a simple Flockwork-P model. Pass this to :func:`tacoma.api.gillespie_epidemics` or
+                Base class for the simulation of a simple edge activity model. Pass this to :func:`tacoma.api.gillespie_epidemics` or
                 :func:`tacoma.api.markov_epidemics`.
             )pbdoc")
         .def(py::init<size_t, double, double, double, bool, bool, size_t, bool>(),
