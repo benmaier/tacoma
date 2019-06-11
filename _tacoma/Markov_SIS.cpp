@@ -77,8 +77,9 @@ void MARKOV_SIS::step(
                     this_noninfection_probability *= 1.0 - P_INF * p_infected->at(j);
                 }
             }
-            this_new_p =   (1.0 - _p) * (1.0 - this_noninfection_probability)
-                         + _p * (1 - P_REC);
+            //this_new_p =   (1.0 - _p) * (1.0 - this_noninfection_probability)
+            //             + _p * (1 - P_REC) + P_REC * _p * (1.0 - this_noninfection_probability);
+            this_new_p =  1.0 - this_noninfection_probability * (1.0 - (1.0 - P_REC) * _p);
 
             //cout << "node_status : " << stat << endl;
             if (this_new_p < 0.0)
