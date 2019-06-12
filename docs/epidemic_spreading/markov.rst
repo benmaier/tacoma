@@ -5,7 +5,12 @@ In contrast to Gillespie's simulation one can write down an approximate equation
 for the temporal evolution of the nodes' probability to be infected, (see Eq. (1) in
 `Epidemic Threshold in Continuous-Time Evolving Networks`_) which can then be
 integrated. This is slower than the Gillespie simulation but leads to smaller 
-fluctuations which makes it easier to obtain the epidemic threshold.
+fluctuations which makes it easier to obtain the epidemic threshold. It is based 
+on the assumption that neighboring infections states are uncorrelated and factorize to
+:math:`\left< i_u i_v\right>=\left< i_u \right>\left<i_v\right>`. This assumption is 
+usually justified in non-sparse annealed systems but leads to drastic differences
+in other systems. Since temporal contact networks are often neither, use this 
+model with care.
 
 How it works
 ------------
@@ -18,10 +23,15 @@ governed by
 
 .. math::
 
-    p_u(t+\Delta t) = p_u(t) (1-\varrho\Delta t) + (1-p_u(t))
-                  \left[
-                        1-\prod_{v=1}^N(1-\eta\Delta t A_{vu}(t)p_v(t))
-                  \right]
+    p_u(t+\Delta t) = 1 - q_u(t,\Delta t)\times\Big[1-p_u(t)\times\left(1-\varrho\Delta t\right)\Big]
+
+where 
+
+.. math::
+
+    q_u(t, \Delta t) = \prod_{v=1}^N\Big[1-\eta\Delta t A_{uv}(t)p_v(t)\Big]
+
+is the probability that none of `u`'s neighbors infects `u` during this time step.
 
 Here, :math:`\Delta t=\mathrm{min}\{\Delta t_{\mathrm{network\ change}}, \Delta t_{\mathrm{max}}\}`
 is either the time until the network changes next, or the maximally allowed 

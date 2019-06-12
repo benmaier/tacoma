@@ -14,7 +14,9 @@
    .. autosummary::
    
       ~EdgeActivityModel.__init__
+      ~EdgeActivityModel.get_current_edgelist
       ~EdgeActivityModel.set_initial_configuration
+      ~EdgeActivityModel.set_initial_edgelist
    
    
 
