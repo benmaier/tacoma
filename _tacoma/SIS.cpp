@@ -241,6 +241,13 @@ void SIS::update_observables(
             // push back time
             time.push_back(t);
 
+            if (save_infected_nodes)
+            {
+                //vector < size_t > _infected;
+                //copy(infected.begin(), infected.end(), back_inserter(_infected)); 
+                saved_infected_nodes.push_back(infected);
+            }
+
             // advance next sampling time
             do
             {
@@ -260,6 +267,13 @@ void SIS::update_observables(
 
             // push back time
             time.push_back(t);
+            if (save_infected_nodes)
+            {
+                //vector < size_t > _infected;
+                //copy(infected.begin(), infected.end(), back_inserter(_infected)); 
+                saved_infected_nodes.push_back(infected);
+            }
+
         }
     }
     else
@@ -275,6 +289,13 @@ void SIS::update_observables(
 
         // push back time
         time.push_back(t);
+
+        if (save_infected_nodes)
+        {
+            //vector < size_t > _infected;
+            //copy(infected.begin(), infected.end(), back_inserter(_infected)); 
+            saved_infected_nodes.push_back(infected);
+        }
 
     }
 }

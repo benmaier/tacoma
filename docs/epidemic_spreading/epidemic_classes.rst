@@ -138,6 +138,8 @@ the `SIS` object.
   times the observables are constant.
 - ``SIS.I``: A list of ints where each entry is the total number of infected
   at the corresponding time in ``SIS.time``
+- ``SIS.infected_nodes``: A list of lists. Each entry is a list containing the node integers which were infected at the corresponding time.
+  at the corresponding time in ``SIS.time``
 - ``SIS.R0``: A list of floats where each entry is the basic
   reproduction number at the corresponding time in ``SIS.time``. The basic
   reproduction number is computed as

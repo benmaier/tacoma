@@ -56,6 +56,7 @@ class SIS
         size_t seed;
         bool verbose;
         bool prevent_disease_extinction;
+        bool save_infected_nodes;
         double sampling_dt;
 
         mt19937_64 generator;
@@ -66,6 +67,8 @@ class SIS
         vector < size_t > SI;
         vector < size_t > I;
 
+        vector < vector < size_t > > saved_infected_nodes;
+
         SIS(
             size_t _N,
             double _t_simulation,
@@ -74,6 +77,7 @@ class SIS
             size_t _number_of_initially_infected = 1,
             size_t _number_of_initially_vaccinated = 0,
             bool _prevent_disease_extinction = false,
+            bool _save_infected_nodes = false,
             double _sampling_dt = 0.0,
             size_t _seed = 0,
             bool _verbose = false
@@ -89,6 +93,7 @@ class SIS
             verbose = _verbose;
             seed = _seed;
             sampling_dt = _sampling_dt;
+            save_infected_nodes = _save_infected_nodes;
 
             mt19937_64 generator;
 
