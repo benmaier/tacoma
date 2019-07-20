@@ -454,7 +454,7 @@ def sample_a_function(t,y,time_points,sample_width=0):
             elif indices[0] == len(x):
                 this_index = -1
             else:
-                this_index = indices[0]
+                this_index = indices[0]-1
             new_y.append(y[this_index])
 
     return np.array(new_y)
