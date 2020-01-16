@@ -116,52 +116,56 @@ class SIS
             else
                 generator.seed(seed);
 
-
-            //check if number of infected and number of vaccinated does not
-            //exceed total node number
-            if (number_of_initially_vaccinated + number_of_initially_infected > N) 
-                throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
-
-            //initialize status vector of nodes and vector of infected
-            node_status = vector < size_t >(N,EPI::S);
-            infected = vector < size_t >();
-
-
-            vector < size_t > node_ints;
-            for(size_t n=0; n<N; n++)
+            if (not was_node_status_set_manually)
             {
-                node_ints.push_back(n);            
-            }
 
-            if (verbose) 
-            {
-                cout << "choosing " << number_of_initially_vaccinated
-                     << " vaccinated and " << number_of_initially_infected
-                     << " infected at random" << endl;
-            }
 
-            choose_random_unique(node_ints.begin(),
-                                 node_ints.end(),
-                                 number_of_initially_vaccinated + number_of_initially_infected,
-                                 generator,
-                                 randuni
-                                 );
+                //check if number of infected and number of vaccinated does not
+                //exceed total node number
+                if (number_of_initially_vaccinated + number_of_initially_infected > N) 
+                    throw length_error( "Number of infected and number of vaccinated may not exceed total population size" );
 
-            for(size_t node=0; node<number_of_initially_vaccinated; node++)
-            {
-                node_status[node_ints[node]] = EPI::R;
-            }
+                //initialize status vector of nodes and vector of infected
+                node_status = vector < size_t >(N,EPI::S);
+                infected = vector < size_t >();
 
-            for(size_t node = number_of_initially_vaccinated; node < number_of_initially_vaccinated + number_of_initially_infected; node++)
-            {
-                node_status[node_ints[node]] = EPI::I;
-                infected.push_back( node_ints[node] );
-            }
 
-            if (verbose)
-            {
-                cout << "infected set has size = " << infected.size() << endl;
-                print_infected();
+                vector < size_t > node_ints;
+                for(size_t n=0; n<N; n++)
+                {
+                    node_ints.push_back(n);            
+                }
+
+                if (verbose) 
+                {
+                    cout << "choosing " << number_of_initially_vaccinated
+                         << " vaccinated and " << number_of_initially_infected
+                         << " infected at random" << endl;
+                }
+
+                choose_random_unique(node_ints.begin(),
+                                     node_ints.end(),
+                                     number_of_initially_vaccinated + number_of_initially_infected,
+                                     generator,
+                                     randuni
+                                     );
+
+                for(size_t node=0; node<number_of_initially_vaccinated; node++)
+                {
+                    node_status[node_ints[node]] = EPI::R;
+                }
+
+                for(size_t node = number_of_initially_vaccinated; node < number_of_initially_vaccinated + number_of_initially_infected; node++)
+                {
+                    node_status[node_ints[node]] = EPI::I;
+                    infected.push_back( node_ints[node] );
+                }
+
+                if (verbose)
+                {
+                    cout << "infected set has size = " << infected.size() << endl;
+                    print_infected();
+                }
             }
         }
 
@@ -201,12 +205,35 @@ class SIS
             print_SI_edges();
         }
 
+        vector < size_t > get_node_status() 
+        {
+            return node_status;
+        }
+
+        void set_node_status(vector < size_t > new_node_status) 
+        {
+            if (new_node_status.size() != N)
+                throw length_error("The node status list length must equal the number of nodes N.");
+
+            node_status = new_node_status; //copy to internal list
+            was_node_status_set_manually = true;
+
+            infected.clear();
+            for(size_t i=0; i<N; ++i)
+            {
+                if (node_status[i] == EPI::I)
+                    infected.push_back(i);
+            }
+        }
+
     private:
         vector < size_t > infected;
         vector < size_t > node_status;
         vector < pair < size_t, size_t > > SI_edges;
         double mean_degree;
         vector < set < size_t > > * G;
+
+        bool was_node_status_set_manually = false;
 
         double next_sampling_time;
 

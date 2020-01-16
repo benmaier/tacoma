@@ -144,6 +144,7 @@ PYBIND11_MODULE(_tacoma, m)
             edge_trajectory_entry
             social_trajectory_entry
             edge_weight
+            EPI
     )pbdoc";
 
     m.def("flockwork_P_varying_rates",
@@ -1093,6 +1094,20 @@ PYBIND11_MODULE(_tacoma, m)
         .def(py::init<>())
         .def_readwrite("value", &edge_weight::value);
 
+    /*
+    py::class_<EPI>(m, "EPI",
+                            R"pbdoc(Helper class for internal usage. Maps the epidemic state of
+                            a node to an integer.)pbdoc")
+        .def(py::init<>())
+        .def_read("S", &EPI::S, "A node is susceptible to disease.")
+        .def_read("I", &EPI::I, "A node is infectious.")
+        .def_read("R", &EPI::R, "A node is recovered.")
+        .def_read("E", &EPI::E, "A node is exposed (infected but not infectious).")
+        .def_read("V", &EPI::V, R"pbdoc(A node is vaccinated (This means the same as ``R`` in 
+                                        most models, but in SIRS it implies that vaccinated nodes 
+                                        cannot have waning immunity).)pbdoc");
+    */
+
     py::class_<social_trajectory_entry>(m, "social_trajectory_entry",
                                         "Each :class:`_tacoma.social_trajectory_entry` ")
         .def(py::init<>())
@@ -1383,6 +1398,11 @@ PYBIND11_MODULE(_tacoma, m)
                     verbose : bool, default = False
                         Be talkative.
                 )pbdoc")
+        .def("set_node_status",&SIS::set_node_status,
+             R"pbdoc(Set the state of the epidemic as given by a list :obj:`list` of :obj:`int`.
+                     Needs to have the same lengths as the number of nodes :math:`N`.)pbdoc")
+        .def("get_node_status",&SIS::get_node_status,
+             R"pbdoc(Retrieve the current state of the epidemic as given by a list :obj:`list` of :obj:`int`. Will have the same lengths as the number of nodes :math:`N`, each entry `i` containing the status of node `i`.)pbdoc")
         .def_readwrite("time", &SIS::time, "A list containing the time points at which one or more of the observables changed.")
         .def_readwrite("R0", &SIS::R0, R"pbdoc(
                    A list containing the basic reproduction number defined as :math:`R_0(t) = \eta\left\langle k \right\rangle(t) / \rho`
