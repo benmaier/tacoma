@@ -165,6 +165,12 @@ void cluster_size_SIS::infection_event()
     // change node status of this node
     node_status[this_susceptible] = EPI::I;
     
+    // save the infection edge in observable
+    if(save_infection_events)
+    {
+      infection_events.push_back(SI_edges.at(this_susceptible_index));
+    }
+
     // add node to the covered nodes
     covered_nodes.insert(this_susceptible);
 

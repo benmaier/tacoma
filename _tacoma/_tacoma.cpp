@@ -1414,7 +1414,7 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("t_simulation", &SIS::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<cluster_size_SIS>(m, "cluster_size_SIS", R"pbdoc(Base class for the simulation of an SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_epidemics` to simulate and retrieve the simulation results. This simulation runs until all initially infected nodes recovered at least once, which is useful to find the epidemic threshold by measuring the impact of the seed(s). If you want to sample the standard observables, set ``sampling_dt>=0.0``.)pbdoc")
-        .def(py::init<size_t, double, double, double, size_t, size_t, double, size_t, bool>(),
+        .def(py::init<size_t, double, double, double, size_t, size_t, double, size_t, bool, bool>(),
              py::arg("N"),
              py::arg("t_simulation"),
              py::arg("infection_rate"),
@@ -1423,6 +1423,7 @@ PYBIND11_MODULE(_tacoma, m)
              py::arg("number_of_initially_vaccinated") = 0,
              py::arg("sampling_dt") = -1.0,
              py::arg("seed") = 0,
+             py::arg("save_infection_events") = false,
              py::arg("verbose") = false,
              R"pbdoc(
                     Parameters
@@ -1450,6 +1451,8 @@ PYBIND11_MODULE(_tacoma, m)
                         If it is 0.0, sample at every change.
                     seed : int, default = 0
                         Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    save_infection_events: bool, default = False
+                        If true, the edge along which each infection event occurs is saved in the variable `infection_events`.
                     verbose : bool, default = False
                         Be talkative.
                 )pbdoc")
@@ -1464,6 +1467,7 @@ PYBIND11_MODULE(_tacoma, m)
                    )pbdoc")
         .def_readwrite("SI", &cluster_size_SIS::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
         .def_readwrite("I", &cluster_size_SIS::I, "A list containing the number of infected at time :math:`t`.")
+        .def_readwrite("infection_events", &cluster_size_SIS::infection_events, "A list containing the edges along which each infection event took place, in the form (infection_source, susceptible).")
         .def_readwrite("t_simulation", &cluster_size_SIS::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<coverage_SIS>(m, "coverage_SIS", R"pbdoc(Base class for the simulation of an SIS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIS` to simulate and retrieve the simulation results. This simulation runs until a certain amount of nodes have been infected at least once, which is useful to fifind the epidemic threshold and thus, only the lifetime of the process is measured. If you want to sample the standard observables, set ``sampling_dt>=0.0``.)pbdoc")

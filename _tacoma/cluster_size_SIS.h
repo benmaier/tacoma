@@ -54,6 +54,7 @@ class cluster_size_SIS
         size_t number_of_initially_infected;
         size_t number_of_initially_vaccinated;
         size_t seed;
+        bool save_infection_events;
         bool verbose;
         double sampling_dt;
         double lifetime;
@@ -69,6 +70,7 @@ class cluster_size_SIS
         vector < double > R0;
         vector < size_t > SI;
         vector < size_t > I;
+        vector < pair <size_t, size_t>> infection_events;
 
         cluster_size_SIS(
             size_t _N,
@@ -79,6 +81,7 @@ class cluster_size_SIS
             size_t _number_of_initially_vaccinated = 0,
             double _sampling_dt = 0.0,
             size_t _seed = 0,
+            bool _save_infection_events = false,
             bool _verbose = false
         )
         {
@@ -88,6 +91,7 @@ class cluster_size_SIS
             recovery_rate = _recovery_rate;
             number_of_initially_vaccinated = _number_of_initially_vaccinated;
             number_of_initially_infected = _number_of_initially_infected;
+            save_infection_events = _save_infection_events;
             verbose = _verbose;
             seed = _seed;
             sampling_dt = _sampling_dt;
@@ -106,6 +110,7 @@ class cluster_size_SIS
             R0.clear();
             SI.clear();
             I.clear();
+            infection_events.clear();
             covered_nodes.clear();
             initially_infected.clear();
             lifetime = -1;
