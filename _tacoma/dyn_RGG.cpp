@@ -40,6 +40,10 @@
 #include <ctime>
 #include <tuple>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 using namespace std;
 
 void dyn_RGG_update_positions(vector < pair < double, double > > &pos,

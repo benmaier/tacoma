@@ -231,7 +231,8 @@ edge_changes
                             tau,
                             event,
                             generator,
-                            uni_distribution);
+                            uni_distribution
+                            );
         t = t + tau;
 
         if (t<t_run_total)
