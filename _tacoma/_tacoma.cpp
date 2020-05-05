@@ -57,6 +57,7 @@
 #include "SIS_node_based.h"
 #include "coverage_SIS.h"
 #include "cluster_size_SIS.h"
+#include "SEIR.h"
 #include "SIR.h"
 #include "SI.h"
 #include "SIRS.h"
