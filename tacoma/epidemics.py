@@ -211,7 +211,7 @@ class SIR_weighted:
         self.recovery_rate = recovery_rate
         self.infected = np.random.choice(N,replace=False,size=(number_of_initially_infected,)).tolist()
         self.recovered = []
-        self.node_status = np.array([ __EPI_S for n in range(N) ],dtype=int)
+        self.node_status = np.array([ _EPI_S for n in range(N) ],dtype=int)
         for n in self.infected:
             self.node_status[n] = _EPI_I 
 
@@ -305,9 +305,9 @@ class SIS_weighted:
         self.infection_rate = infection_rate
         self.recovery_rate = recovery_rate
         self.infected = np.random.choice(N,replace=False,size=(number_of_initially_infected,)).tolist()
-        self.node_status = np.array([ EPI_S for n in range(N) ],dtype=int)
+        self.node_status = np.array([ _EPI_S for n in range(N) ],dtype=int)
         for n in self.infected:
-            self.node_status[n] = EPI_I 
+            self.node_status[n] = _EPI_I 
 
 
         self.force_of_infection_on_node = np.array([ 0.0 for n in range(N) ])
@@ -315,9 +315,9 @@ class SIS_weighted:
         for u, v, weight in weighted_edge_tuples:
             self.graph[u][v] = weight
             self.graph[v][u] = weight
-            if self.node_status[u] == EPI_S and self.node_status[v] == EPI_I:
+            if self.node_status[u] == _EPI_S and self.node_status[v] == _EPI_I:
                 self.force_of_infection_on_node[u] += weight
-            elif self.node_status[v] == EPI_S and self.node_status[u] == EPI_I:
+            elif self.node_status[v] == _EPI_S and self.node_status[u] == _EPI_I:
                 self.force_of_infection_on_node[v] += weight
 
     def evaluate_rates(self):
@@ -327,27 +327,27 @@ class SIS_weighted:
 
     def recovery_event(self):
         recovering_node = self.infected.pop( np.random.choice(len(self.infected)) )
-        self.node_status[recovering_node] = EPI_S
+        self.node_status[recovering_node] = _EPI_S
 
         self.force_of_infection_on_node[recovering_node] = 0.0
         
         for neigh, weight in self.graph[recovering_node].items():
-            if self.node_status[neigh] == EPI_S:
+            if self.node_status[neigh] == _EPI_S:
                 self.force_of_infection_on_node[neigh] -= weight
                 if self.force_of_infection_on_node[neigh] < 0.0:
                     self.force_of_infection_on_node[neigh] = 0.0
-            elif self.node_status[neigh] == EPI_I:
+            elif self.node_status[neigh] == _EPI_I:
                 self.force_of_infection_on_node[recovering_node] += weight
 
     def infection_event(self):
         infecting_node = np.random.choice(self.N, 
                                           p=self.force_of_infection_on_node/self.force_of_infection_on_node.sum()
                                          )
-        self.node_status[infecting_node] = EPI_I
+        self.node_status[infecting_node] = _EPI_I
         self.force_of_infection_on_node[infecting_node] = 0.0
 
         for neigh, weight in self.graph[infecting_node].items():
-            if self.node_status[neigh] == EPI_S:
+            if self.node_status[neigh] == _EPI_S:
                 self.force_of_infection_on_node[neigh] += weight
 
         self.infected.append(infecting_node)
