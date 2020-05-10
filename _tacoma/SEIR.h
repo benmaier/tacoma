@@ -187,7 +187,7 @@ class SEIR
 
         bool simulation_ended() 
         {
-            return (recovered.size() == N);
+            return ((infected.size() == 0) and (exposed.size() == 0));
         };
 
         void get_rates_and_Lambda(vector < double > &rates,
