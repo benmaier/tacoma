@@ -1673,7 +1673,7 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("t_simulation", &SI::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<SIR>(m, "SIR", "Base class for the simulation of an SIR compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIR` to simulate and retrieve the simulation results.")
-        .def(py::init<size_t, double, double, double, size_t, size_t, double, size_t, bool>(),
+        .def(py::init<size_t, double, double, double, size_t, size_t, double, size_t, bool, bool, bool>(),
              py::arg("N"),
              py::arg("t_simulation"),
              py::arg("infection_rate"),
@@ -1682,6 +1682,8 @@ PYBIND11_MODULE(_tacoma, m)
              py::arg("number_of_initially_vaccinated") = 0,
              py::arg("sampling_dt") = 0.0,
              py::arg("seed") = 0,
+             py::arg("save_infection_events") = false,
+             py::arg("stop_simulation_when_all_initially_infected_recovered") = false,
              py::arg("verbose") = false,
              R"pbdoc(
                     Parameters
@@ -1707,6 +1709,10 @@ PYBIND11_MODULE(_tacoma, m)
                         If this is ``>0.0``, save observables roughly every sampling_dt instead of on every change.
                     seed : int, default = 0
                         Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    save_infection_events: bool, default = False
+                        If true, the edge along which each infection event occurs is saved in the variable `infection_events`. Will be set to `True` automatically if `stop_simulation_when_all_initially_infected_recovered` is True.
+                    stop_simulation_when_all_initially_infected_recovered: bool, default = False
+                        If true, the simulation will be stopped as soon as all initially infected have recovered. This can be used to measure the impact a single individual has. If set to true, `save_infection_events` will be set to `True`, as well, such that the infection trees can be inferred.
                     verbose : bool, default = False
                         Be talkative.
                 )pbdoc")
@@ -1718,6 +1724,8 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("SI", &SIR::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
         .def_readwrite("I", &SIR::I, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("R", &SIR::R, "A list containing the number of recovered at time :math:`t`.")
+        .def_readwrite("infection_events", &SIR::infection_events, "A list containing the edges along which each infection event took place, in the form (infection_source, susceptible).")
+        .def_readwrite("initially_infected", &SIR::initially_infected, "A list containing the nodes that were infected initially")
         .def_readwrite("t_simulation", &SIR::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<SIRS>(m, "SIRS", "Base class for the simulation of an SIRS compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIRS` to simulate and retrieve the simulation results.")
@@ -1830,13 +1838,14 @@ PYBIND11_MODULE(_tacoma, m)
                 Base class for the simulation of a simple Flockwork-P model. Pass this to :func:`tacoma.api.gillespie_epidemics` or
                 :func:`tacoma.api.markov_epidemics`.
             )pbdoc")
-        .def(py::init< vector < pair < size_t, size_t > > , size_t, double, double, double, bool, size_t, bool>(),
+        .def(py::init< vector < pair < size_t, size_t > > , size_t, double, double, double, bool, bool, size_t, bool>(),
              py::arg("E"),
              py::arg("N"),
              py::arg("gamma"),
              py::arg("P"),
              py::arg("t0") = 0.0,
              py::arg("save_temporal_network") = false,
+             py::arg("save_aggregated_network") = false,
              py::arg("seed") = 0,
              py::arg("verbose") = false,
              R"pbdoc(
@@ -1855,6 +1864,9 @@ PYBIND11_MODULE(_tacoma, m)
                     save_temporal_network : bool, default: False
                         If this is `True`, the changes are saved in an instance of 
                         :func:`_tacoma.edge_changes` (in the attribute `edge_changes`.
+                    save_aggregated_network : bool, default: False
+                        If this is `True`, the aggregated network is computed on the fly.
+                        After the simulation, access it with ``finish_and_get_aggregated_network``
                     seed : int, default = 0
                         Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
                         However, the generator will be rewritten 
@@ -1866,6 +1878,11 @@ PYBIND11_MODULE(_tacoma, m)
              R"pbdoc(Reset the state of the network to a certain graph (:obj:`list` of :obj:`set` of :obj:`int`))pbdoc")
         .def("get_current_edgelist",&FlockworkPModel::get_current_edgelist,
              R"pbdoc(Get an edge list of the current network state.)pbdoc")
+        .def("finish_and_get_aggregated_network",&FlockworkPModel::finish_and_get_aggregated_network,
+             R"pbdoc(Get a list, each entry contains a pair of ints (the edge) and a float, corresponding to the total
+                     duration this edge was active. This function has to be called because the final time of the
+                     experiment `tmax` is unknown to the model object.)pbdoc"
+             )
         .def("simulate",&FlockworkPModel::simulate,
              py::arg("t_run_total"), 
              py::arg("reset") = true,

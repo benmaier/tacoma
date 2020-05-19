@@ -54,7 +54,9 @@ class SIR
         size_t number_of_initially_infected;
         size_t number_of_initially_vaccinated;
         size_t seed;
+        bool save_infection_events;
         bool verbose;
+        bool stop_simulation_when_all_initially_infected_recovered;
         double sampling_dt;
 
         mt19937_64 generator;
@@ -65,6 +67,8 @@ class SIR
         vector < size_t > SI;
         vector < size_t > I;
         vector < size_t > R;
+        vector < pair <size_t, size_t>> infection_events;
+        vector < size_t > initially_infected;
 
         SIR(
             size_t _N,
@@ -75,6 +79,8 @@ class SIR
             size_t _number_of_initially_vaccinated = 0,
             double _sampling_dt = 0.0,
             size_t _seed = 0,
+            bool _save_infection_events = false,
+            bool _stop_simulation_when_all_initially_infected_recovered = false,
             bool _verbose = false
         )
         {
@@ -84,6 +90,8 @@ class SIR
             recovery_rate = _recovery_rate;
             number_of_initially_vaccinated = _number_of_initially_vaccinated;
             number_of_initially_infected = _number_of_initially_infected;
+            save_infection_events = _save_infection_events || _stop_simulation_when_all_initially_infected_recovered;
+            stop_simulation_when_all_initially_infected_recovered = _stop_simulation_when_all_initially_infected_recovered;
             verbose = _verbose;
             seed = _seed;
             sampling_dt = _sampling_dt;
@@ -104,6 +112,8 @@ class SIR
             SI.clear();
             I.clear();
             R.clear();
+            infection_events.clear();
+            initially_infected.clear();
 
             // seed engine
             if (seed == 0)
@@ -152,6 +162,11 @@ class SIR
                 infected.push_back( node_ints[node] );
             }
 
+            for(auto const &inf: infected)
+            {
+                initially_infected.push_back(inf);
+            }
+
             if (verbose)
             {
                 cout << "infected set has size = " << infected.size() << endl;
@@ -166,7 +181,15 @@ class SIR
 
         bool simulation_ended() 
         {
-            return (infected.size() == 0);
+            if (stop_simulation_when_all_initially_infected_recovered)
+            {
+                bool stop = true;
+                for(auto const &i: initially_infected)
+                    stop = (stop) and (node_status[i] != EPI::I);
+                return stop;
+            }
+            else
+                return (infected.size() == 0);
         };
 
         void get_rates_and_Lambda(vector < double > &rates,

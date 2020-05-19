@@ -136,6 +136,9 @@ void SIS::make_event(
                 double t
                )
 {
+
+    if (verbose)
+        cout << "SIS: attempting to do event of type " << event << endl;
     if (event == 0)
         infection_event();
     else if (event == 1)
@@ -144,6 +147,13 @@ void SIS::make_event(
         throw length_error("SIS: chose event larger than rate vector which should not happen.");
 
     update_observables(t);
+
+    if (verbose)
+    {
+        print_infected();
+        print_SI_edges();
+    }
+
 }
 
 void SIS::infection_event()
@@ -193,14 +203,23 @@ void SIS::recovery_event()
     size_t this_infected_index = random_infected(generator);
     auto it_infected = infected.begin() + this_infected_index;
 
+    if (verbose)
+        cout << "this_infected_index: " << this_infected_index << endl;
+
     // get the node id of this infected about to be recovered
     size_t this_infected = *(it_infected);
+
+    if (verbose)
+        cout << "this_infected: " << this_infected << endl;
 
     // delete this from the infected vector
     infected.erase( it_infected );
 
     // change node status of this node
     node_status[this_infected] = EPI::S;
+
+    if (verbose)
+        cout << "node_status[" << this_infected << "]: " << node_status[this_infected] << endl;
 
     // erase all edges in the SI set which this infected is part of
     SI_edges.erase( 

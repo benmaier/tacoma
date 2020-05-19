@@ -180,6 +180,12 @@ void SIR::infection_event()
     // change node status of this node
     node_status[this_susceptible] = EPI::I;
 
+    // save the infection edge in observable
+    if(save_infection_events)
+    {
+      infection_events.push_back(SI_edges.at(this_susceptible_index));
+    }
+
     // erase all edges in the SI set where this susceptible is part of
     SI_edges.erase( 
             remove_if( 

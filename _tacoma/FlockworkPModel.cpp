@@ -90,6 +90,41 @@ void
     }
 }
 
+void FlockworkPModel::update_aggregated_network(        
+            double const &t,
+            vector < pair < size_t, size_t > > &e_in,
+            vector < pair < size_t, size_t > > &e_out
+        )
+{
+    if (verbose)
+        cout << "===================== updating at time t " << endl;
+
+    for(auto const &edge: e_out)
+    {
+        if (verbose)
+            cout << "edge out: " << edge.first << " " << edge.second << endl;
+        double ti = edge_activation_time[edge];
+
+        if (verbose)
+            cout << "edge was initialized at t = " << ti << endl;
+        double duration = t - ti;
+
+        aggregated_network[edge].value += duration;
+        if (verbose)
+            cout << "added to aggregated network" << endl;
+            cout << "aggregated_network[" << edge.first << " " << edge.second << "].value =" << aggregated_network[edge].value << endl;
+    }
+
+    for(auto const &edge: e_in)
+    {
+        if (verbose)
+            cout << "edge in: " << edge.first << " " << edge.second << endl;
+       edge_activation_time[edge] = t;
+        if (verbose)
+            cout << "added activation time" << endl;      
+    }
+}
+
 
 void FlockworkPModel::get_rates_and_Lambda(
                     vector < double > &_rates,
@@ -109,6 +144,9 @@ void FlockworkPModel::make_event(
                )
 {
 
+    if (verbose)
+        cout << "attempting to make event " << event << endl;
+
     e_in.clear();
     e_out.clear();
 
@@ -116,6 +154,23 @@ void FlockworkPModel::make_event(
         rewire(1.0,e_in,e_out);
     else if (event == 1)
         rewire(0.0,e_in,e_out);
+
+    if (verbose)
+        cout << "rewired." << endl;
+
+    if ( (e_in.size() > 0) or (e_out.size() > 0) )
+    {
+        if (save_aggregated_network)
+            update_aggregated_network(t, e_in, e_out);
+        if (save_temporal_network)
+        {
+            edg_chg.t.push_back(t);
+            edg_chg.edges_in.push_back(e_in);
+            edg_chg.edges_out.push_back(e_out);
+        }
+
+    }
+
 }
 
 void FlockworkPModel::simulate(
@@ -129,7 +184,8 @@ void FlockworkPModel::simulate(
 
     double t = t0;
 
-    edg_chg.t0 = t0;
+    if (save_network)
+        edg_chg.t0 = t0;
 
 
 
@@ -148,11 +204,17 @@ void FlockworkPModel::simulate(
             
            rewire(P,e_in,e_out);
 
-           if (save_network)
+           if ( (e_in.size() > 0) or (e_out.size() > 0) )
            {
-               edg_chg.t.push_back(t);
-               edg_chg.edges_in.push_back(e_in);
-               edg_chg.edges_out.push_back(e_out);
+               if (save_network)
+               {
+                   edg_chg.t.push_back(t);
+                   edg_chg.edges_in.push_back(e_in);
+                   edg_chg.edges_out.push_back(e_out);
+               }
+
+                if (save_aggregated_network)
+                    update_aggregated_network(t, e_in, e_out);
            }
        }
     }
