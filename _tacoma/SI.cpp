@@ -134,14 +134,14 @@ void SI::make_event(
                )
 {
     if (event == 0)
-        infection_event();
+        infection_event(t);
     else
         throw length_error("SI: chose event larger than rate vector which should not happen.");
 
     update_observables(t);
 }
 
-void SI::infection_event()
+void SI::infection_event(double const &t)
 {
     // initialize uniform integer random distribution
     uniform_int_distribution < size_t > random_susceptible(0,SI_edges.size()-1);
@@ -161,7 +161,7 @@ void SI::infection_event()
     // save the infection edge in observable
     if(save_infection_events)
     {
-      infection_events.push_back(SI_edges.at(this_susceptible_index));
+      infection_events.push_back(make_pair(t, SI_edges.at(this_susceptible_index)));
     }
 
     // erase all edges in the SI set where this susceptible is part of

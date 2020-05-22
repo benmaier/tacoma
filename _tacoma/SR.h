@@ -67,7 +67,7 @@ class SR
         vector < size_t > SI;
         vector < size_t > I;
         vector < size_t > R;
-        vector < pair <size_t, size_t>> infection_events;
+        vector < pair < double, pair <size_t, size_t> > > infection_events;
         vector < size_t > initially_infected;
 
         SR(
@@ -229,7 +229,7 @@ class SR
 
         vector < double > rates;
 
-        void infection_event();
+        void infection_event(double const &t);
         void recovery_event(ssize_t this_infected_index = -1);
 
         void print_recovered()

@@ -143,7 +143,7 @@ void SR::make_event(
                )
 {
     if (event == 0)
-        infection_event();
+        infection_event(t);
     else if (event == 1)
         recovery_event();
     else
@@ -152,7 +152,7 @@ void SR::make_event(
     update_observables(t);
 }
 
-void SR::infection_event()
+void SR::infection_event(double const &t)
 {
     // initialize uniform integer random distribution
     uniform_int_distribution < size_t > random_susceptible(0,SI_edges.size()-1);
@@ -183,7 +183,7 @@ void SR::infection_event()
     // save the infection edge in observable
     if(save_infection_events)
     {
-      infection_events.push_back(SI_edges.at(this_susceptible_index));
+      infection_events.push_back(make_pair(t,SI_edges.at(this_susceptible_index)));
     }
 
     // erase all edges in the SI set where this susceptible is part of

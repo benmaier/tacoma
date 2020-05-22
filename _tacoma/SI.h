@@ -63,7 +63,7 @@ class SI
         vector < double > time;
         vector < size_t > _SI;
         vector < size_t > I;
-        vector < pair <size_t, size_t>> infection_events;
+        vector < pair < double, pair <size_t, size_t > > > infection_events;
 
         SI(
             size_t _N,
@@ -204,7 +204,7 @@ class SI
         vector < double > rates;
         double next_sampling_time;
 
-        void infection_event();
+        void infection_event(double const &t);
 
         void print_infected()
         {
