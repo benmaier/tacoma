@@ -29,6 +29,7 @@ social_trajectory_entry = _tc.social_trajectory_entry
 SI = _tc.SI
 SIS = _tc.SIS
 SIR = _tc.SIR
+SR = _tc.SR
 SIRS = _tc.SIRS
 node_based_SIS = _tc.node_based_SIS
 eSIS = _tc.eSIS
@@ -423,6 +424,8 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
             _tc.gillespie_SIS_on_edge_changes(temporal_network, epidemic_object, verbose)
         elif type(epidemic_object) == SIR:
             _tc.gillespie_SIR_on_edge_changes(temporal_network, epidemic_object, verbose)
+        elif type(epidemic_object) == SR:
+            _tc.gillespie_SR_on_edge_changes(temporal_network, epidemic_object, verbose)
         elif type(epidemic_object) == SIRS:
             _tc.gillespie_SIRS_on_edge_changes(temporal_network, epidemic_object, verbose)
         elif type(epidemic_object) == node_based_SIS:
@@ -443,6 +446,8 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
             _tc.gillespie_SIS_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
         elif type(epidemic_object) == SIR:
             _tc.gillespie_SIR_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
+        elif type(epidemic_object) == SR:
+            _tc.gillespie_SR_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
         elif type(epidemic_object) == SIRS:
             _tc.gillespie_SIRS_on_edge_lists(temporal_network, epidemic_object, is_static, verbose)
         elif type(epidemic_object) == node_based_SIS:
@@ -463,6 +468,8 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
             _tc.gillespie_SIS_on_EdgeActivityModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
         elif type(epidemic_object) == SIR:
             _tc.gillespie_SIR_on_EdgeActivityModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
+        elif type(epidemic_object) == SR:
+            _tc.gillespie_SR_on_EdgeActivityModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
         elif type(epidemic_object) == SIRS:
             _tc.gillespie_SIRS_on_EdgeActivityModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
         elif type(epidemic_object) == node_based_SIS:
@@ -482,6 +489,8 @@ def gillespie_epidemics(temporal_network_or_model, epidemic_object, is_static=Fa
         elif type(epidemic_object) == SIS:
             _tc.gillespie_SIS_on_FlockworkPModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
         elif type(epidemic_object) == SIR:
+            _tc.gillespie_SIR_on_FlockworkPModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
+        elif type(epidemic_object) == SR:
             _tc.gillespie_SIR_on_FlockworkPModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)
         elif type(epidemic_object) == SIRS:
             _tc.gillespie_SIRS_on_FlockworkPModel(temporal_network, epidemic_object, reset_simulation_objects, verbose)

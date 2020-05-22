@@ -49,6 +49,7 @@ ext_modules = [
             '_tacoma/SIS.cpp', 
             '_tacoma/SIS_node_based.cpp', 
             '_tacoma/SIR.cpp',             
+            '_tacoma/SR.cpp',             
             '_tacoma/SIRS.cpp',
             '_tacoma/SI.cpp', 
             '_tacoma/ZSBB_model.cpp', 

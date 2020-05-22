@@ -60,6 +60,7 @@
 #include "SEIR.h"
 #include "SIR.h"
 #include "SI.h"
+#include "SR.h"
 #include "SIRS.h"
 #include "dyn_gillespie.h"
 #include "model_gillespie.h"
@@ -102,6 +103,7 @@ PYBIND11_MODULE(_tacoma, m)
             SI
             SIS
             SIR
+            SR
             SIRS
             node_based_SIS
             eSIS
@@ -790,6 +792,19 @@ PYBIND11_MODULE(_tacoma, m)
           py::arg("SIR"),
           py::arg("verbose") = false);
 
+    m.def("gillespie_SR_on_edge_lists", &gillespie_on_edge_lists<SR>,
+          "Perform a Gillespie SR simulation on edge lists.",
+          py::arg("edge_lists"),
+          py::arg("SR"),
+          py::arg("is_static") = false,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_SR_on_edge_changes", &gillespie_on_edge_changes<SR>,
+          "Perform a Gillespie SR simulation on edge changes.",
+          py::arg("edge_changes"),
+          py::arg("SR"),
+          py::arg("verbose") = false);
+
     m.def("gillespie_SIRS_on_edge_lists", &gillespie_on_edge_lists<SIRS>,
           "Perform a Gillespie SIRS simulation on edge lists.",
           py::arg("edge_lists"),
@@ -856,6 +871,13 @@ PYBIND11_MODULE(_tacoma, m)
           "Perform a Gillespie SIR simulation on the edge activity model.",
           py::arg("edge_activity_model"),
           py::arg("SIR"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_SR_on_EdgeActivityModel", &gillespie_on_model<EdgeActivityModel,SR>,
+          "Perform a Gillespie SR simulation on the edge activity model.",
+          py::arg("edge_activity_model"),
+          py::arg("SR"),
           py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
@@ -927,6 +949,13 @@ PYBIND11_MODULE(_tacoma, m)
           "Perform a Gillespie SIR simulation on the Flockwork P-model.",
           py::arg("model"),
           py::arg("SIR"),
+          py::arg("reset_simulation_objects") = true,
+          py::arg("verbose") = false);
+
+    m.def("gillespie_SR_on_FlockworkPModel", &gillespie_on_model<FlockworkPModel,SR>,
+          "Perform a Gillespie SR simulation on the Flockwork P-model.",
+          py::arg("model"),
+          py::arg("SR"),
           py::arg("reset_simulation_objects") = true,
           py::arg("verbose") = false);
 
@@ -1671,6 +1700,62 @@ PYBIND11_MODULE(_tacoma, m)
         .def_readwrite("I", &SI::I, "A list containing the number of infected at time :math:`t`.")
         .def_readwrite("infection_events", &SI::infection_events, "A list containing the edges along which each infection event took place, in the form (infection_source, susceptible).")
         .def_readwrite("t_simulation", &SI::t_simulation, "Absolute run time of the simulation.");
+
+    py::class_<SR>(m, "SR", R"pbdoc(Base class for the simulation of an SR compartmental infection model on a temporal network (an SIR model where only initially infected have non-zero infection rate and non-zero recovery rate. All other nodes have zero infection rate and infinite recovery rate. This model can be used to measure the number of secondary infections of a single infectious seed, without higher-order infections. Pass this to :func:`tacoma.api.gillespie_SR` to simulate and retrieve the simulation results.)pbdoc")
+        .def(py::init<size_t, double, double, double, size_t, size_t, double, size_t, bool, bool, bool>(),
+             py::arg("N"),
+             py::arg("t_simulation"),
+             py::arg("infection_rate"),
+             py::arg("recovery_rate"),
+             py::arg("number_of_initially_infected") = 1,
+             py::arg("number_of_initially_vaccinated") = 0,
+             py::arg("sampling_dt") = 0.0,
+             py::arg("seed") = 0,
+             py::arg("save_infection_events") = false,
+             py::arg("stop_simulation_when_all_initially_infected_recovered") = false,
+             py::arg("verbose") = false,
+             R"pbdoc(
+                    Parameters
+                    ----------
+                    N : int
+                        Number of nodes in the temporal network.
+                    t_simulation : float
+                        Maximum time for the simulation to run. Can possibly be greater than the maximum time of the temporal
+                        network in which case the temporal network is looped.
+                    infection_rate : float
+                        Infection rate per :math:`SI`-link (expected number of reaction events :math:`SI\rightarrow II`
+                        for a single :math:`SI`-link per dimension of time).
+                    recovery_rate : float
+                        Recovery rate per infected (expected number of reaction events :math:`I\rightarrow R`
+                        for a single infected node per dimension of time).
+                    number_of_initially_infected : int, default = 1
+                        Number of nodes which will be in the infected compartment at :math:`t = t_0`. Note that the default
+                        value 1 is not an ideal initial value as fluctuations may lead to a quick end of the simulation
+                        skewing the outcome. I generally recommend to use a number of the order of :math:`N/2`.
+                    number_of_initially_vaccinated : int, default = 0
+                        Number of nodes which will be in the recovered compartment at :math:`t = t_0`.
+                    sampling_dt : float, default = 0.0
+                        If this is ``>0.0``, save observables roughly every sampling_dt instead of on every change.
+                    seed : int, default = 0
+                        Seed for RNG initialization. If this is 0, the seed will be initialized randomly.
+                    save_infection_events: bool, default = False
+                        If true, the edge along which each infection event occurs is saved in the variable `infection_events`. Will be set to `True` automatically if `stop_simulation_when_all_initially_infected_recovered` is True.
+                    stop_simulation_when_all_initially_infected_recovered: bool, default = False
+                        If true, the simulation will be stopped as soon as all initially infected have recovered. This can be used to measure the impact a single individual has. If set to true, `save_infection_events` will be set to `True`, as well, such that the infection trees can be inferred.
+                    verbose : bool, default = False
+                        Be talkative.
+                )pbdoc")
+        .def_readwrite("time", &SR::time, "A list containing the time points at which one or more of the observables changed.")
+        .def_readwrite("R0", &SR::R0, R"pbdoc(
+                   A list containing the basic reproduction number defined as :math:`R_0(t) = \eta\left\langle k \right\rangle(t) / \rho`
+                   where :math:`\eta` is the infection rate per link and :math:`\rho` is the recovery rate per node.
+                   )pbdoc")
+        .def_readwrite("SI", &SR::SI, "A list containing the number of :math:`SI`-links at time :math:`t`.")
+        .def_readwrite("I", &SR::I, "A list containing the number of infected at time :math:`t`.")
+        .def_readwrite("R", &SR::R, "A list containing the number of recovered at time :math:`t`.")
+        .def_readwrite("infection_events", &SR::infection_events, "A list containing the edges along which each infection event took place, in the form (infection_source, susceptible).")
+        .def_readwrite("initially_infected", &SR::initially_infected, "A list containing the nodes that were infected initially")
+        .def_readwrite("t_simulation", &SR::t_simulation, "Absolute run time of the simulation.");
 
     py::class_<SIR>(m, "SIR", "Base class for the simulation of an SIR compartmental infection model on a temporal network. Pass this to :func:`tacoma.api.gillespie_SIR` to simulate and retrieve the simulation results.")
         .def(py::init<size_t, double, double, double, size_t, size_t, double, size_t, bool, bool, bool>(),
